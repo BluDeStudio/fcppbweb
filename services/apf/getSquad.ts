@@ -67,10 +67,9 @@ export async function getSquad({
   const players:
     SquadPlayer[] = [];
 
-  let squadTable:
-    cheerio.Cheerio<
-      cheerio.Element
-    > | null = null;
+  let squadTable: ReturnType<
+    typeof $
+  > | null = null;
 
   $("table").each(
     (_, tableElement) => {
@@ -120,8 +119,12 @@ export async function getSquad({
     return [];
   }
 
+  const table = squadTable as ReturnType<
+    typeof $
+  >;
+
   const headerCells =
-    squadTable
+    table
       .find("thead th")
       .toArray()
       .map(
@@ -199,7 +202,7 @@ export async function getSquad({
       6,
     );
 
-  squadTable
+  table
     .find("tbody tr")
     .each(
       (_, rowElement) => {

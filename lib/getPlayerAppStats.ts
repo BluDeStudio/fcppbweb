@@ -409,7 +409,7 @@ export async function getPlayerAppStats(
   }
 
   const player =
-    playerData as PlayerRow;
+    playerData as unknown as PlayerRow;
 
   /*
    * ========================================
@@ -589,7 +589,7 @@ export async function getPlayerAppStats(
     (
       periodsResponse.data ??
       []
-    ) as PeriodRow[];
+    ) as unknown as PeriodRow[];
 
   const activePeriod =
     periods.find(

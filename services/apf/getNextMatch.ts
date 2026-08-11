@@ -87,6 +87,7 @@ export async function getNextMatch({
       venue: "",
       homeTeam,
       awayTeam,
+      competition: competitionSlug,
     };
   });
 
