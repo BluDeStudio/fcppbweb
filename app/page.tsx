@@ -1,69 +1,436 @@
-import Image from "next/image";
+import { ClubStory } from "@/components/home/ClubStory";
+import { HomeHighlights } from "@/components/home/HomeHighlights";
+import { MatchCenter } from "@/components/home/MatchCenter";
+import { LeagueTable } from "@/components/home/LeagueTable";
+import { Squad } from "@/components/home/Squad";
+import { Results } from "@/components/home/Results";
+import { Partners } from "@/components/home/Partners";
 
-export default function Home() {
+import { AnimatedLogo } from "@/components/ui/AnimatedLogo/AnimatedLogo";
+
+import { clubConfig } from "@/config/club";
+
+import { getLeagueTable } from "@/services/apf/getLeagueTable";
+import { getMatchResults } from "@/services/apf/getMatchResults";
+import { getNextMatch } from "@/services/apf/getNextMatch";
+import { getTopScorer } from "@/services/apf/getTopScorer";
+import { getSquad } from "@/services/apf/getSquad";
+
+import { testSupabaseConnection } from "@/lib/testSupabase";
+
+import type { LeagueRow } from "@/types/league";
+import type { MatchResult } from "@/types/match";
+import type { NextMatch } from "@/types/nextMatch";
+
+import type {
+  SquadPlayer,
+  TopScorer,
+} from "@/types/player";
+
+export default async function HomePage() {
+  /*
+   * ========================================
+   * TEST SUPABASE
+   * ========================================
+   */
+
+  await testSupabaseConnection();
+
+  const aTeam =
+    clubConfig.teams.aTeam;
+
+  const bTeam =
+    clubConfig.teams.bTeam;
+
+  /*
+   * ========================================
+   * DATA
+   * ========================================
+   */
+
+  let aLeagueTable: LeagueRow[] = [];
+  let bLeagueTable: LeagueRow[] = [];
+
+  let aMatches: MatchResult[] = [];
+  let bMatches: MatchResult[] = [];
+
+  let aNextMatch: NextMatch | null =
+    null;
+
+  let bNextMatch: NextMatch | null =
+    null;
+
+  let aTopScorer: TopScorer | null =
+    null;
+
+  let bTopScorer: TopScorer | null =
+    null;
+
+  let aPlayers: SquadPlayer[] = [];
+  let bPlayers: SquadPlayer[] = [];
+
+  /*
+   * ========================================
+   * TABULKY
+   * ========================================
+   */
+
+  try {
+    [
+      aLeagueTable,
+      bLeagueTable,
+    ] = await Promise.all([
+      getLeagueTable({
+        competitionId:
+          aTeam.competition.id,
+
+        competitionSlug:
+          aTeam.competition.slug,
+
+        teamName:
+          aTeam.teamName,
+      }),
+
+      getLeagueTable({
+        competitionId:
+          bTeam.competition.id,
+
+        competitionSlug:
+          bTeam.competition.slug,
+
+        teamName:
+          bTeam.teamName,
+      }),
+    ]);
+  } catch (error) {
+    console.error(
+      "Chyba při načítání tabulek APF:",
+      error,
+    );
+  }
+
+  /*
+   * ========================================
+   * VÝSLEDKY
+   * ========================================
+   */
+
+  try {
+    [
+      aMatches,
+      bMatches,
+    ] = await Promise.all([
+      getMatchResults({
+        competitionId:
+          aTeam.competition.id,
+
+        competitionSlug:
+          aTeam.competition.slug,
+
+        teamName:
+          aTeam.teamName,
+      }),
+
+      getMatchResults({
+        competitionId:
+          bTeam.competition.id,
+
+        competitionSlug:
+          bTeam.competition.slug,
+
+        teamName:
+          bTeam.teamName,
+      }),
+    ]);
+  } catch (error) {
+    console.error(
+      "Chyba při načítání výsledků APF:",
+      error,
+    );
+  }
+
+  /*
+   * ========================================
+   * NÁSLEDUJÍCÍ ZÁPAS
+   * ========================================
+   */
+
+  try {
+    [
+      aNextMatch,
+      bNextMatch,
+    ] = await Promise.all([
+      getNextMatch({
+        competitionId:
+          aTeam.competition.id,
+
+        competitionSlug:
+          aTeam.competition.slug,
+
+        teamName:
+          aTeam.teamName,
+      }),
+
+      getNextMatch({
+        competitionId:
+          bTeam.competition.id,
+
+        competitionSlug:
+          bTeam.competition.slug,
+
+        teamName:
+          bTeam.teamName,
+      }),
+    ]);
+  } catch (error) {
+    console.error(
+      "Chyba při načítání rozpisu APF:",
+      error,
+    );
+  }
+
+  /*
+   * ========================================
+   * NEJLEPŠÍ STŘELCI
+   * ========================================
+   */
+
+  try {
+    [
+      aTopScorer,
+      bTopScorer,
+    ] = await Promise.all([
+      getTopScorer({
+        teamId:
+          aTeam.teamId,
+
+        teamSlug:
+          aTeam.teamSlug,
+      }),
+
+      getTopScorer({
+        teamId:
+          bTeam.teamId,
+
+        teamSlug:
+          bTeam.teamSlug,
+      }),
+    ]);
+  } catch (error) {
+    console.error(
+      "Chyba při načítání střelců APF:",
+      error,
+    );
+  }
+
+  /*
+   * ========================================
+   * SOUPISKY
+   * ========================================
+   */
+
+  try {
+    [
+      aPlayers,
+      bPlayers,
+    ] = await Promise.all([
+      getSquad({
+        teamId:
+          aTeam.teamId,
+
+        teamSlug:
+          aTeam.teamSlug,
+
+        team: "a",
+      }),
+
+      getSquad({
+        teamId:
+          bTeam.teamId,
+
+        teamSlug:
+          bTeam.teamSlug,
+
+        team: "b",
+      }),
+    ]);
+  } catch (error) {
+    console.error(
+      "Chyba při načítání soupisek APF:",
+      error,
+    );
+  }
+
+  /*
+   * ========================================
+   * WEB
+   * ========================================
+   */
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
+    <main>
+      {/* =====================================
+          HERO
+      ===================================== */}
+
+      <section
+        id="home"
+        style={{
+          minHeight: "590px",
+
+          display: "grid",
+
+          placeItems: "center",
+
+          padding:
+            "70px 22px",
+
+          textAlign: "center",
+        }}
+      >
+        <div>
+          <AnimatedLogo
+            size={230}
+            priority
+          />
+
+          <h1
+            style={{
+              marginTop:
+                "28px",
+
+              marginBottom:
+                "0",
+
+              fontSize:
+                "clamp(52px, 8vw, 92px)",
+
+              fontWeight:
+                950,
+
+              lineHeight:
+                0.9,
+
+              letterSpacing:
+                "-0.065em",
+            }}
+          >
+            {clubConfig.name}
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+
+          <p
+            style={{
+              maxWidth:
+                "800px",
+
+              margin:
+                "24px auto 0",
+
+              color:
+                "#747d76",
+
+              fontSize:
+                "clamp(25px, 3.5vw, 42px)",
+
+              fontWeight:
+                900,
+
+              lineHeight:
+                1,
+
+              letterSpacing:
+                "-0.045em",
+            }}
+          >
+            Jeden klub.
+            Dva týmy.
+            Jedna vášeň.
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+      </section>
+
+      {/* =====================================
+          01 / KLUB
+      ===================================== */}
+
+      <ClubStory />
+
+      {/* =====================================
+          02 / STATISTIKY
+      ===================================== */}
+
+      <HomeHighlights
+        aTopScorer={
+          aTopScorer
+        }
+        bTopScorer={
+          bTopScorer
+        }
+      />
+
+      {/* =====================================
+          03 / ZÁPASY
+      ===================================== */}
+
+      <MatchCenter
+        aNextMatch={
+          aNextMatch
+        }
+        bNextMatch={
+          bNextMatch
+        }
+        aMatches={
+          aMatches
+        }
+        bMatches={
+          bMatches
+        }
+      />
+
+      {/* =====================================
+          04 / TABULKA
+      ===================================== */}
+
+      <LeagueTable
+        aTeamRows={
+          aLeagueTable
+        }
+        bTeamRows={
+          bLeagueTable
+        }
+      />
+
+      {/* =====================================
+          05 / SOUPISKA
+      ===================================== */}
+
+      <Squad
+        aPlayers={
+          aPlayers
+        }
+        bPlayers={
+          bPlayers
+        }
+      />
+
+      {/* =====================================
+          06 / VÝSLEDKY
+      ===================================== */}
+
+      <Results
+        aMatches={
+          aMatches
+        }
+        bMatches={
+          bMatches
+        }
+      />
+
+      {/* =====================================
+          07 / PARTNEŘI
+      ===================================== */}
+
+      <Partners />
+    </main>
   );
 }

@@ -1,0 +1,242 @@
+.wrapper {
+  position: relative;
+
+  display: grid;
+  place-items: center;
+
+  flex-shrink: 0;
+
+  isolation: isolate;
+}
+
+.logoContainer {
+  position: absolute;
+  inset: 8%;
+
+  z-index: 3;
+
+  animation:
+    logoFloat
+    4.5s
+    ease-in-out
+    infinite;
+
+  transition:
+    transform 300ms ease,
+    filter 300ms ease;
+}
+
+.logo {
+  object-fit: contain;
+
+  filter:
+    drop-shadow(
+      0 10px 14px
+      rgba(0, 0, 0, 0.45)
+    )
+    drop-shadow(
+      0 0 8px
+      rgba(41, 232, 63, 0.18)
+    );
+
+  transition:
+    filter 300ms ease,
+    transform 300ms ease;
+}
+
+.outerGlow {
+  position: absolute;
+  inset: 18%;
+
+  z-index: 1;
+
+  border-radius: 50%;
+
+  background:
+    radial-gradient(
+      circle,
+      rgba(41, 232, 63, 0.38)
+        0%,
+      rgba(41, 232, 63, 0.15)
+        40%,
+      rgba(41, 232, 63, 0.04)
+        62%,
+      transparent
+        76%
+    );
+
+  filter: blur(20px);
+
+  pointer-events: none;
+
+  animation:
+    glowPulse
+    3.6s
+    ease-in-out
+    infinite;
+}
+
+.rotatingRing {
+  position: absolute;
+  inset: 2%;
+
+  z-index: 2;
+
+  border-radius: 50%;
+
+  background:
+    conic-gradient(
+      from 0deg,
+
+      transparent 0deg,
+      transparent 70deg,
+
+      rgba(41, 232, 63, 0.08)
+        90deg,
+
+      rgba(41, 232, 63, 0.55)
+        112deg,
+
+      transparent 138deg,
+
+      transparent 275deg,
+
+      rgba(41, 232, 63, 0.22)
+        302deg,
+
+      transparent 330deg
+    );
+
+  mask:
+    radial-gradient(
+      circle,
+      transparent 67%,
+      black 68%,
+      black 70%,
+      transparent 71%
+    );
+
+  -webkit-mask:
+    radial-gradient(
+      circle,
+      transparent 67%,
+      black 68%,
+      black 70%,
+      transparent 71%
+    );
+
+  opacity: 0.65;
+
+  pointer-events: none;
+
+  animation:
+    ringRotate
+    10s
+    linear
+    infinite;
+}
+
+.wrapper:hover
+.logoContainer {
+  transform:
+    translateY(-3px)
+    scale(1.04);
+}
+
+.wrapper:hover
+.logo {
+  filter:
+    drop-shadow(
+      0 12px 16px
+      rgba(0, 0, 0, 0.5)
+    )
+    drop-shadow(
+      0 0 15px
+      rgba(41, 232, 63, 0.45)
+    );
+}
+
+@keyframes logoFloat {
+  0%,
+  100% {
+    transform:
+      translateY(0)
+      rotate(-0.5deg);
+  }
+
+  50% {
+    transform:
+      translateY(-5px)
+      rotate(0.5deg);
+  }
+}
+
+@keyframes glowPulse {
+  0%,
+  100% {
+    opacity: 0.28;
+
+    transform:
+      scale(0.9);
+  }
+
+  50% {
+    opacity: 0.72;
+
+    transform:
+      scale(1.08);
+  }
+}
+
+@keyframes ringRotate {
+  from {
+    transform:
+      rotate(0deg);
+  }
+
+  to {
+    transform:
+      rotate(360deg);
+  }
+}
+
+@media (max-width: 768px) {
+  .logoContainer {
+    inset: 6%;
+
+    animation-duration: 5.5s;
+  }
+
+  .outerGlow {
+    inset: 20%;
+
+    filter: blur(14px);
+  }
+
+  .rotatingRing {
+    opacity: 0.4;
+
+    animation-duration: 13s;
+  }
+
+  .wrapper:hover
+  .logoContainer {
+    transform: none;
+  }
+}
+
+@media (
+  prefers-reduced-motion:
+  reduce
+) {
+  .logoContainer,
+  .outerGlow,
+  .rotatingRing {
+    animation: none;
+  }
+
+  .logoContainer,
+  .logo {
+    transition: none;
+  }
+}

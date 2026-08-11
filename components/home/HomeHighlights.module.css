@@ -1,0 +1,772 @@
+.section {
+  padding: 90px 0;
+}
+
+.wrapper {
+  width: min(
+    var(--content-width),
+    calc(100% - 32px)
+  );
+
+  margin: 0 auto;
+}
+
+.switchRow {
+  display: flex;
+  justify-content: flex-end;
+
+  margin: -12px 0 24px;
+}
+
+.container {
+  display: grid;
+
+  grid-template-columns:
+    repeat(
+      4,
+      minmax(0, 1fr)
+    );
+
+  gap: 12px;
+}
+
+.card,
+.completeStatsCard {
+  position: relative;
+
+  min-height: 300px;
+
+  overflow: hidden;
+
+  border:
+    1px solid
+    var(--border);
+
+  border-radius: 18px;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(
+        18,
+        26,
+        20,
+        0.96
+      ),
+      rgba(
+        8,
+        12,
+        9,
+        0.96
+      )
+    );
+
+  transition:
+    transform
+      200ms ease,
+    border-color
+      200ms ease,
+    background
+      200ms ease,
+    box-shadow
+      200ms ease;
+}
+
+.card {
+  padding: 24px;
+}
+
+.card:hover,
+.completeStatsCard:hover {
+  transform:
+    translateY(-5px);
+
+  border-color:
+    rgba(
+      41,
+      232,
+      63,
+      0.36
+    );
+
+  box-shadow:
+    0
+    18px
+    45px
+    rgba(
+      0,
+      0,
+      0,
+      0.24
+    );
+}
+
+.label {
+  position: relative;
+
+  z-index: 5;
+
+  color:
+    var(--primary);
+
+  font-size: 9px;
+  font-weight: 900;
+
+  letter-spacing:
+    0.12em;
+
+  text-transform:
+    uppercase;
+}
+
+.number {
+  position: relative;
+
+  z-index: 5;
+
+  display: block;
+
+  margin-top: 48px;
+
+  color:
+    var(--primary);
+
+  font-size: 58px;
+  font-weight: 950;
+
+  line-height: 1;
+}
+
+.card h3 {
+  position: relative;
+
+  z-index: 5;
+
+  margin:
+    14px
+    0
+    8px;
+
+  color:
+    var(--text);
+
+  font-size: 19px;
+  font-weight: 900;
+
+  line-height: 1.1;
+}
+
+.card p {
+  position: relative;
+
+  z-index: 5;
+
+  margin-bottom: 0;
+
+  color:
+    var(--text-muted);
+
+  font-size: 11px;
+
+  line-height: 1.55;
+}
+
+/* ========================================
+   NEJLEPŠÍ STŘELEC
+======================================== */
+
+.scorerCard {
+  padding: 0;
+
+  isolation: isolate;
+
+  background:
+    #08100a;
+}
+
+.playerPhoto {
+  position: absolute;
+
+  inset: 0;
+
+  z-index: 1;
+}
+
+.playerPhotoImage {
+  object-fit: cover;
+
+  object-position:
+    68% 12%;
+
+  transform:
+    scale(1.03);
+
+  filter:
+    saturate(0.92)
+    contrast(1.04);
+
+  transition:
+    transform
+      450ms ease,
+    filter
+      450ms ease;
+}
+
+.scorerCard:hover
+.playerPhotoImage {
+  transform:
+    scale(1.07);
+
+  filter:
+    saturate(1)
+    contrast(1.06)
+    brightness(1.04);
+}
+
+.scorerShade {
+  position: absolute;
+
+  inset: 0;
+
+  z-index: 2;
+
+  background:
+    linear-gradient(
+      90deg,
+      rgba(
+        5,
+        9,
+        6,
+        0.98
+      ) 0%,
+      rgba(
+        5,
+        9,
+        6,
+        0.9
+      ) 30%,
+      rgba(
+        5,
+        9,
+        6,
+        0.7
+      ) 52%,
+      rgba(
+        5,
+        9,
+        6,
+        0.18
+      ) 78%,
+      rgba(
+        5,
+        9,
+        6,
+        0.04
+      ) 100%
+    ),
+    linear-gradient(
+      0deg,
+      rgba(
+        4,
+        8,
+        5,
+        0.78
+      ) 0%,
+      transparent
+      46%
+    );
+
+  pointer-events: none;
+}
+
+.scorerGlow {
+  position: absolute;
+
+  right: -90px;
+  bottom: -110px;
+
+  z-index: 3;
+
+  width: 300px;
+  height: 300px;
+
+  border-radius: 50%;
+
+  background:
+    radial-gradient(
+      circle,
+      rgba(
+        41,
+        232,
+        63,
+        0.16
+      ) 0%,
+      rgba(
+        41,
+        232,
+        63,
+        0.06
+      ) 38%,
+      transparent
+      70%
+    );
+
+  filter:
+    blur(8px);
+
+  pointer-events: none;
+}
+
+.scorerText {
+  position: relative;
+
+  z-index: 5;
+
+  display: flex;
+
+  flex-direction: column;
+
+  justify-content:
+    flex-end;
+
+  width: 68%;
+
+  min-height: 300px;
+
+  padding: 24px;
+}
+
+.scorerText .label {
+  position: absolute;
+
+  top: 24px;
+  left: 24px;
+}
+
+.scorerNumber {
+  display: block;
+
+  margin-bottom: 6px;
+
+  color:
+    var(--primary);
+
+  font-size:
+    clamp(
+      56px,
+      5vw,
+      78px
+    );
+
+  font-weight: 950;
+
+  line-height: 0.9;
+
+  letter-spacing:
+    -0.06em;
+
+  text-shadow:
+    0
+    0
+    22px
+    rgba(
+      41,
+      232,
+      63,
+      0.12
+    );
+}
+
+.scorerText h3 {
+  margin:
+    10px
+    0
+    5px;
+
+  color:
+    #ffffff;
+
+  font-size:
+    clamp(
+      18px,
+      1.7vw,
+      23px
+    );
+
+  font-weight: 950;
+
+  line-height: 1;
+}
+
+.scorerText p {
+  color:
+    rgba(
+      225,
+      231,
+      226,
+      0.62
+    );
+
+  font-size: 10px;
+}
+
+/* ========================================
+   KOMPLETNÍ STATISTIKY
+======================================== */
+
+.completeStatsCard {
+  display: flex;
+
+  flex-direction: column;
+
+  justify-content:
+    space-between;
+
+  padding: 24px;
+
+  color:
+    #ffffff;
+
+  text-decoration: none;
+
+  isolation: isolate;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(
+        15,
+        34,
+        19,
+        0.98
+      ),
+      rgba(
+        6,
+        13,
+        8,
+        0.98
+      )
+    );
+}
+
+.completeStatsGlow {
+  position: absolute;
+
+  right: -90px;
+  bottom: -110px;
+
+  width: 280px;
+  height: 280px;
+
+  border-radius: 50%;
+
+  background:
+    radial-gradient(
+      circle,
+      rgba(
+        41,
+        232,
+        63,
+        0.22
+      ) 0%,
+      rgba(
+        41,
+        232,
+        63,
+        0.08
+      ) 36%,
+      transparent
+      70%
+    );
+
+  filter:
+    blur(7px);
+
+  pointer-events: none;
+}
+
+.completeStatsContent {
+  position: relative;
+
+  z-index: 5;
+
+  margin-top: auto;
+  margin-bottom: 48px;
+}
+
+.completeStatsContent strong {
+  display: block;
+
+  color:
+    #ffffff;
+
+  font-size:
+    clamp(
+      28px,
+      2.8vw,
+      38px
+    );
+
+  font-weight: 950;
+
+  line-height: 0.92;
+
+  letter-spacing:
+    -0.055em;
+}
+
+.completeStatsContent p {
+  max-width: 190px;
+
+  margin:
+    14px
+    0
+    0;
+
+  color:
+    rgba(
+      225,
+      231,
+      226,
+      0.62
+    );
+
+  font-size: 11px;
+
+  line-height: 1.5;
+}
+
+.completeStatsArrow {
+  position: absolute;
+
+  right: 20px;
+  bottom: 20px;
+
+  z-index: 5;
+
+  display: grid;
+
+  place-items: center;
+
+  width: 43px;
+  height: 43px;
+
+  border-radius: 11px;
+
+  color:
+    #061007;
+
+  background:
+    var(--primary);
+
+  font-size: 21px;
+  font-weight: 950;
+
+  transition:
+    transform
+      180ms ease;
+}
+
+.completeStatsCard:hover
+.completeStatsArrow {
+  transform:
+    translateX(4px);
+}
+
+/* ========================================
+   SILUETA
+======================================== */
+
+.photoFallback {
+  position: absolute;
+
+  inset: 0;
+
+  z-index: 1;
+
+  overflow: hidden;
+
+  background:
+    radial-gradient(
+      circle at
+      72% 38%,
+      rgba(
+        41,
+        232,
+        63,
+        0.12
+      ),
+      transparent
+      40%
+    ),
+    linear-gradient(
+      145deg,
+      #111813,
+      #060a07
+    );
+}
+
+.silhouetteHead {
+  position: absolute;
+
+  top: 18%;
+  right: 16%;
+
+  width: 82px;
+  height: 82px;
+
+  border-radius: 50%;
+
+  background:
+    linear-gradient(
+      145deg,
+      #6b756e,
+      #323a34
+    );
+}
+
+.silhouetteBody {
+  position: absolute;
+
+  right: -4%;
+  bottom: -16%;
+
+  width: 64%;
+  height: 72%;
+
+  border-radius:
+    48% 48%
+    8% 8%;
+
+  background:
+    linear-gradient(
+      145deg,
+      #566159,
+      #252c27
+    );
+}
+
+/* ========================================
+   RESPONSIVE
+======================================== */
+
+@media (
+  max-width: 1100px
+) {
+  .container {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(
+          0,
+          1fr
+        )
+      );
+  }
+}
+
+@media (
+  max-width: 600px
+) {
+  .section {
+    padding:
+      65px 0;
+  }
+
+  .wrapper {
+    width:
+      calc(
+        100% - 22px
+      );
+  }
+
+  .switchRow {
+    margin-top: -5px;
+  }
+
+  .switchRow > div {
+    width: 100%;
+  }
+
+  .container {
+    grid-template-columns:
+      1fr;
+  }
+
+  .card,
+  .completeStatsCard {
+    min-height: 250px;
+  }
+
+  .card {
+    padding: 22px;
+  }
+
+  .scorerCard {
+    padding: 0;
+  }
+
+  .scorerText {
+    width: 68%;
+
+    min-height: 250px;
+
+    padding: 22px;
+  }
+
+  .scorerText .label {
+    top: 22px;
+    left: 22px;
+  }
+
+  .completeStatsCard {
+    padding: 22px;
+  }
+
+  .playerPhotoImage {
+    object-position:
+      65% 15%;
+  }
+
+  .scorerShade {
+    background:
+      linear-gradient(
+        90deg,
+        rgba(
+          5,
+          9,
+          6,
+          0.98
+        ) 0%,
+        rgba(
+          5,
+          9,
+          6,
+          0.88
+        ) 38%,
+        rgba(
+          5,
+          9,
+          6,
+          0.46
+        ) 65%,
+        rgba(
+          5,
+          9,
+          6,
+          0.08
+        ) 100%
+      ),
+      linear-gradient(
+        0deg,
+        rgba(
+          4,
+          8,
+          5,
+          0.76
+        ) 0%,
+        transparent
+        48%
+      );
+  }
+}

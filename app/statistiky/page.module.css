@@ -1,0 +1,214 @@
+.page {
+  min-height: 100vh;
+
+  padding-top: 82px;
+
+  background:
+    radial-gradient(
+      circle at 78% 8%,
+      rgba(
+        41,
+        232,
+        63,
+        0.07
+      ),
+      transparent 28%
+    ),
+    #050806;
+}
+
+.container {
+  width: min(
+    var(--content-width),
+    calc(
+      100% - 32px
+    )
+  );
+
+  margin: 0 auto;
+}
+
+.hero {
+  padding:
+    74px
+    0
+    54px;
+
+  border-bottom:
+    1px solid
+    rgba(
+      255,
+      255,
+      255,
+      0.055
+    );
+}
+
+.kicker {
+  margin-bottom: 18px;
+
+  color:
+    var(--primary);
+
+  font-size: 9px;
+  font-weight: 950;
+
+  letter-spacing:
+    0.14em;
+
+  text-transform:
+    uppercase;
+}
+
+.heroGrid {
+  display: grid;
+
+  grid-template-columns:
+    minmax(
+      0,
+      1fr
+    )
+    auto;
+
+  align-items: end;
+
+  gap: 38px;
+}
+
+.hero h1 {
+  max-width: 850px;
+
+  margin: 0;
+
+  color:
+    var(--text);
+
+  font-size:
+    clamp(
+      48px,
+      7vw,
+      88px
+    );
+
+  font-weight: 950;
+
+  line-height: 0.92;
+
+  letter-spacing:
+    -0.06em;
+}
+
+.hero h1 span {
+  display: block;
+
+  color:
+    var(--primary);
+}
+
+.hero p {
+  max-width: 640px;
+
+  margin:
+    22px
+    0
+    0;
+
+  color:
+    var(--text-muted);
+
+  font-size: 13px;
+
+  line-height: 1.65;
+}
+
+.season {
+  display: grid;
+
+  justify-items: end;
+
+  gap: 7px;
+
+  padding-bottom: 5px;
+}
+
+.season span {
+  color:
+    var(--text-muted);
+
+  font-size: 8px;
+  font-weight: 900;
+
+  letter-spacing:
+    0.1em;
+
+  text-transform:
+    uppercase;
+}
+
+.season strong {
+  color:
+    var(--primary);
+
+  font-size: 24px;
+  font-weight: 950;
+
+  letter-spacing:
+    -0.04em;
+}
+
+.content {
+  padding:
+    38px
+    0
+    110px;
+}
+
+@media (
+  max-width: 760px
+) {
+  .page {
+    padding-top: 74px;
+  }
+
+  .container {
+    width:
+      calc(
+        100% - 22px
+      );
+  }
+
+  .hero {
+    padding:
+      48px
+      0
+      38px;
+  }
+
+  .heroGrid {
+    grid-template-columns:
+      1fr;
+
+    align-items:
+      start;
+
+    gap: 26px;
+  }
+
+  .hero h1 {
+    font-size:
+      clamp(
+        45px,
+        14vw,
+        66px
+      );
+  }
+
+  .season {
+    justify-items:
+      start;
+  }
+
+  .content {
+    padding-top: 28px;
+  }
+}

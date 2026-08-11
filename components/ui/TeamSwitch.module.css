@@ -1,0 +1,65 @@
+.switch {
+  display: inline-flex;
+  align-items: center;
+
+  gap: 6px;
+
+  padding: 5px;
+
+  border: 1px solid var(--border);
+  border-radius: 999px;
+
+  background:
+    rgba(255, 255, 255, 0.025);
+}
+
+.switch button {
+  padding: 9px 15px;
+
+  border: 0;
+  border-radius: 999px;
+
+  background: transparent;
+
+  color: var(--text-muted);
+
+  font-size: 10px;
+  font-weight: 900;
+
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+
+  cursor: pointer;
+
+  transition:
+    color 180ms ease,
+    background 180ms ease;
+}
+
+.switch button:hover {
+  color: var(--text);
+}
+
+.switch .active {
+  color: #061007;
+
+  background: var(--primary);
+}
+
+@media (max-width: 520px) {
+  .switch {
+    width: 100%;
+
+    display: grid;
+
+    grid-template-columns:
+      repeat(3, 1fr);
+  }
+
+  .switch button {
+    padding:
+      9px 8px;
+
+    font-size: 9px;
+  }
+}
