@@ -25,11 +25,19 @@
 
   padding: 5px;
 
-  border: 1px solid var(--border);
+  border:
+    1px solid
+    var(--border);
+
   border-radius: 999px;
 
   background:
-    rgba(255, 255, 255, 0.025);
+    rgba(
+      255,
+      255,
+      255,
+      0.025
+    );
 }
 
 .switch button {
@@ -40,9 +48,11 @@
   border: 0;
   border-radius: 999px;
 
-  background: transparent;
+  background:
+    transparent;
 
-  color: var(--text-muted);
+  color:
+    var(--text-muted);
 
   font-size: 10px;
   font-weight: 900;
@@ -55,11 +65,13 @@
   transition:
     color 180ms ease,
     background 180ms ease,
-    transform 180ms ease;
+    transform 180ms ease,
+    box-shadow 180ms ease;
 }
 
 .switch button:hover {
-  color: var(--text);
+  color:
+    var(--text);
 
   transform:
     translateY(-1px);
@@ -70,13 +82,28 @@
 
   background:
     var(--primary);
+
+  box-shadow:
+    0 0 20px
+    rgba(
+      41,
+      232,
+      63,
+      0.16
+    );
 }
 
 .grid {
   display: grid;
 
   grid-template-columns:
-    repeat(4, 1fr);
+    repeat(
+      4,
+      minmax(
+        0,
+        1fr
+      )
+    );
 
   gap: 12px;
 
@@ -90,7 +117,8 @@
   padding: 28px;
 
   border:
-    1px solid var(--border);
+    1px solid
+    var(--border);
 
   border-radius: 15px;
 
@@ -117,32 +145,41 @@
   }
 }
 
-@media (max-width: 1000px) {
+@media (
+  max-width: 1000px
+) {
   .grid {
     grid-template-columns:
-      repeat(3, 1fr);
+      repeat(
+        3,
+        minmax(
+          0,
+          1fr
+        )
+      );
   }
 }
 
-@media (max-width: 760px) {
-  .grid {
-    grid-template-columns:
-      repeat(2, 1fr);
-  }
-}
-
-@media (max-width: 600px) {
+@media (
+  max-width: 760px
+) {
   .section {
-    padding: 60px 0;
+    padding:
+      58px 0;
   }
 
   .container {
     width:
-      calc(100% - 22px);
+      calc(
+        100% - 18px
+      );
   }
 
   .toolbar {
-    margin-top: -5px;
+    margin:
+      -5px
+      0
+      18px;
   }
 
   .switch {
@@ -151,16 +188,32 @@
     display: grid;
 
     grid-template-columns:
-      1fr 1fr;
+      1fr
+      1fr;
   }
 
   .switch button {
     min-width: 0;
   }
+
+  .grid {
+    grid-template-columns:
+      repeat(
+        3,
+        minmax(
+          0,
+          1fr
+        )
+      );
+
+    gap: 7px;
+  }
 }
 
-@media (max-width: 430px) {
+@media (
+  max-width: 360px
+) {
   .grid {
-    grid-template-columns: 1fr;
+    gap: 5px;
   }
 }

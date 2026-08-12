@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 
 import {
   useEffect,
@@ -14,23 +15,44 @@ import type {
 import styles from "./PlayerCard.module.css";
 
 type PlayerCardProps = {
-  player: SquadPlayer;
+  player:
+    SquadPlayer;
+
+  team:
+    "a" |
+    "b";
+
+  stats: {
+    matches: number;
+
+    goals: number;
+
+    assists: number;
+  };
+
+  statsLoaded: boolean;
 };
 
 export function PlayerCard({
   player,
+  team,
+  stats,
+  statsLoaded,
 }: PlayerCardProps) {
   const [
     imageFailed,
     setImageFailed,
-  ] = useState(false);
+  ] =
+    useState(false);
 
   useEffect(() => {
-    setImageFailed(false);
+    setImageFailed(
+      false,
+    );
   }, [player.id]);
 
   return (
-    <a
+    <Link
       className={
         styles.card
       }
@@ -59,8 +81,7 @@ export function PlayerCard({
             }
             fill
             sizes="
-              (max-width: 430px) 100vw,
-              (max-width: 760px) 50vw,
+              (max-width: 760px) 33vw,
               (max-width: 1000px) 33vw,
               25vw
             "
@@ -121,7 +142,7 @@ export function PlayerCard({
               styles.teamBadge
             }
           >
-            {player.team === "a"
+            {team === "a"
               ? "A-tým"
               : "B-tým"}
           </span>
@@ -153,29 +174,35 @@ export function PlayerCard({
             styles.stats
           }
         >
-          <div>
-            <span>
-              Zápasy
-            </span>
+          <Stat
+            label="Zápasy"
+            mobileLabel="Z"
+            value={
+              statsLoaded
+                ? stats.matches
+                : "·"
+            }
+          />
 
-            <strong>
-              {
-                player.matches
-              }
-            </strong>
-          </div>
+          <Stat
+            label="Góly"
+            mobileLabel="G"
+            value={
+              statsLoaded
+                ? stats.goals
+                : "·"
+            }
+          />
 
-          <div>
-            <span>
-              Góly
-            </span>
-
-            <strong>
-              {
-                player.goals
-              }
-            </strong>
-          </div>
+          <Stat
+            label="Asistence"
+            mobileLabel="A"
+            value={
+              statsLoaded
+                ? stats.assists
+                : "·"
+            }
+          />
         </div>
 
         <div
@@ -196,7 +223,45 @@ export function PlayerCard({
           </span>
         </div>
       </div>
-    </a>
+    </Link>
+  );
+}
+
+function Stat({
+  label,
+  mobileLabel,
+  value,
+}: {
+  label: string;
+
+  mobileLabel: string;
+
+  value:
+    string |
+    number;
+}) {
+  return (
+    <div>
+      <span
+        className={
+          styles.desktopStatLabel
+        }
+      >
+        {label}
+      </span>
+
+      <span
+        className={
+          styles.mobileStatLabel
+        }
+      >
+        {mobileLabel}
+      </span>
+
+      <strong>
+        {value}
+      </strong>
+    </div>
   );
 }
 

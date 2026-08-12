@@ -31,10 +31,9 @@
   text-decoration: none;
 
   transition:
-    transform
-      200ms ease,
-    border-color
-      200ms ease;
+    transform 200ms ease,
+    border-color 200ms ease,
+    box-shadow 200ms ease;
 }
 
 .card:hover {
@@ -47,6 +46,15 @@
       232,
       63,
       0.38
+    );
+
+  box-shadow:
+    0 18px 42px
+    rgba(
+      0,
+      0,
+      0,
+      0.2
     );
 }
 
@@ -75,14 +83,11 @@
     center top;
 
   transition:
-    transform
-      350ms ease,
-    filter
-      350ms ease;
+    transform 350ms ease,
+    filter 350ms ease;
 }
 
-.card:hover
-.image {
+.card:hover .image {
   transform:
     scale(1.035);
 
@@ -100,23 +105,17 @@
   background:
     linear-gradient(
       180deg,
-      transparent
-        42%,
+      transparent 42%,
       rgba(
         5,
         7,
         5,
         0.82
-      )
-        100%
+      ) 100%
     );
 
   pointer-events: none;
 }
-
-/* ========================================
-   HORNÍ INFO
-======================================== */
 
 .topInfo {
   position: absolute;
@@ -164,11 +163,8 @@
   font-size: 9px;
   font-weight: 900;
 
-  letter-spacing:
-    0.07em;
-
-  text-transform:
-    uppercase;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
 
   backdrop-filter:
     blur(8px);
@@ -195,10 +191,6 @@
     #061007;
 }
 
-/* ========================================
-   TÝM + HOST
-======================================== */
-
 .teamInfo {
   position: absolute;
 
@@ -213,8 +205,7 @@
 }
 
 .teamBadge {
-  color:
-    #ffffff;
+  color: #ffffff;
 
   background:
     rgba(
@@ -226,16 +217,11 @@
 }
 
 .loanBadge {
-  color:
-    #ffffff;
+  color: #ffffff;
 
   background:
     #637078;
 }
-
-/* ========================================
-   TEXT
-======================================== */
 
 .content {
   padding: 16px;
@@ -259,16 +245,19 @@
 
   grid-template-columns:
     repeat(
-      2,
-      1fr
+      3,
+      minmax(
+        0,
+        1fr
+      )
     );
 
-  gap: 8px;
+  gap: 7px;
 }
 
 .stats > div {
   padding:
-    9px 10px;
+    9px 8px;
 
   border:
     1px solid
@@ -296,15 +285,12 @@
   margin-bottom: 3px;
 
   color:
-    var(
-      --text-muted
-    );
+    var(--text-muted);
 
-  font-size: 8px;
+  font-size: 7px;
   font-weight: 850;
 
-  letter-spacing:
-    0.07em;
+  letter-spacing: 0.07em;
 
   text-transform:
     uppercase;
@@ -318,11 +304,14 @@
   font-weight: 950;
 }
 
+.mobileStatLabel {
+  display: none !important;
+}
+
 .detail {
   display: flex;
 
   align-items: center;
-
   justify-content:
     space-between;
 
@@ -340,47 +329,34 @@
     );
 
   color:
-    var(
-      --text-muted
-    );
+    var(--text-muted);
 
   font-size: 9px;
   font-weight: 850;
 
-  letter-spacing:
-    0.07em;
-
-  text-transform:
-    uppercase;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
 
   transition:
-    color
-      180ms ease;
+    color 180ms ease;
 }
 
 .arrow {
   font-size: 14px;
 
   transition:
-    transform
-      180ms ease;
+    transform 180ms ease;
 }
 
-.card:hover
-.detail {
+.card:hover .detail {
   color:
     var(--primary);
 }
 
-.card:hover
-.arrow {
+.card:hover .arrow {
   transform:
     translateX(3px);
 }
-
-/* ========================================
-   SILUETA
-======================================== */
 
 .fallback {
   position: absolute;
@@ -390,7 +366,6 @@
   display: flex;
 
   align-items: center;
-
   justify-content:
     center;
 
@@ -399,15 +374,14 @@
   background:
     radial-gradient(
       circle at
-        50% 35%,
+      50% 35%,
       rgba(
         41,
         232,
         63,
         0.1
       ),
-      transparent
-        42%
+      transparent 42%
     ),
     linear-gradient(
       145deg,
@@ -507,4 +481,169 @@
 
   letter-spacing:
     -0.06em;
+}
+
+/* ========================================
+   MOBIL — 3 HRÁČI VEDLE SEBE
+======================================== */
+
+@media (
+  max-width: 760px
+) {
+  .card {
+    border-radius: 11px;
+  }
+
+  .imageWrapper {
+    aspect-ratio:
+      0.86 / 1;
+  }
+
+  .topInfo {
+    top: 6px;
+    left: 6px;
+    right: 6px;
+
+    gap: 4px;
+  }
+
+  .position,
+  .numberBadge,
+  .teamBadge,
+  .loanBadge {
+    min-height: 18px;
+
+    padding:
+      0 5px;
+
+    font-size: 5px;
+
+    letter-spacing:
+      0.04em;
+  }
+
+  .numberBadge {
+    font-size: 7px;
+  }
+
+  .teamInfo {
+    left: 6px;
+    bottom: 6px;
+
+    gap: 3px;
+  }
+
+  .content {
+    padding:
+      8px 6px 7px;
+  }
+
+  .content h3 {
+    overflow: hidden;
+
+    margin:
+      0 0 7px;
+
+    font-size:
+      clamp(
+        9px,
+        2.65vw,
+        12px
+      );
+
+    line-height: 1.05;
+
+    text-overflow:
+      ellipsis;
+
+    white-space:
+      nowrap;
+  }
+
+  .stats {
+    gap: 3px;
+  }
+
+  .stats > div {
+    padding:
+      5px 2px;
+
+    border-radius:
+      6px;
+
+    text-align: center;
+  }
+
+  .desktopStatLabel {
+    display:
+      none !important;
+  }
+
+  .mobileStatLabel {
+    display:
+      block !important;
+
+    margin-bottom: 2px;
+
+    font-size: 5px !important;
+
+    letter-spacing: 0;
+  }
+
+  .stats strong {
+    font-size: 10px;
+  }
+
+  .detail {
+    margin-top: 7px;
+
+    padding-top: 6px;
+
+    font-size: 5px;
+
+    letter-spacing:
+      0.035em;
+  }
+
+  .arrow {
+    font-size: 9px;
+  }
+
+  .fallbackGlow {
+    width: 90px;
+    height: 90px;
+  }
+
+  .fallbackHead {
+    width: 40px;
+    height: 40px;
+  }
+
+  .fallbackBody {
+    width: 78%;
+    height: 65%;
+  }
+
+  .fallback span {
+    bottom: 8px;
+    left: 8px;
+
+    font-size: 13px;
+  }
+}
+
+@media (
+  max-width: 380px
+) {
+  .position {
+    display: none;
+  }
+
+  .content h3 {
+    font-size: 9px;
+  }
+
+  .stats strong {
+    font-size: 9px;
+  }
 }
