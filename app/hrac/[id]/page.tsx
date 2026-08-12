@@ -504,81 +504,101 @@ export default async function PlayerPage({
 
         <section
           className={
-            styles.statsSection
+            styles.dashboardSection
           }
         >
           <div
             className={
-              styles.sectionTitle
+              styles.dashboardPanel
             }
           >
-            <span>
-              Kariéra
-            </span>
-
-            <h2>
-              Celkové statistiky.
-            </h2>
-          </div>
-
-          <div
-            className={
-              styles.statsGrid
-            }
-          >
-            <StatBox
-              label="Sezóny"
-              value={
-                profile.career.seasons
+            <div
+              className={
+                styles.dashboardHeader
               }
-            />
+            >
+              <div>
+                <span
+                  className={
+                    styles.dashboardEyebrow
+                  }
+                >
+                  Kariéra
+                </span>
 
-            <StatBox
-              label="Zápasy"
-              value={
-                profile.career.matches
-              }
-            />
+                <h2>
+                  Celková kariéra.
+                </h2>
+              </div>
 
-            <StatBox
-              label="Góly"
-              value={
-                profile.career.goals
-              }
-            />
+              <div
+                className={
+                  styles.seasonCount
+                }
+              >
+                <strong>
+                  {
+                    profile.career.seasons
+                  }
+                </strong>
 
-            <StatBox
-              label="Asistence"
-              value={
-                careerAssists
-              }
-            />
+                <span>
+                  sezóny
+                </span>
+              </div>
+            </div>
 
-            <StatBox
-              label="Průměrná známka"
-              value={
-                careerRating !==
-                null
-                  ? careerRating.toFixed(
-                      1,
-                    )
-                  : "—"
+            <div
+              className={
+                styles.metricGrid
               }
-            />
+            >
+              <ProfileMetric
+                label="Zápasy"
+                value={
+                  profile.career.matches
+                }
+                featured
+              />
 
-            <StatBox
-              label="Docházka"
-              value={
-                attendance ??
-                "—"
-              }
-              suffix={
-                attendance !==
-                null
-                  ? "%"
-                  : ""
-              }
-            />
+              <ProfileMetric
+                label="Góly"
+                value={
+                  profile.career.goals
+                }
+                featured
+              />
+
+              <ProfileMetric
+                label="Asistence"
+                value={
+                  careerAssists
+                }
+                featured
+              />
+
+              <ProfileMetric
+                label="Známka"
+                value={
+                  careerRating !==
+                  null
+                    ? careerRating.toFixed(
+                        1,
+                      )
+                    : "—"
+                }
+              />
+
+              <ProfileMetric
+                label="Docházka"
+                value={
+                  attendance !==
+                  null
+                    ? `${attendance}%`
+                    : "—"
+                }
+              />
+            </div>
           </div>
         </section>
 
@@ -588,89 +608,104 @@ export default async function PlayerPage({
 
         <section
           className={
-            styles.currentSeason
+            styles.dashboardSection
           }
         >
           <div
-            className={
-              styles.sectionTitle
-            }
+            className={`${styles.dashboardPanel} ${styles.currentDashboard}`}
           >
-            <span>
-              Aktuálně
-            </span>
-
-            <h2>
-              Sezóna{" "}
-              {CURRENT_SEASON}
-            </h2>
-          </div>
-
-          <div
-            className={
-              styles.statsGrid
-            }
-          >
-            <StatBox
-              label="Zápasy"
-              value={
-                currentSeasonStats.matches
+            <div
+              className={
+                styles.dashboardHeader
               }
-            />
+            >
+              <div>
+                <span
+                  className={
+                    styles.dashboardEyebrow
+                  }
+                >
+                  Aktuálně
+                </span>
 
-            <StatBox
-              label="Góly"
-              value={
-                currentSeasonStats.goals
-              }
-            />
+                <h2>
+                  Sezóna{" "}
+                  {CURRENT_SEASON}
+                </h2>
+              </div>
 
-            <StatBox
-              label="Asistence"
-              value={
-                currentSeasonStats.assists
-              }
-            />
+              <span
+                className={
+                  styles.liveBadge
+                }
+              >
+                LIVE
+              </span>
+            </div>
 
-            <StatBox
-              label="ŽK"
-              value={
-                currentSeasonStats.yellowCards
-              }
-            />
+            <div
+              className={`${styles.metricGrid} ${styles.currentMetricGrid}`}
+            >
+              <ProfileMetric
+                label="Zápasy"
+                value={
+                  currentSeasonStats.matches
+                }
+                featured
+              />
 
-            <StatBox
-              label="ČK"
-              value={
-                currentSeasonStats.redCards
-              }
-            />
+              <ProfileMetric
+                label="Góly"
+                value={
+                  currentSeasonStats.goals
+                }
+                featured
+              />
 
-            <StatBox
-              label="Průměrná známka"
-              value={
-                currentSeasonStats.rating !==
-                null
-                  ? currentSeasonStats.rating.toFixed(
-                      1,
-                    )
-                  : "—"
-              }
-            />
+              <ProfileMetric
+                label="Asistence"
+                value={
+                  currentSeasonStats.assists
+                }
+                featured
+              />
 
-            <StatBox
-              label="Docházka"
-              value={
-                currentSeasonStats.attendance ??
-                "—"
-              }
-              suffix={
-                currentSeasonStats.attendance !==
-                null
-                  ? "%"
-                  : ""
-              }
-            />
+              <ProfileMetric
+                label="ŽK"
+                value={
+                  currentSeasonStats.yellowCards
+                }
+              />
+
+              <ProfileMetric
+                label="ČK"
+                value={
+                  currentSeasonStats.redCards
+                }
+              />
+
+              <ProfileMetric
+                label="Známka"
+                value={
+                  currentSeasonStats.rating !==
+                  null
+                    ? currentSeasonStats.rating.toFixed(
+                        1,
+                      )
+                    : "—"
+                }
+              />
+
+              <ProfileMetric
+                label="Docházka"
+                value={
+                  currentSeasonStats.attendance !==
+                  null
+                    ? `${currentSeasonStats.attendance}%`
+                    : "—"
+                }
+              />
+            </div>
           </div>
         </section>
 
@@ -1332,6 +1367,38 @@ function SeasonHistory({
           );
         },
       )}
+    </div>
+  );
+}
+
+function ProfileMetric({
+  label,
+  value,
+  featured = false,
+}: {
+  label: string;
+
+  value:
+    string |
+    number;
+
+  featured?: boolean;
+}) {
+  return (
+    <div
+      className={
+        featured
+          ? styles.profileMetricFeatured
+          : styles.profileMetric
+      }
+    >
+      <span>
+        {label}
+      </span>
+
+      <strong>
+        {value}
+      </strong>
     </div>
   );
 }
