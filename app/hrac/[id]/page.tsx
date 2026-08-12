@@ -498,17 +498,6 @@ export default async function PlayerPage({
           </div>
         </section>
 
-        <div
-          className={
-            styles.profileDashboard
-          }
-        >
-          <div
-            className={
-              styles.profileDashboardLeft
-            }
-          >
-
         {/* ==================================
             KARIÉRA
         ================================== */}
@@ -720,14 +709,6 @@ export default async function PlayerPage({
           </div>
         </section>
 
-          </div>
-
-          <div
-            className={
-              styles.profileDashboardRight
-            }
-          >
-
         {/* ==================================
             POSLEDNÍ ZÁPASY
         ================================== */}
@@ -756,13 +737,10 @@ export default async function PlayerPage({
               appStats?.matches ??
               []
             }
-            limit={5}
+            limit={8}
           />
         </section>
 
-
-          </div>
-        </div>
 
         {/* ==================================
             PŘEHLED SEZÓN

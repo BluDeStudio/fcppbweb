@@ -2519,3 +2519,133 @@
     font-size: 30px;
   }
 }
+
+
+/* =========================================================
+   FINÁLNÍ PROFIL — SEKCE POD SEBOU + KOMPAKTNÍ ŘÁDKY
+   ========================================================= */
+
+/* Zrušení předchozího desktop 45/55 layoutu */
+.profileDashboard,
+.profileDashboardLeft,
+.profileDashboardRight {
+  display: contents;
+}
+
+/* Kariéra + aktuální sezóna opět přes celou šířku */
+.dashboardSection {
+  width: 100%;
+  margin-top: 14px;
+}
+
+.dashboardPanel {
+  width: 100%;
+  padding: 12px 16px 13px;
+}
+
+.dashboardHeader {
+  margin-bottom: 9px;
+}
+
+/* CELKOVÁ KARIÉRA: všech 5 údajů na jednom řádku */
+.metricGrid,
+.metricGrid:not(.currentMetricGrid) {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0;
+}
+
+/* AKTUÁLNÍ SEZÓNA: všech 7 údajů na jednom řádku */
+.currentMetricGrid,
+.profileDashboardLeft .currentMetricGrid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 0;
+}
+
+/* Nižší statistické dlaždice */
+.profileMetric,
+.profileMetricFeatured,
+.profileDashboardLeft .profileMetric,
+.profileDashboardLeft .profileMetricFeatured {
+  min-height: 56px;
+  padding: 8px 12px;
+}
+
+.profileMetric strong,
+.profileMetricFeatured strong,
+.profileDashboardLeft .profileMetric strong,
+.profileDashboardLeft .profileMetricFeatured strong {
+  margin-top: 5px;
+  font-size: clamp(18px, 1.7vw, 24px);
+}
+
+/* Poslední zápasy zase normálně pod aktuální sezonou */
+.performance,
+.profileDashboardRight .performance {
+  width: 100%;
+  margin-top: 30px;
+}
+
+.profileDashboardRight .sectionTitle h2 {
+  font-size: clamp(30px, 4vw, 48px);
+}
+
+/* =========================================================
+   MOBIL
+   ========================================================= */
+
+@media (max-width: 760px) {
+  .dashboardSection {
+    margin-top: 10px;
+  }
+
+  .dashboardPanel {
+    padding: 10px;
+  }
+
+  .dashboardHeader {
+    margin-bottom: 7px;
+  }
+
+  /* Kariéra pořád 5 hodnot na JEDNOM řádku */
+  .metricGrid,
+  .metricGrid:not(.currentMetricGrid) {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+
+  /* Aktuální sezóna pořád 7 hodnot na JEDNOM řádku */
+  .currentMetricGrid,
+  .profileDashboardLeft .currentMetricGrid {
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+  }
+
+  .profileMetric,
+  .profileMetricFeatured,
+  .profileDashboardLeft .profileMetric,
+  .profileDashboardLeft .profileMetricFeatured {
+    min-height: 49px;
+    padding: 6px 2px;
+    text-align: center;
+  }
+
+  .profileMetric span,
+  .profileMetricFeatured span {
+    font-size: 4.5px;
+    letter-spacing: 0;
+    white-space: nowrap;
+  }
+
+  .profileMetric strong,
+  .profileMetricFeatured strong,
+  .profileDashboardLeft .profileMetric strong,
+  .profileDashboardLeft .profileMetricFeatured strong {
+    margin-top: 5px;
+    font-size: 14px;
+  }
+
+  .performance,
+  .profileDashboardRight .performance {
+    margin-top: 24px;
+  }
+}
