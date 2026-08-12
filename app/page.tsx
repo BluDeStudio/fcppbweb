@@ -5,6 +5,7 @@ import { LeagueTable } from "@/components/home/LeagueTable";
 import { Squad } from "@/components/home/Squad";
 import { Results } from "@/components/home/Results";
 import { Partners } from "@/components/home/Partners";
+import { Transfers } from "@/components/home/Transfers";
 
 import { AnimatedLogo } from "@/components/ui/AnimatedLogo/AnimatedLogo";
 
@@ -17,10 +18,12 @@ import { getTopScorer } from "@/services/apf/getTopScorer";
 import { getSquad } from "@/services/apf/getSquad";
 
 import { testSupabaseConnection } from "@/lib/testSupabase";
+import { getPublishedTransfers } from "@/lib/getTransfers";
 
 import type { LeagueRow } from "@/types/league";
 import type { MatchResult } from "@/types/match";
 import type { NextMatch } from "@/types/nextMatch";
+import type { ClubTransfer } from "@/types/transfer";
 
 import type {
   SquadPlayer,
@@ -68,6 +71,8 @@ export default async function HomePage() {
 
   let aPlayers: SquadPlayer[] = [];
   let bPlayers: SquadPlayer[] = [];
+
+  let transfers: ClubTransfer[] = [];
 
   /*
    * ========================================
@@ -365,6 +370,22 @@ export default async function HomePage() {
 
   /*
    * ========================================
+   * PŘESTUPY
+   * ========================================
+   */
+
+  try {
+    transfers =
+      await getPublishedTransfers();
+  } catch (error) {
+    console.error(
+      "Chyba při načítání přestupů:",
+      error,
+    );
+  }
+
+  /*
+   * ========================================
    * WEB
    * ========================================
    */
@@ -503,7 +524,17 @@ export default async function HomePage() {
       />
 
       {/* =====================================
-          05 / SOUPISKA
+          05 / PŘESTUPY
+      ===================================== */}
+
+      <Transfers
+        transfers={
+          transfers
+        }
+      />
+
+      {/* =====================================
+          06 / SOUPISKA
       ===================================== */}
 
       <Squad
@@ -516,7 +547,7 @@ export default async function HomePage() {
       />
 
       {/* =====================================
-          06 / VÝSLEDKY
+          07 / VÝSLEDKY
       ===================================== */}
 
       <Results
@@ -529,7 +560,7 @@ export default async function HomePage() {
       />
 
       {/* =====================================
-          07 / PARTNEŘI
+          08 / PARTNEŘI
       ===================================== */}
 
       <Partners />
