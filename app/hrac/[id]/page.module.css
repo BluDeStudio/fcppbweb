@@ -2345,3 +2345,177 @@
     font-size: 14px;
   }
 }
+
+
+/* ========================================
+   PROFIL — DESKTOP 45 / 55 DASHBOARD
+======================================== */
+
+.profileDashboard {
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 0.45fr)
+    minmax(0, 0.55fr);
+
+  align-items: start;
+
+  gap: 14px;
+
+  margin-top: 16px;
+}
+
+.profileDashboardLeft,
+.profileDashboardRight {
+  min-width: 0;
+}
+
+.profileDashboardLeft {
+  display: grid;
+
+  gap: 12px;
+}
+
+.profileDashboardLeft
+.dashboardSection {
+  margin-top: 0;
+}
+
+.profileDashboardRight
+.performance {
+  margin-top: 0;
+}
+
+.profileDashboardRight
+.sectionTitle {
+  margin-bottom: 10px;
+}
+
+.profileDashboardRight
+.sectionTitle h2 {
+  font-size:
+    clamp(
+      28px,
+      3vw,
+      40px
+    );
+}
+
+/*
+ * Levá strana je užší než původní full-width
+ * panel, proto statistiky rozdělíme elegantněji.
+ */
+.profileDashboardLeft
+.metricGrid:not(.currentMetricGrid) {
+  grid-template-columns:
+    repeat(
+      5,
+      minmax(0, 1fr)
+    );
+}
+
+.profileDashboardLeft
+.currentMetricGrid {
+  grid-template-columns:
+    repeat(
+      4,
+      minmax(0, 1fr)
+    );
+}
+
+.profileDashboardLeft
+.profileMetric,
+.profileDashboardLeft
+.profileMetricFeatured {
+  min-height: 62px;
+
+  padding:
+    9px
+    8px;
+}
+
+.profileDashboardLeft
+.profileMetric strong,
+.profileDashboardLeft
+.profileMetricFeatured strong {
+  font-size:
+    clamp(
+      17px,
+      1.7vw,
+      23px
+    );
+}
+
+/*
+ * Poslední zápasy mají na PC stejnou výšku
+ * a vizuální hustotu jako levý dashboard.
+ */
+.profileDashboardRight
+:global(.list) {
+  gap: 6px;
+}
+
+/* ========================================
+   TABLET / MOBIL — ZPĚT POD SEBE
+======================================== */
+
+@media (max-width: 980px) {
+  .profileDashboard {
+    grid-template-columns:
+      1fr;
+
+    gap: 22px;
+  }
+
+  .profileDashboardLeft {
+    gap: 12px;
+  }
+
+  .profileDashboardLeft
+  .currentMetricGrid {
+    grid-template-columns:
+      repeat(
+        7,
+        minmax(0, 1fr)
+      );
+  }
+}
+
+@media (max-width: 760px) {
+  .profileDashboard {
+    gap: 24px;
+
+    margin-top: 12px;
+  }
+
+  .profileDashboardLeft {
+    gap: 10px;
+  }
+
+  /*
+   * Na telefonu zachováme přesně kompaktní
+   * horizontální statistiky z předchozí verze.
+   */
+  .profileDashboardLeft
+  .metricGrid:not(.currentMetricGrid) {
+    grid-template-columns:
+      repeat(
+        5,
+        minmax(0, 1fr)
+      );
+  }
+
+  .profileDashboardLeft
+  .currentMetricGrid {
+    grid-template-columns:
+      repeat(
+        7,
+        minmax(0, 1fr)
+      );
+  }
+
+  .profileDashboardRight
+  .sectionTitle h2 {
+    font-size: 30px;
+  }
+}
