@@ -5,7 +5,8 @@ import type {
 import styles from "./PlayerRecentMatches.module.css";
 
 type PlayerRecentMatchesProps = {
-  matches: PlayerAppMatch[];
+  matches:
+    PlayerAppMatch[];
 
   limit?: number;
 };
@@ -44,7 +45,9 @@ export function PlayerRecentMatches({
       }
     >
       {visibleMatches.map(
-        (match) => (
+        (
+          match,
+        ) => (
           <MatchRow
             key={
               match.matchId
@@ -62,7 +65,8 @@ export function PlayerRecentMatches({
 function MatchRow({
   match,
 }: {
-  match: PlayerAppMatch;
+  match:
+    PlayerAppMatch;
 }) {
   return (
     <article
@@ -72,127 +76,147 @@ function MatchRow({
     >
       <div
         className={
-          styles.matchDate
+          styles.topRow
         }
       >
-        <span>
-          {formatDate(
-            match.date,
-          )}
-        </span>
-
-        <strong>
-          {formatTeam(
-            match.team,
-          )}
-        </strong>
-      </div>
-
-      <div
-        className={
-          styles.matchContent
-        }
-      >
-        <h3>
-          {
-            match.matchTitle
+        <div
+          className={
+            styles.dateTeam
           }
-        </h3>
+        >
+          <span
+            className={
+              styles.date
+            }
+          >
+            {formatDate(
+              match.date,
+            )}
+          </span>
+
+          <span
+            className={
+              styles.team
+            }
+          >
+            {formatTeam(
+              match.team,
+            )}
+          </span>
+        </div>
 
         <div
           className={
-            styles.performanceStats
+            styles.matchInfo
           }
         >
-          <MiniStat
-            label="Góly"
-            value={
-              match.goals
+          <h3>
+            {
+              match.matchTitle
             }
-          />
+          </h3>
 
-          <MiniStat
-            label="Asistence"
-            value={
-              match.assists
-            }
-          />
+          {(match.location ||
+            match.time) && (
+            <div
+              className={
+                styles.meta
+              }
+            >
+              {match.location && (
+                <span>
+                  {
+                    match.location
+                  }
+                </span>
+              )}
 
-          <MiniStat
-            label="ŽK"
-            value={
-              match.yellowCards
-            }
-            card="yellow"
-          />
-
-          <MiniStat
-            label="ČK"
-            value={
-              match.redCards
-            }
-            card="red"
-          />
+              {match.time && (
+                <span>
+                  {
+                    match.time
+                  }
+                </span>
+              )}
+            </div>
+          )}
         </div>
 
-        {(match.location ||
-          match.time) && (
-          <div
+        <div
+          className={
+            styles.result
+          }
+        >
+          <strong
             className={
-              styles.meta
+              styles.score
             }
           >
-            {match.location && (
-              <span>
-                {
-                  match.location
-                }
-              </span>
-            )}
+            {match.score ??
+              "—"}
+          </strong>
 
-            {match.time && (
-              <span>
-                {match.time}
-              </span>
-            )}
-          </div>
-        )}
+          {match.averageRating !==
+          null ? (
+            <span
+              className={`${styles.rating} ${getRatingClass(
+                match.averageRating,
+              )}`}
+            >
+              {match.averageRating.toFixed(
+                1,
+              )}
+            </span>
+          ) : (
+            <span
+              className={
+                styles.ratingEmpty
+              }
+            >
+              —
+            </span>
+          )}
+        </div>
       </div>
 
       <div
         className={
-          styles.resultBlock
+          styles.statsRow
         }
       >
-        <strong
-          className={
-            styles.score
+        <MiniStat
+          label="G"
+          title="Góly"
+          value={
+            match.goals
           }
-        >
-          {match.score ??
-            "—"}
-        </strong>
+        />
 
-        {match.averageRating !==
-        null ? (
-          <span
-            className={`${styles.ratingBadge} ${getRatingClass(
-              match.averageRating,
-            )}`}
-          >
-            {match.averageRating.toFixed(
-              1,
-            )}
-          </span>
-        ) : (
-          <span
-            className={
-              styles.ratingEmpty
-            }
-          >
-            —
-          </span>
-        )}
+        <MiniStat
+          label="A"
+          title="Asistence"
+          value={
+            match.assists
+          }
+        />
+
+        <MiniStat
+          label="ŽK"
+          title="Žluté karty"
+          value={
+            match.yellowCards
+          }
+          card="yellow"
+        />
+
+        <MiniStat
+          label="ČK"
+          title="Červené karty"
+          value={
+            match.redCards
+          }
+          card="red"
+        />
 
         {match.isPlayerOfTheMatch && (
           <span
@@ -210,41 +234,45 @@ function MatchRow({
 
 function MiniStat({
   label,
+  title,
   value,
   card,
 }: {
-  label: string;
+  label:
+    string;
+
+  title:
+    string;
 
   value:
-    | number
-    | string;
+    number |
+    string;
 
   card?:
-    | "yellow"
-    | "red";
+    "yellow" |
+    "red";
 }) {
   return (
     <div
       className={
         styles.miniStat
       }
+      title={
+        title
+      }
     >
       {card && (
-        <span
+        <i
           className={
-            card === "yellow"
+            card ===
+            "yellow"
               ? styles.yellowCard
               : styles.redCard
           }
-          aria-hidden="true"
         />
       )}
 
-      <span
-        className={
-          styles.miniLabel
-        }
-      >
+      <span>
         {label}
       </span>
 
@@ -255,52 +283,46 @@ function MiniStat({
   );
 }
 
+function formatTeam(
+  value: string,
+): string {
+  if (
+    value === "A"
+  ) {
+    return "A-TÝM";
+  }
+
+  if (
+    value === "B"
+  ) {
+    return "B-TÝM";
+  }
+
+  return value;
+}
+
 function getRatingClass(
   rating: number,
 ): string {
   if (
     rating >= 8
   ) {
-    return styles.ratingExcellent;
+    return styles.ratingDarkGreen;
   }
 
   if (
     rating >= 7
   ) {
-    return styles.ratingGood;
-  }
-
-  if (
-    rating >= 6.5
-  ) {
-    return styles.ratingAverage;
+    return styles.ratingGreen;
   }
 
   if (
     rating >= 6
   ) {
-    return styles.ratingWeak;
+    return styles.ratingOrange;
   }
 
-  return styles.ratingBad;
-}
-
-function formatTeam(
-  team: string,
-): string {
-  if (
-    team === "A"
-  ) {
-    return "A-TÝM";
-  }
-
-  if (
-    team === "B"
-  ) {
-    return "B-TÝM";
-  }
-
-  return team;
+  return styles.ratingRed;
 }
 
 function formatDate(
