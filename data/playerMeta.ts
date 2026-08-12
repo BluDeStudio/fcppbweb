@@ -84,7 +84,7 @@ const playerMeta: Record<
 
   1562: {
     position: "player",
-    team: "both",
+    team: "a",
     status: "loan",
     shirtNumber: null,
   },

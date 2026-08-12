@@ -230,9 +230,9 @@ export default async function HomePage() {
    */
 
   try {
-    [
-      aPlayers,
-      bPlayers,
+    const [
+      aApfPlayers,
+      bApfPlayers,
     ] = await Promise.all([
       getSquad({
         teamId:
@@ -254,6 +254,108 @@ export default async function HomePage() {
         team: "b",
       }),
     ]);
+
+    /*
+     * ========================================
+     * KMENOVÉ SOUPISKY
+     * ========================================
+     *
+     * APF určuje, na které týmové stránce
+     * se hráč objevil / nastoupil.
+     *
+     * Kmenovou příslušnost ale určujeme
+     * výhradně podle playerMeta.ts:
+     *
+     * player.team === "a" -> A-tým
+     * player.team === "b" -> B-tým
+     *
+     * Pokud hráč nastoupí za oba týmy,
+     * v soupisce zůstane jen u svého kmene.
+     */
+
+    const allPlayersById =
+      new Map<
+        number,
+        SquadPlayer
+      >();
+
+    [
+      ...aApfPlayers,
+      ...bApfPlayers,
+    ].forEach(
+      (
+        player,
+      ) => {
+        const existing =
+          allPlayersById.get(
+            player.id,
+          );
+
+        if (
+          !existing
+        ) {
+          allPlayersById.set(
+            player.id,
+            player,
+          );
+
+          return;
+        }
+
+        /*
+         * Když je hráč na obou APF stránkách,
+         * ponecháme jeden záznam.
+         *
+         * Pro soupisku jsou důležité hlavně:
+         * ID, jméno, foto, kmen, status, číslo.
+         * Statistiky se na kartách stejně
+         * načítají zvlášť z aplikace 2026/27.
+         */
+        allPlayersById.set(
+          player.id,
+          {
+            ...existing,
+
+            team:
+              player.team,
+
+            status:
+              player.status,
+
+            shirtNumber:
+              player.shirtNumber ??
+              existing.shirtNumber,
+
+            apfSlug:
+              player.apfSlug ||
+              existing.apfSlug,
+          },
+        );
+      },
+    );
+
+    const allPlayers =
+      Array.from(
+        allPlayersById.values(),
+      );
+
+    aPlayers =
+      allPlayers.filter(
+        (
+          player,
+        ) =>
+          player.team ===
+          "a",
+      );
+
+    bPlayers =
+      allPlayers.filter(
+        (
+          player,
+        ) =>
+          player.team ===
+          "b",
+      );
   } catch (error) {
     console.error(
       "Chyba při načítání soupisek APF:",

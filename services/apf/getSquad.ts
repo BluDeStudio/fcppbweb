@@ -312,10 +312,6 @@ export async function getSquad({
               )
             : 0;
 
-        if (matches < 1) {
-          return;
-        }
-
         const exists =
           players.some(
             (player) =>
