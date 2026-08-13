@@ -1,70 +1,183 @@
+import { requireAdmin } from "@/lib/adminAuth";
 import { getSupabaseAdmin } from "@/lib/supabaseAdmin";
-import { TransferAdminForm } from "@/components/admin/TransferAdminForm";
 
-type AdminTransfersPageProps = {
-  searchParams: Promise<{
-    success?: string;
-    error?: string;
-  }>;
+import { AdminShell } from "@/components/admin/AdminShell";
+import { TransferAdminForm } from "@/components/admin/TransferAdminForm";
+import {
+  TransfersAdmin,
+  type AdminTransfer,
+} from "@/components/admin/TransfersAdmin";
+
+import { clubConfig } from "@/config/club";
+import { getSquad } from "@/services/apf/getSquad";
+
+type TransferRow = {
+  id: string;
+  direction: "arrival" | "departure";
+  movement_type: "transfer" | "loan";
+  player_id: number | null;
+  player_name: string;
+  description: string | null;
+  image_url: string | null;
+  other_club: string | null;
+  other_club_apf_id: number | null;
+  other_club_logo_url: string | null;
+  occurred_on: string;
+  published: boolean;
 };
 
 export default async function AdminTransfersPage({
   searchParams,
-}: AdminTransfersPageProps) {
+}: {
+  searchParams: Promise<{
+    success?: string;
+    error?: string;
+  }>;
+}) {
+  await requireAdmin();
+
   const params = await searchParams;
-  const supabase = getSupabaseAdmin();
 
-  const { data, error } = await supabase
-    .from("players")
-    .select("apf_player_id, name")
-    .not("apf_player_id", "is", null)
-    .order("name", { ascending: true });
+  const aTeam = clubConfig.teams.aTeam;
+  const bTeam = clubConfig.teams.bTeam;
 
-  if (error) {
-    console.error("Nepodařilo se načíst hráče:", error);
+  const [
+    squadResult,
+    transferResult,
+  ] = await Promise.all([
+    Promise.all([
+      getSquad({
+        teamId: aTeam.teamId,
+        teamSlug: aTeam.teamSlug,
+        team: "a",
+      }),
+      getSquad({
+        teamId: bTeam.teamId,
+        teamSlug: bTeam.teamSlug,
+        team: "b",
+      }),
+    ]),
+
+    getSupabaseAdmin()
+      .from("club_transfers")
+      .select(
+        [
+          "id",
+          "direction",
+          "movement_type",
+          "player_id",
+          "player_name",
+          "description",
+          "image_url",
+          "other_club",
+          "other_club_apf_id",
+          "other_club_logo_url",
+          "occurred_on",
+          "published",
+        ].join(", "),
+      )
+      .order("occurred_on", { ascending: false })
+      .order("created_at", { ascending: false }),
+  ]);
+
+  const playerMap =
+    new Map<
+      number,
+      {
+        id: number;
+        name: string;
+      }
+    >();
+
+  const [
+    aPlayers,
+    bPlayers,
+  ] = squadResult;
+
+  [
+    ...aPlayers,
+    ...bPlayers,
+  ].forEach((player) => {
+    playerMap.set(player.id, {
+      id: player.id,
+      name: player.name,
+    });
+  });
+
+  const players =
+    Array.from(
+      playerMap.values(),
+    ).sort((a, b) =>
+      a.name.localeCompare(
+        b.name,
+        "cs",
+      ),
+    );
+
+  if (transferResult.error) {
+    console.error(
+      "Admin transfers:",
+      transferResult.error,
+    );
   }
 
-  const players = (data ?? []).map((player) => ({
-    id: Number(player.apf_player_id),
-    name: String(player.name),
-  }));
+  const transfers:
+    AdminTransfer[] =
+    (
+      transferResult.data ??
+      []
+    ).map((row) => {
+      const item =
+        row as unknown as TransferRow;
+
+      return {
+        id: item.id,
+        direction: item.direction,
+        movementType: item.movement_type,
+        playerId: item.player_id,
+        playerName: item.player_name,
+        description: item.description,
+        imageUrl: item.image_url,
+        otherClub: item.other_club,
+        otherClubApfId: item.other_club_apf_id,
+        otherClubLogoUrl: item.other_club_logo_url,
+        occurredOn: item.occurred_on,
+        published: item.published,
+      };
+    });
 
   return (
-    <main style={{ minHeight: "100vh", padding: "80px 18px" }}>
-      <div style={{ width: "min(720px, 100%)", margin: "0 auto" }}>
-        <div style={{ marginBottom: "20px" }}>
-          <span
-            style={{
-              color: "var(--primary)",
-              fontSize: "9px",
-              fontWeight: 950,
-              letterSpacing: ".1em",
-              textTransform: "uppercase",
-            }}
-          >
-            FC PPB Admin
-          </span>
+    <AdminShell title="Přestupy">
+      {params.success && (
+        <p
+          style={{
+            color:
+              "var(--primary)",
+          }}
+        >
+          ✅ Změna byla uložena.
+        </p>
+      )}
 
-          <h1
-            style={{
-              margin: "6px 0 0",
-              fontSize: "clamp(38px, 7vw, 62px)",
-              lineHeight: .95,
-              letterSpacing: "-.05em",
-            }}
-          >
-            Přestupy.
-          </h1>
-        </div>
+      {params.error && (
+        <p
+          style={{
+            color:
+              "#ff7474",
+          }}
+        >
+          ❌ Chyba:{" "}
+          {params.error}
+        </p>
+      )}
 
-        {params.success === "1" && <p>✅ Přestup byl uložen.</p>}
+      <TransferAdminForm
+        players={players}
+      />
 
-        {params.error && (
-          <p>❌ Přestup se nepodařilo uložit. Chyba: {params.error}</p>
-        )}
-
-        <TransferAdminForm players={players} />
-      </div>
-    </main>
+      <TransfersAdmin
+        transfers={transfers}
+      />
+    </AdminShell>
   );
 }
