@@ -1,14 +1,7 @@
 "use client";
 
-import {
-  useMemo,
-  useState,
-} from "react";
-
-import {
-  createTransfer,
-} from "@/app/admin/prestupy/actions";
-
+import { useMemo, useState } from "react";
+import { createTransfer } from "@/app/admin/prestupy/actions";
 import styles from "./TransferAdminForm.module.css";
 
 type PlayerOption = {
@@ -19,75 +12,25 @@ type PlayerOption = {
 export function TransferAdminForm({
   players,
 }: {
-  players:
-    PlayerOption[];
+  players: PlayerOption[];
 }) {
-  const [
-    direction,
-    setDirection,
-  ] =
-    useState<
-      "arrival" |
-      "departure"
-    >(
-      "arrival",
-    );
+  const [direction, setDirection] =
+    useState<"arrival" | "departure">("arrival");
 
-  const [
-    selectedPlayerName,
-    setSelectedPlayerName,
-  ] =
-    useState(
-      "",
-    );
+  const [selectedPlayerName, setSelectedPlayerName] = useState("");
 
-  const sortedPlayers =
-    useMemo(
-      () =>
-        players
-          .slice()
-          .sort(
-            (
-              a,
-              b,
-            ) =>
-              a.name.localeCompare(
-                b.name,
-                "cs",
-              ),
-          ),
-      [
-        players,
-      ],
-    );
+  const sortedPlayers = useMemo(
+    () => players.slice().sort((a, b) => a.name.localeCompare(b.name, "cs")),
+    [players],
+  );
 
   return (
-    <form
-      action={
-        createTransfer
-      }
-      className={
-        styles.form
-      }
-    >
-      <div
-        className={
-          styles.switch
-        }
-      >
+    <form action={createTransfer} className={styles.form}>
+      <div className={styles.switch}>
         <button
           type="button"
-          className={
-            direction ===
-            "arrival"
-              ? styles.active
-              : undefined
-          }
-          onClick={() =>
-            setDirection(
-              "arrival",
-            )
-          }
+          className={direction === "arrival" ? styles.active : undefined}
+          onClick={() => setDirection("arrival")}
         >
           Příchod
         </button>
@@ -95,275 +38,132 @@ export function TransferAdminForm({
         <button
           type="button"
           className={
-            direction ===
-            "departure"
+            direction === "departure"
               ? styles.activeDeparture
               : undefined
           }
-          onClick={() =>
-            setDirection(
-              "departure",
-            )
-          }
+          onClick={() => setDirection("departure")}
         >
           Odchod
         </button>
       </div>
 
-      <input
-        type="hidden"
-        name="direction"
-        value={
-          direction
-        }
-      />
-
+      <input type="hidden" name="direction" value={direction} />
       <input
         type="hidden"
         name="selectedPlayerName"
-        value={
-          selectedPlayerName
-        }
+        value={selectedPlayerName}
       />
 
-      {direction ===
-      "departure" ? (
-        <>
-          <label>
-            <span>
-              Hráč ze soupisky
-            </span>
+      {direction === "departure" ? (
+        <label>
+          <span>Hráč ze soupisky</span>
 
-            <select
-              name="playerId"
-              required
-              defaultValue=""
-              onChange={
-                (
-                  event,
-                ) => {
-                  const option =
-                    event
-                      .currentTarget
-                      .selectedOptions[0];
+          <select
+            name="playerId"
+            required
+            defaultValue=""
+            onChange={(event) => {
+              const option = event.currentTarget.selectedOptions[0];
+              setSelectedPlayerName(option?.dataset.name ?? "");
+            }}
+          >
+            <option value="">Vyber hráče</option>
 
-                  setSelectedPlayerName(
-                    option?.dataset
-                      .name ??
-                      "",
-                  );
-                }
-              }
-            >
+            {sortedPlayers.map((player) => (
               <option
-                value=""
+                key={player.id}
+                value={player.id}
+                data-name={player.name}
               >
-                Vyber hráče
+                {player.name}
               </option>
-
-              {sortedPlayers.map(
-                (
-                  player,
-                ) => (
-                  <option
-                    key={
-                      player.id
-                    }
-                    value={
-                      player.id
-                    }
-                    data-name={
-                      player.name
-                    }
-                  >
-                    {
-                      player.name
-                    }
-                  </option>
-                ),
-              )}
-            </select>
-          </label>
-
-          {selectedPlayerName && (
-            <div
-              className={
-                styles.info
-              }
-            >
-              Fotku hráče není
-              potřeba nahrávat.
-              Použije se automaticky
-              jeho současná profilová
-              fotka.
-            </div>
-          )}
-        </>
+            ))}
+          </select>
+        </label>
       ) : (
         <label>
-          <span>
-            Jméno hráče
-          </span>
-
-          <input
-            name="arrivalName"
-            placeholder="Např. Jan Novák"
-            required
-          />
+          <span>Jméno hráče</span>
+          <input name="arrivalName" required />
         </label>
       )}
 
-      <div
-        className={
-          styles.twoCols
-        }
-      >
+      <div className={styles.twoCols}>
         <label>
-          <span>
-            Typ
-          </span>
+          <span>Druh pohybu</span>
 
           <select
-            name="movementType"
-            defaultValue="transfer"
+            name="movementDetail"
+            defaultValue={
+              direction === "arrival"
+                ? "transfer_from"
+                : "transfer_to"
+            }
+            key={direction}
           >
-            <option
-              value="transfer"
-            >
-              Přestup
-            </option>
-
-            <option
-              value="loan"
-            >
-              Hostování
-            </option>
+            {direction === "arrival" ? (
+              <>
+                <option value="transfer_from">Přestup z týmu</option>
+                <option value="loan_in">Na hostování</option>
+                <option value="loan_end">Konec hostování / návrat</option>
+              </>
+            ) : (
+              <>
+                <option value="transfer_to">Přestup do týmu</option>
+                <option value="loan_out">Na hostování</option>
+                <option value="loan_end">Konec hostování</option>
+                <option value="released">Vyřazení z týmu</option>
+              </>
+            )}
           </select>
         </label>
 
         <label>
-          <span>
-            Datum
-          </span>
-
-          <input
-            name="occurredOn"
-            type="date"
-            required
-          />
+          <span>Datum</span>
+          <input name="occurredOn" type="date" required />
         </label>
       </div>
 
-      <div
-        className={
-          styles.clubBox
-        }
-      >
-        <div
-          className={
-            styles.clubBoxTitle
-          }
-        >
-          {direction ===
-          "arrival"
+      <div className={styles.clubBox}>
+        <div className={styles.clubBoxTitle}>
+          {direction === "arrival"
             ? "Klub, ze kterého přichází"
             : "Klub, do kterého odchází"}
         </div>
 
         <label>
-          <span>
-            APF ID týmu
-          </span>
-
-          <input
-            name="otherClubApfId"
-            inputMode="numeric"
-            placeholder="Např. 265"
-          />
-
+          <span>APF ID týmu</span>
+          <input name="otherClubApfId" inputMode="numeric" />
           <small>
-            Pokud tým existuje na
-            futsalvplzni.cz, stačí
-            jeho ID. Web se pokusí
-            automaticky načíst název
-            i znak.
+            Když zadáš APF ID, web doplní název/znak a na veřejné kartě
+            vytvoří proklik na profil týmu.
           </small>
         </label>
 
         <label>
-          <span>
-            Název klubu ručně
-          </span>
-
-          <input
-            name="otherClub"
-            placeholder="Použij, pokud klub není na APF"
-          />
+          <span>Název klubu ručně</span>
+          <input name="otherClub" />
         </label>
       </div>
 
       <label>
-        <span>
-          Krátký popis
-        </span>
-
-        <textarea
-          name="description"
-          rows={4}
-          placeholder="Krátký text k přestupu..."
-        />
+        <span>Krátký popis</span>
+        <textarea name="description" rows={3} />
       </label>
 
-      {direction ===
-        "arrival" && (
+      {direction === "arrival" && (
         <label>
-          <span>
-            Fotka hráče
-          </span>
-
-          <input
-            name="photo"
-            type="file"
-            accept="image/*"
-          />
+          <span>Fotka hráče</span>
+          <input name="photo" type="file" accept="image/*" />
         </label>
       )}
 
-      <label>
-        <span>
-          Admin heslo
-        </span>
-
-        <input
-          name="adminPassword"
-          type="password"
-          required
-          autoComplete="off"
-        />
+      <label className={styles.check}>
+        <input name="published" type="checkbox" defaultChecked />
+        <span>Zveřejnit ihned</span>
       </label>
 
-      <label
-        className={
-          styles.check
-        }
-      >
-        <input
-          name="published"
-          type="checkbox"
-          defaultChecked
-        />
-
-        <span>
-          Zveřejnit ihned
-        </span>
-      </label>
-
-      <button
-        type="submit"
-        className={
-          styles.submit
-        }
-      >
+      <button type="submit" className={styles.submit}>
         Uložit přestup
       </button>
     </form>

@@ -11,10 +11,17 @@ import {
 import { clubConfig } from "@/config/club";
 import { getSquad } from "@/services/apf/getSquad";
 
+import type {
+  TransferDirection,
+  TransferMovementDetail,
+  TransferMovementType,
+} from "@/types/transfer";
+
 type TransferRow = {
   id: string;
-  direction: "arrival" | "departure";
-  movement_type: "transfer" | "loan";
+  direction: TransferDirection;
+  movement_type: TransferMovementType;
+  movement_detail: TransferMovementDetail | null;
   player_id: number | null;
   player_name: string;
   description: string | null;
@@ -25,6 +32,21 @@ type TransferRow = {
   occurred_on: string;
   published: boolean;
 };
+
+function fallbackDetail(
+  direction: TransferDirection,
+  movementType: TransferMovementType,
+): TransferMovementDetail {
+  if (movementType === "loan") {
+    return direction === "arrival"
+      ? "loan_in"
+      : "loan_out";
+  }
+
+  return direction === "arrival"
+    ? "transfer_from"
+    : "transfer_to";
+}
 
 export default async function AdminTransfersPage({
   searchParams,
@@ -41,10 +63,7 @@ export default async function AdminTransfersPage({
   const aTeam = clubConfig.teams.aTeam;
   const bTeam = clubConfig.teams.bTeam;
 
-  const [
-    squadResult,
-    transferResult,
-  ] = await Promise.all([
+  const [squads, transferResult] = await Promise.all([
     Promise.all([
       getSquad({
         teamId: aTeam.teamId,
@@ -65,6 +84,7 @@ export default async function AdminTransfersPage({
           "id",
           "direction",
           "movement_type",
+          "movement_detail",
           "player_id",
           "player_name",
           "description",
@@ -80,104 +100,62 @@ export default async function AdminTransfersPage({
       .order("created_at", { ascending: false }),
   ]);
 
-  const playerMap =
-    new Map<
-      number,
-      {
-        id: number;
-        name: string;
-      }
-    >();
+  const playerMap = new Map<number, { id: number; name: string }>();
 
-  const [
-    aPlayers,
-    bPlayers,
-  ] = squadResult;
-
-  [
-    ...aPlayers,
-    ...bPlayers,
-  ].forEach((player) => {
+  [...squads[0], ...squads[1]].forEach((player) => {
     playerMap.set(player.id, {
       id: player.id,
       name: player.name,
     });
   });
 
-  const players =
-    Array.from(
-      playerMap.values(),
-    ).sort((a, b) =>
-      a.name.localeCompare(
-        b.name,
-        "cs",
-      ),
-    );
+  const players = Array.from(playerMap.values()).sort((a, b) =>
+    a.name.localeCompare(b.name, "cs"),
+  );
 
   if (transferResult.error) {
-    console.error(
-      "Admin transfers:",
-      transferResult.error,
-    );
+    console.error("Admin transfers:", transferResult.error);
   }
 
-  const transfers:
-    AdminTransfer[] =
-    (
-      transferResult.data ??
-      []
-    ).map((row) => {
-      const item =
-        row as unknown as TransferRow;
+  const transfers: AdminTransfer[] = (transferResult.data ?? []).map((row) => {
+    const item = row as unknown as TransferRow;
 
-      return {
-        id: item.id,
-        direction: item.direction,
-        movementType: item.movement_type,
-        playerId: item.player_id,
-        playerName: item.player_name,
-        description: item.description,
-        imageUrl: item.image_url,
-        otherClub: item.other_club,
-        otherClubApfId: item.other_club_apf_id,
-        otherClubLogoUrl: item.other_club_logo_url,
-        occurredOn: item.occurred_on,
-        published: item.published,
-      };
-    });
+    return {
+      id: item.id,
+      direction: item.direction,
+      movementType: item.movement_type,
+      movementDetail:
+        item.movement_detail ??
+        fallbackDetail(item.direction, item.movement_type),
+      playerId: item.player_id,
+      playerName: item.player_name,
+      description: item.description,
+      imageUrl: item.image_url,
+      otherClub: item.other_club,
+      otherClubApfId: item.other_club_apf_id,
+      otherClubLogoUrl: item.other_club_logo_url,
+      occurredOn: item.occurred_on,
+      published: item.published,
+    };
+  });
 
   return (
     <AdminShell title="Přestupy">
       {params.success && (
-        <p
-          style={{
-            color:
-              "var(--primary)",
-          }}
-        >
+        <p style={{ color: "var(--primary)" }}>
           ✅ Změna byla uložena.
         </p>
       )}
 
       {params.error && (
-        <p
-          style={{
-            color:
-              "#ff7474",
-          }}
-        >
-          ❌ Chyba:{" "}
-          {params.error}
+        <p style={{ color: "#ff7474" }}>
+          ❌ Chyba: {params.error}
         </p>
       )}
 
-      <TransferAdminForm
-        players={players}
-      />
+      <TransferAdminForm players={players} />
 
-      <TransfersAdmin
-        transfers={transfers}
-      />
+      <TransfersAdmin transfers={transfers} />
     </AdminShell>
   );
 }

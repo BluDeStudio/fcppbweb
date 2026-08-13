@@ -6,10 +6,19 @@ export type TransferMovementType =
   | "transfer"
   | "loan";
 
+export type TransferMovementDetail =
+  | "transfer_from"
+  | "transfer_to"
+  | "loan_in"
+  | "loan_out"
+  | "loan_end"
+  | "released";
+
 export type ClubTransfer = {
   id: string;
   direction: TransferDirection;
   movementType: TransferMovementType;
+  movementDetail: TransferMovementDetail;
   playerId: number | null;
   playerName: string;
   description: string | null;

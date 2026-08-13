@@ -2,9 +2,16 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+
 import { requireAdmin } from "@/lib/adminAuth";
 import { getSupabaseAdmin } from "@/lib/supabaseAdmin";
 import { getApfTeamInfo } from "@/services/apf/getApfTeamInfo";
+
+import type {
+  TransferDirection,
+  TransferMovementDetail,
+  TransferMovementType,
+} from "@/types/transfer";
 
 const text = (fd: FormData, key: string) =>
   String(fd.get(key) ?? "").trim();
@@ -13,6 +20,45 @@ function refresh() {
   revalidatePath("/");
   revalidatePath("/admin/prestupy");
   revalidatePath("/admin/hraci");
+}
+
+function isDirection(value: string): value is TransferDirection {
+  return value === "arrival" || value === "departure";
+}
+
+function isDetail(value: string): value is TransferMovementDetail {
+  return [
+    "transfer_from",
+    "transfer_to",
+    "loan_in",
+    "loan_out",
+    "loan_end",
+    "released",
+  ].includes(value);
+}
+
+function detailAllowedForDirection(
+  direction: TransferDirection,
+  detail: TransferMovementDetail,
+) {
+  if (direction === "arrival") {
+    return ["transfer_from", "loan_in", "loan_end"].includes(detail);
+  }
+
+  return [
+    "transfer_to",
+    "loan_out",
+    "loan_end",
+    "released",
+  ].includes(detail);
+}
+
+function legacyMovementType(
+  detail: TransferMovementDetail,
+): TransferMovementType {
+  return ["loan_in", "loan_out", "loan_end"].includes(detail)
+    ? "loan"
+    : "transfer";
 }
 
 async function resolveClub(fd: FormData) {
@@ -70,8 +116,20 @@ async function uploadPhoto(photo: File, playerName: string) {
 export async function createTransfer(fd: FormData) {
   await requireAdmin();
 
-  const direction = text(fd, "direction");
-  const movementType = text(fd, "movementType");
+  const directionRaw = text(fd, "direction");
+  const detailRaw = text(fd, "movementDetail");
+
+  if (!isDirection(directionRaw) || !isDetail(detailRaw)) {
+    redirect("/admin/prestupy?error=required");
+  }
+
+  const direction = directionRaw;
+  const movementDetail = detailRaw;
+
+  if (!detailAllowedForDirection(direction, movementDetail)) {
+    redirect("/admin/prestupy?error=movement");
+  }
+
   const selectedPlayerId = text(fd, "playerId");
   const selectedPlayerName = text(fd, "selectedPlayerName");
   const arrivalName = text(fd, "arrivalName");
@@ -82,12 +140,7 @@ export async function createTransfer(fd: FormData) {
   const playerName =
     direction === "departure" ? selectedPlayerName : arrivalName;
 
-  if (
-    !["arrival", "departure"].includes(direction) ||
-    !["transfer", "loan"].includes(movementType) ||
-    !playerName ||
-    !occurredOn
-  ) {
+  if (!playerName || !occurredOn) {
     redirect("/admin/prestupy?error=required");
   }
 
@@ -102,6 +155,7 @@ export async function createTransfer(fd: FormData) {
     playerId ? `/images/${playerId}.jpg` : null;
 
   const photo = fd.get("photo");
+
   if (photo instanceof File && photo.size > 0) {
     try {
       imageUrl = await uploadPhoto(photo, playerName);
@@ -111,13 +165,12 @@ export async function createTransfer(fd: FormData) {
     }
   }
 
-  const supabase = getSupabaseAdmin();
-
-  const { error } = await supabase
+  const { error } = await getSupabaseAdmin()
     .from("club_transfers")
     .insert({
       direction,
-      movement_type: movementType,
+      movement_type: legacyMovementType(movementDetail),
+      movement_detail: movementDetail,
       player_id: playerId,
       player_name: playerName,
       description: description || null,
@@ -142,8 +195,8 @@ export async function updateTransfer(fd: FormData) {
   await requireAdmin();
 
   const id = text(fd, "id");
-  const direction = text(fd, "direction");
-  const movementType = text(fd, "movementType");
+  const directionRaw = text(fd, "direction");
+  const detailRaw = text(fd, "movementDetail");
   const playerIdRaw = text(fd, "playerId");
   const playerName = text(fd, "playerName");
   const occurredOn = text(fd, "occurredOn");
@@ -155,10 +208,17 @@ export async function updateTransfer(fd: FormData) {
     !id ||
     !playerName ||
     !occurredOn ||
-    !["arrival", "departure"].includes(direction) ||
-    !["transfer", "loan"].includes(movementType)
+    !isDirection(directionRaw) ||
+    !isDetail(detailRaw)
   ) {
     redirect("/admin/prestupy?error=required");
+  }
+
+  const direction = directionRaw;
+  const movementDetail = detailRaw;
+
+  if (!detailAllowedForDirection(direction, movementDetail)) {
+    redirect(`/admin/prestupy?error=movement&edit=${id}`);
   }
 
   const playerId = playerIdRaw ? Number(playerIdRaw) : null;
@@ -171,6 +231,7 @@ export async function updateTransfer(fd: FormData) {
   }
 
   const photo = fd.get("photo");
+
   if (photo instanceof File && photo.size > 0) {
     try {
       imageUrl = await uploadPhoto(photo, playerName);
@@ -180,13 +241,12 @@ export async function updateTransfer(fd: FormData) {
     }
   }
 
-  const supabase = getSupabaseAdmin();
-
-  const { error } = await supabase
+  const { error } = await getSupabaseAdmin()
     .from("club_transfers")
     .update({
       direction,
-      movement_type: movementType,
+      movement_type: legacyMovementType(movementDetail),
+      movement_detail: movementDetail,
       player_id: playerId,
       player_name: playerName,
       description: description || null,
@@ -234,6 +294,7 @@ export async function deleteTransfer(fd: FormData) {
   await requireAdmin();
 
   const id = text(fd, "id");
+
   if (!id) redirect("/admin/prestupy?error=required");
 
   const { error } = await getSupabaseAdmin()
