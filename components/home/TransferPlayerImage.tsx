@@ -27,7 +27,7 @@ export function TransferPlayerImage({
       src={src}
       alt={name}
       fill
-      sizes="(max-width: 760px) 100vw, 50vw"
+      sizes="(max-width: 600px) 108px, 180px"
       className={styles.image}
       onError={() => setFailed(true)}
     />

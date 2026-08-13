@@ -1,55 +1,24 @@
-import Link from "next/link";
-
-import {
-  SectionHeader,
-} from "@/components/ui/SectionHeader";
-
-import type {
-  ClubTransfer,
-} from "@/types/transfer";
-
-import {
-  TransferPlayerImage,
-} from "./TransferPlayerImage";
-
+import { SectionHeader } from "@/components/ui/SectionHeader";
+import type { ClubTransfer } from "@/types/transfer";
+import { TransferPlayerImage } from "./TransferPlayerImage";
 import styles from "./Transfers.module.css";
 
 export function Transfers({
   transfers,
 }: {
-  transfers:
-    ClubTransfer[];
+  transfers: ClubTransfer[];
 }) {
-  const arrivals =
-    transfers.filter(
-      (
-        transfer,
-      ) =>
-        transfer.direction ===
-        "arrival",
-    );
+  const arrivals = transfers.filter(
+    (transfer) => transfer.direction === "arrival",
+  );
 
-  const departures =
-    transfers.filter(
-      (
-        transfer,
-      ) =>
-        transfer.direction ===
-        "departure",
-    );
+  const departures = transfers.filter(
+    (transfer) => transfer.direction === "departure",
+  );
 
   return (
-    <section
-      id="prestupy"
-      className={
-        styles.section
-      }
-    >
-      <div
-        className={
-          styles.container
-        }
-      >
+    <section id="prestupy" className={styles.section}>
+      <div className={styles.container}>
         <SectionHeader
           number="05"
           label="Přestupy"
@@ -58,146 +27,71 @@ export function Transfers({
           meta="Sezóna 2026/27"
         />
 
-        {transfers.length >
-        0 ? (
-          <div
-            className={
-              styles.board
-            }
-          >
-            <TransferColumn
-              title="PŘÍCHODY"
-              subtitle="Nové posily FC PPB"
-              direction="arrival"
-              transfers={
-                arrivals
-              }
-            />
+        <div className={styles.transferGrid}>
+          <TransferSide
+            title="PŘÍCHODY"
+            arrows="<<"
+            subtitle="NOVÉ POSILY FC PPB"
+            direction="arrival"
+            transfers={arrivals}
+          />
 
-            <TransferColumn
-              title="ODCHODY"
-              subtitle="Opustili FC PPB"
-              direction="departure"
-              transfers={
-                departures
-              }
-            />
-          </div>
-        ) : (
-          <div
-            className={
-              styles.empty
-            }
-          >
-            Aktuálně nejsou
-            zveřejněné žádné
-            přestupy.
-          </div>
-        )}
+          <TransferSide
+            title="ODCHODY"
+            arrows=">>"
+            subtitle="OPUSTILI FC PPB"
+            direction="departure"
+            transfers={departures}
+          />
+        </div>
       </div>
     </section>
   );
 }
 
-function TransferColumn({
+function TransferSide({
   title,
+  arrows,
   subtitle,
   direction,
   transfers,
 }: {
-  title:
-    string;
-
-  subtitle:
-    string;
-
-  direction:
-    "arrival" |
-    "departure";
-
-  transfers:
-    ClubTransfer[];
+  title: string;
+  arrows: string;
+  subtitle: string;
+  direction: "arrival" | "departure";
+  transfers: ClubTransfer[];
 }) {
-  const isArrival =
-    direction ===
-    "arrival";
+  const isArrival = direction === "arrival";
 
   return (
     <div
-      className={`${styles.column} ${
-        isArrival
-          ? styles.arrivalColumn
-          : styles.departureColumn
+      className={`${styles.side} ${
+        isArrival ? styles.sideArrival : styles.sideDeparture
       }`}
     >
-      <div
-        className={
-          styles.columnHeader
-        }
-      >
+      <div className={styles.sideHeader}>
         <div>
           <h3>
-            {title}
-
-            <span
-              className={
-                styles.chevrons
-              }
-            >
-              {isArrival
-                ? " <<"
-                : " >>"}
-            </span>
+            {title} <span>{arrows}</span>
           </h3>
-
-          <p>
-            {subtitle}
-          </p>
+          <p>{subtitle}</p>
         </div>
 
-        <span
-          className={
-            styles.count
-          }
-        >
-          {
-            transfers.length
-          }
-        </span>
+        <div className={styles.counter}>{transfers.length}</div>
       </div>
 
-      <div
-        className={
-          styles.cards
-        }
-      >
-        {transfers.map(
-          (
-            transfer,
-          ) => (
-            <TransferCard
-              key={
-                transfer.id
-              }
-              transfer={
-                transfer
-              }
-            />
-          ),
-        )}
+      <div className={styles.list}>
+        {transfers.map((transfer) => (
+          <TransferCard
+            key={transfer.id}
+            transfer={transfer}
+          />
+        ))}
 
-        {transfers.length ===
-          0 && (
-          <div
-            className={
-              styles.columnEmpty
-            }
-          >
-            Zatím žádný{" "}
-            {isArrival
-              ? "příchod"
-              : "odchod"}
-            .
+        {transfers.length === 0 && (
+          <div className={styles.noTransfers}>
+            Zatím žádný {isArrival ? "příchod" : "odchod"}.
           </div>
         )}
       </div>
@@ -208,168 +102,84 @@ function TransferColumn({
 function TransferCard({
   transfer,
 }: {
-  transfer:
-    ClubTransfer;
+  transfer: ClubTransfer;
 }) {
-  const isArrival =
-    transfer.direction ===
-    "arrival";
+  const isArrival = transfer.direction === "arrival";
 
-  const apfClubUrl =
-    transfer.otherClubApfId
-      ? `https://futsalvplzni.cz/tym/${transfer.otherClubApfId}/team`
-      : null;
+  const clubUrl = transfer.otherClubApfId
+    ? `https://futsalvplzni.cz/tym/${transfer.otherClubApfId}/team`
+    : null;
+
+  const clubContent = (
+    <>
+      <ClubLogo transfer={transfer} />
+
+      <span className={styles.clubDirection}>
+        {isArrival ? "Z KLUBU" : "DO KLUBU"}
+      </span>
+
+      <strong className={styles.clubName}>
+        {transfer.otherClub || "Klub neuveden"}
+      </strong>
+
+      {clubUrl && (
+        <span className={styles.externalArrow}>
+          ↗
+        </span>
+      )}
+    </>
+  );
 
   return (
     <article
-      className={`${styles.card} ${
-        isArrival
-          ? styles.arrivalCard
-          : styles.departureCard
+      className={`${styles.transferCard} ${
+        isArrival ? styles.cardArrival : styles.cardDeparture
       }`}
     >
-      <div
-        className={
-          styles.playerVisual
-        }
-      >
+      <div className={styles.photo}>
         <TransferPlayerImage
-          src={
-            transfer.imageUrl
-          }
-          name={
-            transfer.playerName
-          }
+          src={transfer.imageUrl}
+          name={transfer.playerName}
         />
       </div>
 
-      <div
-        className={
-          styles.playerInfo
-        }
-      >
-        <h4>
-          {
-            transfer.playerName
-          }
-        </h4>
+      <div className={styles.playerData}>
+        <h4>{transfer.playerName}</h4>
 
-        <div
-          className={
-            styles.shortLine
-          }
-        />
+        <div className={styles.accentLine} />
 
-        <span
-          className={
-            styles.transferType
-          }
-        >
-          {transfer.movementType ===
-          "loan"
+        <span className={styles.transferType}>
+          {transfer.movementType === "loan"
             ? "HOSTOVÁNÍ"
             : "PŘESTUP"}
         </span>
 
-        <strong
-          className={
-            styles.date
-          }
-        >
-          {new Date(
-            transfer.occurredOn,
-          ).toLocaleDateString(
-            "cs-CZ",
-          )}
+        <strong className={styles.transferDate}>
+          {new Date(transfer.occurredOn).toLocaleDateString("cs-CZ")}
         </strong>
       </div>
 
-      <div
-        className={
-          styles.clubInfo
-        }
-      >
-        {apfClubUrl ? (
+      <div className={styles.clubData}>
+        {clubUrl ? (
           <a
-            href={
-              apfClubUrl
-            }
+            href={clubUrl}
             target="_blank"
             rel="noreferrer"
-            className={
-              styles.clubLink
-            }
-            title="Otevřít tým na APF"
+            className={styles.clubLink}
           >
-            <ClubLogo
-              transfer={
-                transfer
-              }
-            />
-
-            <span
-              className={
-                styles.clubLabel
-              }
-            >
-              {isArrival
-                ? "Z KLUBU"
-                : "DO KLUBU"}
-            </span>
-
-            <strong>
-              {transfer.otherClub ||
-                "Klub neuveden"}
-            </strong>
-
-            <span
-              className={
-                styles.external
-              }
-            >
-              ↗
-            </span>
+            {clubContent}
           </a>
         ) : (
-          <div
-            className={
-              styles.clubStatic
-            }
-          >
-            <ClubLogo
-              transfer={
-                transfer
-              }
-            />
-
-            <span
-              className={
-                styles.clubLabel
-              }
-            >
-              {isArrival
-                ? "Z KLUBU"
-                : "DO KLUBU"}
-            </span>
-
-            <strong>
-              {transfer.otherClub ||
-                "Klub neuveden"}
-            </strong>
+          <div className={styles.clubStatic}>
+            {clubContent}
           </div>
         )}
       </div>
 
       {transfer.description && (
-        <div
-          className={
-            styles.description
-          }
-        >
-          {
-            transfer.description
-          }
-        </div>
+        <p className={styles.description}>
+          {transfer.description}
+        </p>
       )}
     </article>
   );
@@ -378,34 +188,20 @@ function TransferCard({
 function ClubLogo({
   transfer,
 }: {
-  transfer:
-    ClubTransfer;
+  transfer: ClubTransfer;
 }) {
-  if (
-    transfer.otherClubLogoUrl
-  ) {
+  if (transfer.otherClubLogoUrl) {
     return (
       <img
-        src={
-          transfer.otherClubLogoUrl
-        }
-        alt={
-          transfer.otherClub ??
-          "Klub"
-        }
-        className={
-          styles.clubLogo
-        }
+        src={transfer.otherClubLogoUrl}
+        alt={transfer.otherClub || "Klub"}
+        className={styles.clubLogo}
       />
     );
   }
 
   return (
-    <div
-      className={
-        styles.clubFallback
-      }
-    >
+    <div className={styles.clubLogoFallback}>
       FC
     </div>
   );
