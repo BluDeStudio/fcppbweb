@@ -18,7 +18,10 @@ import { getTopScorer } from "@/services/apf/getTopScorer";
 import { getSquad } from "@/services/apf/getSquad";
 
 import { testSupabaseConnection } from "@/lib/testSupabase";
-import { getPublishedTransfers } from "@/lib/getTransfers";
+import {
+  getDepartedPlayerIds,
+  getPublishedTransfers,
+} from "@/lib/getTransfers";
 
 import type { LeagueRow } from "@/types/league";
 import type { MatchResult } from "@/types/match";
@@ -375,8 +378,44 @@ export default async function HomePage() {
    */
 
   try {
+    const [
+      publishedTransfers,
+      departedPlayerIds,
+    ] =
+      await Promise.all([
+        getPublishedTransfers(),
+        getDepartedPlayerIds(),
+      ]);
+
     transfers =
-      await getPublishedTransfers();
+      publishedTransfers;
+
+    /*
+     * ODCHOD hráče ho odstraní pouze
+     * z AKTUÁLNÍ SOUPISKY.
+     *
+     * Profil, aplikace, historické zápasy
+     * a statistiky zůstávají nedotčené.
+     */
+    aPlayers =
+      aPlayers.filter(
+        (
+          player,
+        ) =>
+          !departedPlayerIds.has(
+            player.id,
+          ),
+      );
+
+    bPlayers =
+      bPlayers.filter(
+        (
+          player,
+        ) =>
+          !departedPlayerIds.has(
+            player.id,
+          ),
+      );
   } catch (error) {
     console.error(
       "Chyba při načítání přestupů:",

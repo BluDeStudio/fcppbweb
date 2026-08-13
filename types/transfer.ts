@@ -1,5 +1,10 @@
-export type TransferDirection = "arrival" | "departure";
-export type TransferMovementType = "transfer" | "loan";
+export type TransferDirection =
+  | "arrival"
+  | "departure";
+
+export type TransferMovementType =
+  | "transfer"
+  | "loan";
 
 export type ClubTransfer = {
   id: string;
@@ -10,6 +15,8 @@ export type ClubTransfer = {
   description: string | null;
   imageUrl: string | null;
   otherClub: string | null;
+  otherClubApfId: number | null;
+  otherClubLogoUrl: string | null;
   occurredOn: string;
   published: boolean;
 };

@@ -79,3 +79,36 @@
 @media (max-width: 600px) {
   .twoCols { grid-template-columns: 1fr; }
 }
+
+
+.clubBox {
+  display: grid;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid rgba(41, 232, 63, 0.14);
+  border-radius: 12px;
+  background: rgba(41, 232, 63, 0.025);
+}
+
+.clubBoxTitle {
+  color: var(--text);
+  font-size: 10px;
+  font-weight: 950;
+  text-transform: uppercase;
+}
+
+.form small {
+  color: var(--text-muted);
+  font-size: 8px;
+  line-height: 1.45;
+}
+
+.info {
+  padding: 10px 12px;
+  border: 1px solid rgba(41, 232, 63, 0.15);
+  border-radius: 9px;
+  color: var(--primary);
+  background: rgba(41, 232, 63, 0.035);
+  font-size: 9px;
+  line-height: 1.5;
+}
