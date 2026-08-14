@@ -599,119 +599,43 @@
 }
 
 .allTransfersWrap {
-  display:
-    flex;
-
-  justify-content:
-    center;
-
-  margin-top:
-    18px;
+  display: flex;
+  width: 100%;
+  margin-top: 18px;
 }
 
 .allTransfersButton {
-  width:
-    min(
-      520px,
-      100%
-    );
-
-  min-height:
-    50px;
-
-  display:
-    flex;
-
-  align-items:
-    center;
-
-  justify-content:
-    space-between;
-
-  gap:
-    18px;
-
-  padding:
-    0 20px;
-
-  border:
-    1px solid
-    rgba(
-      41,
-      232,
-      63,
-      0.22
-    );
-
-  border-radius:
-    12px;
-
-  color:
-    #cbd2cd;
-
-  background:
-    rgba(
-      255,
-      255,
-      255,
-      0.015
-    );
-
-  text-decoration:
-    none;
-
-  transition:
-    border-color
-    0.18s
-    ease,
-    background
-    0.18s
-    ease,
-    color
-    0.18s
-    ease;
+  width: 100%;
+  min-height: 54px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 0 22px;
+  border: 1px solid rgba(41, 232, 63, 0.22);
+  border-radius: 12px;
+  color: #cbd2cd;
+  background: rgba(255, 255, 255, 0.015);
+  text-decoration: none;
+  transition: border-color 0.18s ease, background 0.18s ease, color 0.18s ease;
 }
 
-.allTransfersButton
-span {
-  font-size:
-    10px;
-
-  font-weight:
-    900;
-
-  letter-spacing:
-    0.05em;
+.allTransfersButton span {
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.05em;
 }
 
-.allTransfersButton
-strong {
-  color:
-    #29e83f;
-
-  font-size:
-    20px;
+.allTransfersButton strong {
+  color: #29e83f;
+  font-size: 22px;
+  line-height: 1;
 }
 
 .allTransfersButton:hover {
-  color:
-    #ffffff;
-
-  border-color:
-    rgba(
-      41,
-      232,
-      63,
-      0.48
-    );
-
-  background:
-    rgba(
-      41,
-      232,
-      63,
-      0.035
-    );
+  color: #ffffff;
+  border-color: rgba(41, 232, 63, 0.48);
+  background: rgba(41, 232, 63, 0.035);
 }
 
 /* Fallback silueta */
