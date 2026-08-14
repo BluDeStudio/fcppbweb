@@ -105,7 +105,11 @@ function TransferSide({
         </div>
       </div>
 
-      <div className={styles.cardsGrid}>
+      <div
+        className={`${styles.cardsGrid} ${
+          arrival ? styles.arrivalGrid : styles.departureGrid
+        }`}
+      >
         {transfers.map(
           (transfer) => (
             <TransferCard
