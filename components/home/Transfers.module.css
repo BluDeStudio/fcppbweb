@@ -1,1 +1,943 @@
-.section{padding:54px 0 58px}.container{width:calc(100% - 40px);max-width:1440px;margin:0 auto}.previewGrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.transferCard{min-width:0;overflow:hidden;border:1px solid;border-radius:16px;background:#0a0f0b}.cardArrival{border-color:rgba(41,232,63,.36);background:linear-gradient(180deg,rgba(30,94,40,.18),rgba(8,14,9,.98))}.cardDeparture{border-color:rgba(255,63,63,.38);background:linear-gradient(180deg,rgba(107,23,23,.18),rgba(14,8,8,.98))}.photo{position:relative;width:100%;aspect-ratio:1.08/1;overflow:hidden;background:#0b100d}.photo>img{object-fit:cover;object-position:center top}.directionBadge{position:absolute;z-index:4;top:12px;left:12px;padding:6px 8px;border:1px solid rgba(0,0,0,.35);border-radius:999px;color:#061007;font-size:7px;font-weight:1000;letter-spacing:.055em;backdrop-filter:blur(8px)}.cardArrival .directionBadge{background:#29e83f}.cardDeparture .directionBadge{color:#fff;background:#d93434}.cardBody{display:grid;gap:8px;padding:13px 14px 14px}.cardBody h4{margin:0;color:#fff;font-size:clamp(21px,1.65vw,28px);line-height:.94;font-weight:950;letter-spacing:-.045em}.transferType{color:#909993;font-size:7px;font-weight:900;letter-spacing:.07em}.clubRow{min-width:0}.clubLink,.clubStatic{display:grid;grid-template-columns:33px minmax(0,1fr) auto;align-items:center;gap:8px;min-width:0;color:inherit;text-decoration:none}.clubStatic{grid-template-columns:33px minmax(0,1fr)}.clubLink{transition:opacity .16s ease,transform .16s ease}.clubLink:hover{opacity:.82;transform:translateX(2px)}.clubLogo{display:block;width:33px;height:33px;object-fit:contain}.clubLogoFallback{display:grid;place-items:center;width:33px;height:33px;border:1px solid rgba(255,255,255,.12);border-radius:8px;color:rgba(255,255,255,.34);font-size:8px;font-weight:950}.clubDirection{display:block;color:#7e8781;font-size:5.5px;font-weight:900;letter-spacing:.07em}.clubName{display:block;min-width:0;margin-top:2px;overflow:hidden;color:#fff;font-size:10px;line-height:1.15;font-weight:900;text-overflow:ellipsis;white-space:nowrap}.externalArrow{font-size:10px;font-weight:950}.cardArrival .externalArrow{color:#29e83f}.cardDeparture .externalArrow{color:#ff4c4c}.transferDate{font-size:9px;font-weight:950}.cardArrival .transferDate{color:#29e83f}.cardDeparture .transferDate{color:#ff4b4b}.description{margin:0;color:#858e88;font-size:7px;line-height:1.35}.emptyCard{min-height:100%;display:grid;place-items:center;align-content:center;gap:9px;padding:28px 18px;text-align:center;border-style:dashed}.emptyCard strong{color:#fff;font-size:11px;font-weight:950}.emptyCard span{color:#7f8882;font-size:8px;line-height:1.4}.emptyIcon{display:grid;place-items:center;width:48px;height:48px;border:1px solid currentColor;border-radius:50%;font-size:22px;font-weight:950}.cardArrival.emptyCard .emptyIcon{color:#29e83f}.cardDeparture.emptyCard .emptyIcon{color:#ff4b4b}.allTransfersWrap{display:flex;justify-content:center;margin-top:18px}.allTransfersButton{width:min(520px,100%);min-height:50px;display:flex;align-items:center;justify-content:space-between;gap:18px;padding:0 20px;border:1px solid rgba(41,232,63,.22);border-radius:12px;color:#cbd2cd;background:rgba(255,255,255,.015);text-decoration:none;transition:border-color .18s ease,background .18s ease,color .18s ease}.allTransfersButton span{font-size:10px;font-weight:900;letter-spacing:.05em}.allTransfersButton strong{color:#29e83f;font-size:20px}.allTransfersButton:hover{color:#fff;border-color:rgba(41,232,63,.48);background:rgba(41,232,63,.035)}.silhouette{position:absolute;inset:0;overflow:hidden;background:radial-gradient(circle at 50% 35%,rgba(255,255,255,.055),transparent 36%),linear-gradient(145deg,#111813,#070b08)}.silhouetteHead{position:absolute;top:17%;left:50%;width:30%;aspect-ratio:1;transform:translateX(-50%);border-radius:50%;background:rgba(255,255,255,.13)}.silhouetteBody{position:absolute;left:50%;bottom:-34%;width:72%;height:76%;transform:translateX(-50%);border-radius:50% 50% 15% 15%;background:rgba(255,255,255,.1)}@media(max-width:1000px){.previewGrid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:600px){.section{padding:48px 0 50px}.container{width:calc(100% - 18px)}.previewGrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.directionBadge{top:8px;left:8px;padding:5px 6px;font-size:6px}.cardBody{gap:6px;padding:9px}.cardBody h4{font-size:17px}.clubLink,.clubStatic{grid-template-columns:27px minmax(0,1fr) auto;gap:6px}.clubStatic{grid-template-columns:27px minmax(0,1fr)}.clubLogo,.clubLogoFallback{width:27px;height:27px}.clubName{font-size:9px}}
+.section {
+  padding: 54px 0 58px;
+}
+
+/*
+ * DŮLEŽITÉ:
+ * stejná šířka jako TABULKA / SOUPISKA.
+ * Už žádných vlastních 1440 px.
+ */
+.container {
+  width: min(
+    var(--content-width),
+    calc(100% - 32px)
+  );
+
+  margin: 0 auto;
+}
+
+/*
+ * 4 stejné sloupce jako u soupisky:
+ * PŘÍCHOD | PŘÍCHOD | ODCHOD | ODCHOD
+ */
+.previewGrid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(
+      4,
+      minmax(0, 1fr)
+    );
+
+  gap: 16px;
+}
+
+.transferCard {
+  min-width: 0;
+
+  overflow: hidden;
+
+  border:
+    1px solid;
+
+  border-radius:
+    16px;
+
+  background:
+    #0a0f0b;
+}
+
+.cardArrival {
+  border-color:
+    rgba(
+      41,
+      232,
+      63,
+      0.34
+    );
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(
+        30,
+        94,
+        40,
+        0.17
+      ),
+      rgba(
+        8,
+        14,
+        9,
+        0.99
+      )
+    );
+}
+
+.cardDeparture {
+  border-color:
+    rgba(
+      255,
+      63,
+      63,
+      0.36
+    );
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(
+        107,
+        23,
+        23,
+        0.17
+      ),
+      rgba(
+        14,
+        8,
+        8,
+        0.99
+      )
+    );
+}
+
+/*
+ * Rozměrově stejný princip jako karta hráče:
+ * vyšší portrétní karta.
+ */
+.photo {
+  position:
+    relative;
+
+  width:
+    100%;
+
+  aspect-ratio:
+    4 / 5;
+
+  overflow:
+    hidden;
+
+  background:
+    #0b100d;
+}
+
+.photo > img {
+  width:
+    100%;
+
+  height:
+    100%;
+
+  object-fit:
+    cover;
+
+  object-position:
+    center top;
+}
+
+.directionBadge {
+  position:
+    absolute;
+
+  z-index:
+    4;
+
+  top:
+    12px;
+
+  left:
+    12px;
+
+  display:
+    inline-flex;
+
+  align-items:
+    center;
+
+  min-height:
+    28px;
+
+  padding:
+    0 9px;
+
+  border:
+    1px solid
+    rgba(
+      0,
+      0,
+      0,
+      0.35
+    );
+
+  border-radius:
+    999px;
+
+  color:
+    #061007;
+
+  font-size:
+    7px;
+
+  font-weight:
+    1000;
+
+  letter-spacing:
+    0.055em;
+
+  backdrop-filter:
+    blur(8px);
+}
+
+.cardArrival
+.directionBadge {
+  background:
+    #29e83f;
+}
+
+.cardDeparture
+.directionBadge {
+  color:
+    #ffffff;
+
+  background:
+    #d93434;
+}
+
+.cardBody {
+  display:
+    grid;
+
+  gap:
+    8px;
+
+  padding:
+    13px
+    14px
+    15px;
+}
+
+.cardBody h4 {
+  margin:
+    0;
+
+  color:
+    #ffffff;
+
+  font-size:
+    clamp(
+      20px,
+      1.55vw,
+      27px
+    );
+
+  line-height:
+    0.94;
+
+  font-weight:
+    950;
+
+  letter-spacing:
+    -0.045em;
+}
+
+.transferType {
+  color:
+    #909993;
+
+  font-size:
+    7px;
+
+  font-weight:
+    900;
+
+  letter-spacing:
+    0.07em;
+}
+
+.clubRow {
+  min-width:
+    0;
+
+  margin-top:
+    2px;
+}
+
+.clubLink,
+.clubStatic {
+  display:
+    grid;
+
+  grid-template-columns:
+    34px
+    minmax(0, 1fr)
+    auto;
+
+  align-items:
+    center;
+
+  gap:
+    8px;
+
+  min-width:
+    0;
+
+  color:
+    inherit;
+
+  text-decoration:
+    none;
+}
+
+.clubStatic {
+  grid-template-columns:
+    34px
+    minmax(0, 1fr);
+}
+
+.clubLink {
+  transition:
+    opacity
+    0.16s
+    ease,
+    transform
+    0.16s
+    ease;
+}
+
+.clubLink:hover {
+  opacity:
+    0.82;
+
+  transform:
+    translateX(
+      2px
+    );
+}
+
+.clubLogo {
+  display:
+    block;
+
+  width:
+    34px;
+
+  height:
+    34px;
+
+  object-fit:
+    contain;
+}
+
+.clubLogoFallback {
+  display:
+    grid;
+
+  place-items:
+    center;
+
+  width:
+    34px;
+
+  height:
+    34px;
+
+  border:
+    1px solid
+    rgba(
+      255,
+      255,
+      255,
+      0.12
+    );
+
+  border-radius:
+    9px;
+
+  color:
+    rgba(
+      255,
+      255,
+      255,
+      0.34
+    );
+
+  font-size:
+    8px;
+
+  font-weight:
+    950;
+}
+
+.clubText {
+  min-width:
+    0;
+}
+
+.clubDirection {
+  display:
+    block;
+
+  color:
+    #7e8781;
+
+  font-size:
+    5.5px;
+
+  font-weight:
+    900;
+
+  letter-spacing:
+    0.07em;
+}
+
+.clubName {
+  display:
+    block;
+
+  min-width:
+    0;
+
+  margin-top:
+    2px;
+
+  overflow:
+    hidden;
+
+  color:
+    #ffffff;
+
+  font-size:
+    10px;
+
+  line-height:
+    1.15;
+
+  font-weight:
+    900;
+
+  text-overflow:
+    ellipsis;
+
+  white-space:
+    nowrap;
+}
+
+.externalArrow {
+  font-size:
+    10px;
+
+  font-weight:
+    950;
+}
+
+.cardArrival
+.externalArrow {
+  color:
+    #29e83f;
+}
+
+.cardDeparture
+.externalArrow {
+  color:
+    #ff4c4c;
+}
+
+.transferDate {
+  font-size:
+    9px;
+
+  font-weight:
+    950;
+}
+
+.cardArrival
+.transferDate {
+  color:
+    #29e83f;
+}
+
+.cardDeparture
+.transferDate {
+  color:
+    #ff4b4b;
+}
+
+.description {
+  margin:
+    0;
+
+  color:
+    #858e88;
+
+  font-size:
+    7px;
+
+  line-height:
+    1.35;
+}
+
+/*
+ * Prázdná karta má stejnou velikost,
+ * aby se 4-karetní layout nikdy nerozsypal.
+ */
+.emptyCard {
+  display:
+    grid;
+
+  grid-template-rows:
+    auto
+    1fr;
+
+  min-height:
+    100%;
+}
+
+.emptyVisual {
+  display:
+    grid;
+
+  place-items:
+    center;
+
+  width:
+    100%;
+
+  aspect-ratio:
+    4 / 5;
+
+  background:
+    radial-gradient(
+      circle
+      at 50%
+      45%,
+      rgba(
+        255,
+        255,
+        255,
+        0.045
+      ),
+      transparent
+      36%
+    );
+}
+
+.emptyBody {
+  display:
+    grid;
+
+  gap:
+    6px;
+
+  padding:
+    13px
+    14px
+    15px;
+}
+
+.emptyBody strong {
+  color:
+    #ffffff;
+
+  font-size:
+    11px;
+
+  font-weight:
+    950;
+}
+
+.emptyBody span {
+  color:
+    #7f8882;
+
+  font-size:
+    8px;
+
+  line-height:
+    1.4;
+}
+
+.emptyIcon {
+  display:
+    grid;
+
+  place-items:
+    center;
+
+  width:
+    52px;
+
+  height:
+    52px;
+
+  border:
+    1px solid
+    currentColor;
+
+  border-radius:
+    50%;
+
+  font-size:
+    23px;
+
+  font-weight:
+    950;
+}
+
+.cardArrival
+.emptyCard
+.emptyIcon {
+  color:
+    #29e83f;
+}
+
+.cardDeparture
+.emptyCard
+.emptyIcon {
+  color:
+    #ff4b4b;
+}
+
+.allTransfersWrap {
+  display:
+    flex;
+
+  justify-content:
+    center;
+
+  margin-top:
+    18px;
+}
+
+.allTransfersButton {
+  width:
+    min(
+      520px,
+      100%
+    );
+
+  min-height:
+    50px;
+
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    space-between;
+
+  gap:
+    18px;
+
+  padding:
+    0 20px;
+
+  border:
+    1px solid
+    rgba(
+      41,
+      232,
+      63,
+      0.22
+    );
+
+  border-radius:
+    12px;
+
+  color:
+    #cbd2cd;
+
+  background:
+    rgba(
+      255,
+      255,
+      255,
+      0.015
+    );
+
+  text-decoration:
+    none;
+
+  transition:
+    border-color
+    0.18s
+    ease,
+    background
+    0.18s
+    ease,
+    color
+    0.18s
+    ease;
+}
+
+.allTransfersButton
+span {
+  font-size:
+    10px;
+
+  font-weight:
+    900;
+
+  letter-spacing:
+    0.05em;
+}
+
+.allTransfersButton
+strong {
+  color:
+    #29e83f;
+
+  font-size:
+    20px;
+}
+
+.allTransfersButton:hover {
+  color:
+    #ffffff;
+
+  border-color:
+    rgba(
+      41,
+      232,
+      63,
+      0.48
+    );
+
+  background:
+    rgba(
+      41,
+      232,
+      63,
+      0.035
+    );
+}
+
+/* Fallback silueta */
+.silhouette {
+  position:
+    absolute;
+
+  inset:
+    0;
+
+  overflow:
+    hidden;
+
+  background:
+    radial-gradient(
+      circle
+      at 50%
+      35%,
+      rgba(
+        255,
+        255,
+        255,
+        0.055
+      ),
+      transparent
+      36%
+    ),
+    linear-gradient(
+      145deg,
+      #111813,
+      #070b08
+    );
+}
+
+.silhouetteHead {
+  position:
+    absolute;
+
+  top:
+    17%;
+
+  left:
+    50%;
+
+  width:
+    30%;
+
+  aspect-ratio:
+    1;
+
+  transform:
+    translateX(
+      -50%
+    );
+
+  border-radius:
+    50%;
+
+  background:
+    rgba(
+      255,
+      255,
+      255,
+      0.13
+    );
+}
+
+.silhouetteBody {
+  position:
+    absolute;
+
+  left:
+    50%;
+
+  bottom:
+    -34%;
+
+  width:
+    72%;
+
+  height:
+    76%;
+
+  transform:
+    translateX(
+      -50%
+    );
+
+  border-radius:
+    50%
+    50%
+    15%
+    15%;
+
+  background:
+    rgba(
+      255,
+      255,
+      255,
+      0.1
+    );
+}
+
+/*
+ * Tablet / menší PC:
+ * 2 + 2.
+ */
+@media (
+  max-width:
+    1000px
+) {
+  .previewGrid {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(
+          0,
+          1fr
+        )
+      );
+  }
+}
+
+/*
+ * Mobil:
+ * stále 2 vedle sebe.
+ */
+@media (
+  max-width:
+    600px
+) {
+  .section {
+    padding:
+      48px 0 50px;
+  }
+
+  .container {
+    width:
+      calc(
+        100% - 18px
+      );
+  }
+
+  .previewGrid {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(
+          0,
+          1fr
+        )
+      );
+
+    gap:
+      8px;
+  }
+
+  .directionBadge {
+    top:
+      8px;
+
+    left:
+      8px;
+
+    min-height:
+      24px;
+
+    padding:
+      0 6px;
+
+    font-size:
+      6px;
+  }
+
+  .cardBody {
+    gap:
+      6px;
+
+    padding:
+      9px;
+  }
+
+  .cardBody h4 {
+    font-size:
+      17px;
+  }
+
+  .clubLink,
+  .clubStatic {
+    grid-template-columns:
+      27px
+      minmax(
+        0,
+        1fr
+      )
+      auto;
+
+    gap:
+      6px;
+  }
+
+  .clubStatic {
+    grid-template-columns:
+      27px
+      minmax(
+        0,
+        1fr
+      );
+  }
+
+  .clubLogo,
+  .clubLogoFallback {
+    width:
+      27px;
+
+    height:
+      27px;
+  }
+
+  .clubName {
+    font-size:
+      9px;
+  }
+
+  .emptyBody {
+    padding:
+      9px;
+  }
+}
