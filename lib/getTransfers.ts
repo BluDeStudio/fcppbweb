@@ -1,4 +1,5 @@
 import { supabase } from "@/lib/supabase";
+import { clubConfig } from "@/config/club";
 
 import type {
   ClubTransfer,
@@ -63,23 +64,30 @@ export async function getPublishedTransfers(): Promise<ClubTransfer[]> {
     .order("created_at", { ascending: false });
 
   if (error) {
-    console.error("Nepodařilo se načíst přestupy:", error);
+    console.error(
+      "Nepodařilo se načíst přestupy:",
+      error,
+    );
+
     return [];
   }
 
   return (data ?? []).map((row) => {
-    const item = row as unknown as TransferRow;
+    const item =
+      row as unknown as TransferRow;
 
     return {
       id: item.id,
       direction: item.direction,
       movementType: item.movement_type,
+
       movementDetail:
         item.movement_detail ??
         fallbackMovementDetail(
           item.direction,
           item.movement_type,
         ),
+
       playerId: item.player_id,
       playerName: item.player_name,
       description: item.description,
@@ -93,22 +101,92 @@ export async function getPublishedTransfers(): Promise<ClubTransfer[]> {
   });
 }
 
+/*
+ * ========================================
+ * ODCHODY POUZE AKTUÁLNÍ SEZÓNY
+ * ========================================
+ *
+ * Historický odchod z 2025/26 už nesmí
+ * vyhodit hráče ze soupisky 2026/27.
+ *
+ * Sezóna FC PPB začíná 1. srpna.
+ */
 export async function getDepartedPlayerIds(): Promise<Set<number>> {
+  const {
+    startDate,
+    endDate,
+  } =
+    getCurrentSeasonDateRange();
+
   const { data, error } = await supabase
     .from("club_transfers")
     .select("player_id")
     .eq("published", true)
     .eq("direction", "departure")
+    .gte("occurred_on", startDate)
+    .lte("occurred_on", endDate)
     .not("player_id", "is", null);
 
   if (error) {
-    console.error("Nepodařilo se načíst odchozí hráče:", error);
+    console.error(
+      "Nepodařilo se načíst odchozí hráče:",
+      error,
+    );
+
     return new Set();
   }
 
   return new Set(
     (data ?? [])
-      .map((row) => Number(row.player_id))
-      .filter((id) => Number.isFinite(id)),
+      .map(
+        (row) =>
+          Number(
+            row.player_id,
+          ),
+      )
+      .filter(
+        (id) =>
+          Number.isFinite(
+            id,
+          ),
+      ),
   );
+}
+
+function getCurrentSeasonDateRange(): {
+  startDate: string;
+  endDate: string;
+} {
+  const match =
+    clubConfig.season.match(
+      /(\d{4})\/(\d{2})/,
+    );
+
+  if (!match) {
+    const year =
+      new Date().getFullYear();
+
+    return {
+      startDate:
+        `${year}-08-01`,
+      endDate:
+        `${year + 1}-07-31`,
+    };
+  }
+
+  const startYear =
+    Number(
+      match[1],
+    );
+
+  const endYear =
+    startYear + 1;
+
+  return {
+    startDate:
+      `${startYear}-08-01`,
+
+    endDate:
+      `${endYear}-07-31`,
+  };
 }

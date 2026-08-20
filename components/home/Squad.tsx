@@ -7,6 +7,7 @@ import {
 } from "react";
 
 import { SectionHeader } from "@/components/ui/SectionHeader";
+import { clubConfig } from "@/config/club";
 
 import { getPlayerAppStats } from "@/lib/getPlayerAppStats";
 
@@ -32,14 +33,9 @@ type SquadProps = {
 
 type CurrentTeamStats = {
   matches: number;
-
   goals: number;
-
   assists: number;
 };
-
-const CURRENT_SEASON =
-  "2026/27";
 
 export function Squad({
   aPlayers,
@@ -125,6 +121,16 @@ export function Squad({
                 player,
               ) => {
                 try {
+                  /*
+                   * getPlayerAppStats bere APF Player ID.
+                   * ADMIN při propojení STATPPKA + APF
+                   * synchronizuje stejné APF ID i do
+                   * tabulky players aplikace.
+                   *
+                   * Tím se odsud automaticky načtou:
+                   * zápasy, góly, asistence a další
+                   * data z aplikace.
+                   */
                   const stats =
                     await getPlayerAppStats(
                       player.id,
@@ -141,7 +147,7 @@ export function Squad({
                         getSeasonFromDate(
                           match.date,
                         ) ===
-                        CURRENT_SEASON,
+                        clubConfig.season,
                     );
 
                   return [
@@ -246,7 +252,7 @@ export function Squad({
         }
       >
         <SectionHeader
-          number="05"
+          number="06"
           label="Soupiska"
           title="Naši hráči."
           secondLine={
@@ -254,7 +260,7 @@ export function Squad({
               ? "A-tým FC PPB."
               : "B-tým FC PPB."
           }
-          meta={`Sezóna ${CURRENT_SEASON}`}
+          meta={`Sezóna ${clubConfig.season}`}
         />
 
         <div
@@ -304,7 +310,9 @@ export function Squad({
         {players.length >
         0 ? (
           <div
-            key={team}
+            key={
+              team
+            }
             className={
               styles.grid
             }
@@ -354,9 +362,7 @@ export function Squad({
 function summarizeTeam(
   matches: Array<{
     team: string;
-
     goals: number;
-
     assists: number;
   }>,
   team:
@@ -499,13 +505,13 @@ function getSeasonFromDate(
 
   return `${startYear}/${String(
     startYear + 1,
-  ).slice(
-    -2,
-  )}`;
+  ).slice(-2)}`;
 }
 
 function normalizeDate(
-  value?: string | null,
+  value?:
+    string |
+    null,
 ): string {
   if (
     !value
@@ -589,9 +595,7 @@ function emptyStats():
 CurrentTeamStats {
   return {
     matches: 0,
-
     goals: 0,
-
     assists: 0,
   };
 }

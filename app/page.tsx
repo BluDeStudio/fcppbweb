@@ -15,7 +15,7 @@ import { getLeagueTable } from "@/services/apf/getLeagueTable";
 import { getMatchResults } from "@/services/apf/getMatchResults";
 import { getNextMatch } from "@/services/apf/getNextMatch";
 import { getTopScorer } from "@/services/apf/getTopScorer";
-import { getSquad } from "@/services/apf/getSquad";
+import { getManagedSquads } from "@/lib/getManagedSquads";
 
 import { testSupabaseConnection } from "@/lib/testSupabase";
 import {
@@ -235,138 +235,37 @@ export default async function HomePage() {
    * ========================================
    * SOUPISKY
    * ========================================
+   *
+   * ADMIN → HRÁČI je nový hlavní zdroj:
+   * - A/B kmen
+   * - aktivní / neaktivní
+   * - pozice
+   * - status
+   * - číslo
+   * - fotka
+   *
+   * APF dál dodává sportovní statistiky.
+   * STATPPKA dál dodává aktuální zápasy,
+   * góly, asistence, známky a docházku.
+   *
+   * Hráči, které ještě nemáme převedené
+   * do ADMINU, během migrace zůstávají
+   * načtení starým APF/playerMeta způsobem.
+   * ========================================
    */
 
   try {
-    const [
-      aApfPlayers,
-      bApfPlayers,
-    ] = await Promise.all([
-      getSquad({
-        teamId:
-          aTeam.teamId,
-
-        teamSlug:
-          aTeam.teamSlug,
-
-        team: "a",
-      }),
-
-      getSquad({
-        teamId:
-          bTeam.teamId,
-
-        teamSlug:
-          bTeam.teamSlug,
-
-        team: "b",
-      }),
-    ]);
-
-    /*
-     * ========================================
-     * KMENOVÉ SOUPISKY
-     * ========================================
-     *
-     * APF určuje, na které týmové stránce
-     * se hráč objevil / nastoupil.
-     *
-     * Kmenovou příslušnost ale určujeme
-     * výhradně podle playerMeta.ts:
-     *
-     * player.team === "a" -> A-tým
-     * player.team === "b" -> B-tým
-     *
-     * Pokud hráč nastoupí za oba týmy,
-     * v soupisce zůstane jen u svého kmene.
-     */
-
-    const allPlayersById =
-      new Map<
-        number,
-        SquadPlayer
-      >();
-
-    [
-      ...aApfPlayers,
-      ...bApfPlayers,
-    ].forEach(
-      (
-        player,
-      ) => {
-        const existing =
-          allPlayersById.get(
-            player.id,
-          );
-
-        if (
-          !existing
-        ) {
-          allPlayersById.set(
-            player.id,
-            player,
-          );
-
-          return;
-        }
-
-        /*
-         * Když je hráč na obou APF stránkách,
-         * ponecháme jeden záznam.
-         *
-         * Pro soupisku jsou důležité hlavně:
-         * ID, jméno, foto, kmen, status, číslo.
-         * Statistiky se na kartách stejně
-         * načítají zvlášť z aplikace 2026/27.
-         */
-        allPlayersById.set(
-          player.id,
-          {
-            ...existing,
-
-            team:
-              player.team,
-
-            status:
-              player.status,
-
-            shirtNumber:
-              player.shirtNumber ??
-              existing.shirtNumber,
-
-            apfSlug:
-              player.apfSlug ||
-              existing.apfSlug,
-          },
-        );
-      },
-    );
-
-    const allPlayers =
-      Array.from(
-        allPlayersById.values(),
-      );
+    const managedSquads =
+      await getManagedSquads();
 
     aPlayers =
-      allPlayers.filter(
-        (
-          player,
-        ) =>
-          player.team ===
-          "a",
-      );
+      managedSquads.aPlayers;
 
     bPlayers =
-      allPlayers.filter(
-        (
-          player,
-        ) =>
-          player.team ===
-          "b",
-      );
+      managedSquads.bPlayers;
   } catch (error) {
     console.error(
-      "Chyba při načítání soupisek APF:",
+      "Chyba při načítání spravovaných soupisek:",
       error,
     );
   }

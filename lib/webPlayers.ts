@@ -1,9 +1,14 @@
 import { getSupabaseAdmin } from "@/lib/supabaseAdmin";
 
+export type WebPlayerTeam =
+  | "a"
+  | "b"
+  | "both";
+
 export type WebPlayerProfile = {
   id: string;
   name: string;
-  team: "a" | "b";
+  team: WebPlayerTeam;
   position: "player" | "goalkeeper";
   status: "club" | "loan";
   shirtNumber: number | null;
@@ -16,7 +21,7 @@ export type WebPlayerProfile = {
 type WebPlayerRow = {
   id: string;
   name: string;
-  team: "a" | "b";
+  team: WebPlayerTeam;
   position: "player" | "goalkeeper";
   status: "club" | "loan";
   shirt_number: number | null;
@@ -26,7 +31,9 @@ type WebPlayerRow = {
   active: boolean;
 };
 
-function mapRow(row: WebPlayerRow): WebPlayerProfile {
+function mapRow(
+  row: WebPlayerRow,
+): WebPlayerProfile {
   return {
     id: row.id,
     name: row.name,
@@ -55,5 +62,15 @@ export async function getWebPlayers(): Promise<WebPlayerProfile[]> {
     return [];
   }
 
-  return (data ?? []).map((row) => mapRow(row as WebPlayerRow));
+  return (data ?? []).map(
+    (row) => mapRow(row as WebPlayerRow),
+  );
+}
+
+export async function getActiveWebPlayers(): Promise<WebPlayerProfile[]> {
+  const players = await getWebPlayers();
+
+  return players.filter(
+    (player) => player.active,
+  );
 }
