@@ -42,60 +42,43 @@ export function LeagueTable({
   return (
     <section
       id="tabulka"
-      className={
-        styles.section
-      }
+      className={styles.section}
     >
       <SectionHeader
         number="04"
         label="Tabulka"
         title="Tabulka soutěže."
-        secondLine={
-          secondLine
-        }
+        secondLine={secondLine}
         meta={`Sezóna ${clubConfig.season}`}
       />
 
       <div
-        className={
-          styles.controlsRow
-        }
+        className={styles.controlsRow}
       >
         <div
-          className={
-            styles.seasonInfo
-          }
+          className={styles.seasonInfo}
         >
           <span>
             Aktuální sezóna
           </span>
 
           <strong>
-            {
-              clubConfig.season
-            }
+            {clubConfig.season}
           </strong>
         </div>
 
         <div
-          className={
-            styles.actions
-          }
+          className={styles.actions}
         >
           <TeamSwitch
-            value={
-              view
-            }
-            onChange={
-              setView
-            }
+            value={view}
+            onChange={setView}
+            showAll={false}
           />
 
           <Link
             href="/historie"
-            className={
-              styles.historyButton
-            }
+            className={styles.historyButton}
           >
             <span>
               Historie
@@ -118,9 +101,7 @@ export function LeagueTable({
               .competition
               .name
           }
-          rows={
-            aTeamRows
-          }
+          rows={aTeamRows}
         />
       )}
 
@@ -134,9 +115,7 @@ export function LeagueTable({
               .competition
               .name
           }
-          rows={
-            bTeamRows
-          }
+          rows={bTeamRows}
         />
       )}
     </section>
@@ -154,15 +133,10 @@ export function LeagueTableBlock({
   subtitle,
   rows,
 }: LeagueTableBlockProps) {
-  if (
-    rows.length ===
-    0
-  ) {
+  if (rows.length === 0) {
     return (
       <div
-        className={
-          styles.empty
-        }
+        className={styles.empty}
       >
         Tabulka zatím není
         na APF dostupná.
@@ -172,14 +146,10 @@ export function LeagueTableBlock({
 
   return (
     <div
-      className={
-        styles.block
-      }
+      className={styles.block}
     >
       <div
-        className={
-          styles.blockHeading
-        }
+        className={styles.blockHeading}
       >
         <strong>
           {title}
@@ -191,14 +161,10 @@ export function LeagueTableBlock({
       </div>
 
       <div
-        className={
-          styles.tableWrapper
-        }
+        className={styles.tableWrapper}
       >
         <table
-          className={
-            styles.table
-          }
+          className={styles.table}
         >
           <thead>
             <tr>
@@ -215,9 +181,7 @@ export function LeagueTableBlock({
 
           <tbody>
             {rows.map(
-              (
-                row,
-              ) => (
+              (row) => (
                 <tr
                   key={`${row.position}-${row.teamName}`}
                   className={
@@ -227,59 +191,39 @@ export function LeagueTableBlock({
                   }
                 >
                   <td>
-                    {
-                      row.position
-                    }
+                    {row.position}
                   </td>
 
                   <td
-                    className={
-                      styles.teamName
-                    }
+                    className={styles.teamName}
                   >
-                    {
-                      row.teamName
-                    }
+                    {row.teamName}
                   </td>
 
                   <td>
-                    {
-                      row.matches
-                    }
+                    {row.matches}
                   </td>
 
                   <td>
-                    {
-                      row.wins
-                    }
+                    {row.wins}
                   </td>
 
                   <td>
-                    {
-                      row.draws
-                    }
+                    {row.draws}
                   </td>
 
                   <td>
-                    {
-                      row.losses
-                    }
+                    {row.losses}
                   </td>
 
                   <td>
-                    {
-                      row.score
-                    }
+                    {row.score}
                   </td>
 
                   <td
-                    className={
-                      styles.points
-                    }
+                    className={styles.points}
                   >
-                    {
-                      row.points
-                    }
+                    {row.points}
                   </td>
                 </tr>
               ),
