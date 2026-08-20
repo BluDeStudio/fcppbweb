@@ -1,4 +1,9 @@
-.section {
+.page {
+  padding:
+    64px 0 90px;
+}
+
+.container {
   width:
     min(
       var(--content-width),
@@ -7,12 +12,132 @@
 
   margin:
     0 auto;
-
-  padding:
-    90px 0;
 }
 
-.controlsRow {
+.top {
+  display:
+    flex;
+
+  align-items:
+    flex-end;
+
+  justify-content:
+    space-between;
+
+  gap:
+    28px;
+
+  margin-bottom:
+    28px;
+}
+
+.eyebrow {
+  color:
+    var(--primary);
+
+  font-size:
+    8px;
+
+  font-weight:
+    950;
+
+  letter-spacing:
+    0.09em;
+
+  text-transform:
+    uppercase;
+}
+
+.top h1 {
+  max-width:
+    850px;
+
+  margin:
+    7px 0 0;
+
+  color:
+    #ffffff;
+
+  font-size:
+    clamp(
+      42px,
+      6vw,
+      76px
+    );
+
+  line-height:
+    0.9;
+
+  font-weight:
+    1000;
+
+  letter-spacing:
+    -0.06em;
+}
+
+.top p {
+  max-width:
+    650px;
+
+  margin:
+    18px 0 0;
+
+  color:
+    #7d8780;
+
+  font-size:
+    12px;
+
+  line-height:
+    1.5;
+}
+
+.back {
+  flex:
+    0 0 auto;
+
+  padding:
+    11px 14px;
+
+  border:
+    1px solid
+    rgba(
+      255,
+      255,
+      255,
+      0.09
+    );
+
+  border-radius:
+    10px;
+
+  color:
+    #aab2ac;
+
+  text-decoration:
+    none;
+
+  font-size:
+    9px;
+
+  font-weight:
+    900;
+}
+
+.back:hover {
+  color:
+    #ffffff;
+
+  border-color:
+    rgba(
+      41,
+      232,
+      63,
+      0.35
+    );
+}
+
+.seasonBar {
   display:
     flex;
 
@@ -25,30 +150,40 @@
   gap:
     16px;
 
-  margin:
-    -12px 0 24px;
+  margin-bottom:
+    14px;
+
+  padding:
+    12px 14px;
+
+  border-top:
+    1px solid
+    rgba(
+      255,
+      255,
+      255,
+      0.07
+    );
+
+  border-bottom:
+    1px solid
+    rgba(
+      255,
+      255,
+      255,
+      0.07
+    );
 }
 
-.seasonInfo {
-  display:
-    flex;
-
-  align-items:
-    center;
-
-  gap:
-    9px;
-}
-
-.seasonInfo span {
+.seasonBar > span {
   color:
-    var(--text-muted);
+    #7d8780;
 
   font-size:
     8px;
 
   font-weight:
-    850;
+    900;
 
   letter-spacing:
     0.08em;
@@ -57,58 +192,82 @@
     uppercase;
 }
 
-.seasonInfo strong {
-  color:
-    var(--text);
-
-  font-size:
-    11px;
-
-  font-weight:
-    950;
-}
-
-.actions {
+.seasonLinks {
   display:
     flex;
 
-  align-items:
-    center;
+  flex-wrap:
+    wrap;
 
   gap:
-    10px;
+    7px;
 }
 
-.historyButton {
-  min-height:
-    38px;
-
-  display:
-    inline-flex;
-
-  align-items:
-    center;
-
-  gap:
-    18px;
-
+.seasonLink,
+.activeSeason {
   padding:
-    0 13px;
+    7px 10px;
 
   border:
     1px solid
     rgba(
-      41,
-      232,
-      63,
-      0.22
+      255,
+      255,
+      255,
+      0.08
+    );
+
+  border-radius:
+    8px;
+
+  color:
+    #9ba49d;
+
+  text-decoration:
+    none;
+
+  font-size:
+    8px;
+
+  font-weight:
+    900;
+}
+
+.activeSeason {
+  color:
+    #061007;
+
+  border-color:
+    var(--primary);
+
+  background:
+    var(--primary);
+}
+
+.teamSwitch {
+  display:
+    inline-flex;
+
+  gap:
+    5px;
+
+  margin:
+    8px 0 22px;
+
+  padding:
+    4px;
+
+  border:
+    1px solid
+    rgba(
+      255,
+      255,
+      255,
+      0.08
     );
 
   border-radius:
     10px;
-
-  color:
-    #cbd2cd;
 
   background:
     rgba(
@@ -117,63 +276,38 @@
       255,
       0.015
     );
+}
+
+.tab,
+.activeTab {
+  padding:
+    8px 11px;
+
+  border-radius:
+    7px;
+
+  color:
+    #8d9690;
 
   text-decoration:
     none;
 
-  transition:
-    border-color
-    0.18s ease,
-    background
-    0.18s ease,
-    color
-    0.18s ease;
-}
-
-.historyButton span {
   font-size:
     8px;
 
   font-weight:
     900;
 
-  letter-spacing:
-    0.06em;
-
   text-transform:
     uppercase;
 }
 
-.historyButton strong {
+.activeTab {
   color:
-    var(--primary);
-
-  font-size:
-    17px;
-
-  line-height:
-    1;
-}
-
-.historyButton:hover {
-  color:
-    #ffffff;
-
-  border-color:
-    rgba(
-      41,
-      232,
-      63,
-      0.48
-    );
+    #061007;
 
   background:
-    rgba(
-      41,
-      232,
-      63,
-      0.035
-    );
+    var(--primary);
 }
 
 .allTables {
@@ -184,7 +318,7 @@
     32px;
 }
 
-.block {
+.tableBlock {
   width:
     100%;
 }
@@ -386,64 +520,35 @@ tr:last-child td {
 
 @media (
   max-width:
-    720px
+    760px
 ) {
-  .controlsRow {
+  .page {
+    padding:
+      30px 0 70px;
+  }
+
+  .container {
+    width:
+      calc(
+        100% - 18px
+      );
+  }
+
+  .top {
+    display:
+      grid;
+  }
+
+  .back {
+    justify-self:
+      start;
+  }
+
+  .seasonBar {
     align-items:
-      stretch;
+      flex-start;
 
     flex-direction:
       column;
-  }
-
-  .actions {
-    width:
-      100%;
-  }
-
-  .actions > div {
-    flex:
-      1;
-  }
-
-  .historyButton {
-    flex:
-      0 0 auto;
-  }
-}
-
-@media (
-  max-width:
-    600px
-) {
-  .section {
-    width:
-      calc(
-        100% - 22px
-      );
-
-    padding:
-      65px 0;
-  }
-
-  .actions {
-    display:
-      grid;
-
-    grid-template-columns:
-      1fr;
-  }
-
-  .actions > div {
-    width:
-      100%;
-  }
-
-  .historyButton {
-    width:
-      100%;
-
-    justify-content:
-      space-between;
   }
 }

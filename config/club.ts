@@ -5,7 +5,7 @@ export const clubConfig = {
 
   logo: "/images/fc-ppb-logo.png",
 
-  season: "2025/26",
+  season: "2026/27",
 
   apf: {
     baseUrl: "https://futsalvplzni.cz",
@@ -21,7 +21,7 @@ export const clubConfig = {
       teamSlug: "fc-ppb",
 
       competition: {
-        id: 418,
+        id: 430,
         slug: "1-b-trida",
         name: "1. B třída",
       },
@@ -36,9 +36,9 @@ export const clubConfig = {
       teamSlug: "fc-ppb-b",
 
       competition: {
-        id: 422,
-        slug: "3-b-trida",
-        name: "3. B třída",
+        id: 432,
+        slug: "2-b-trida",
+        name: "2. B třída",
       },
     },
   },
