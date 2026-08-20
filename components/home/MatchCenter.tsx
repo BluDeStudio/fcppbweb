@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useState } from "react";
 
 import { SectionHeader } from "@/components/ui/SectionHeader";
+import { clubConfig } from "@/config/club";
 
 import type { MatchResult } from "@/types/match";
 import type { NextMatch } from "@/types/nextMatch";
@@ -39,6 +40,11 @@ export function MatchCenter({
       ? aMatches
       : bMatches;
 
+  const currentTeam =
+    team === "a"
+      ? clubConfig.teams.aTeam
+      : clubConfig.teams.bTeam;
+
   return (
     <section
       id="zapasy"
@@ -49,12 +55,8 @@ export function MatchCenter({
           number="03"
           label="Zápasy"
           title="Zápasy."
-          secondLine={
-            team === "a"
-              ? "A-tým FC PPB."
-              : "B-tým FC PPB."
-          }
-          meta="Sezóna 2025/26"
+          secondLine={`${currentTeam.label} ${clubConfig.name}.`}
+          meta={`Sezóna ${clubConfig.season}`}
         />
 
         <div className={styles.toolbar}>
@@ -179,12 +181,13 @@ function NextMatchCard({
       ) : (
         <div className={styles.noMatch}>
           <strong>
-            Nová sezóna se připravuje.
+            Rozpis zatím není dostupný.
           </strong>
 
           <p>
-            Čekáme na zveřejnění
-            dalšího rozpisu APF.
+            Jakmile bude další zápas
+            zveřejněný na APF, zobrazí
+            se zde automaticky.
           </p>
         </div>
       )}
@@ -289,9 +292,17 @@ function LastMatchesCard({
             ),
           )
         ) : (
-          <p className={styles.empty}>
-            Zápasy nejsou dostupné.
-          </p>
+          <div className={styles.noMatch}>
+            <strong>
+              Sezóna ještě nemá výsledky.
+            </strong>
+
+            <p>
+              Po odehrání prvních zápasů
+              se výsledky zobrazí
+              automaticky.
+            </p>
+          </div>
         )}
       </div>
     </article>
