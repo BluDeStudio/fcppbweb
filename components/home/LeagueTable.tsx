@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-
 import { useState } from "react";
 
 import {
@@ -38,9 +37,7 @@ export function LeagueTable({
   const secondLine =
     view === "a"
       ? `${clubConfig.teams.aTeam.competition.name}.`
-      : view === "b"
-        ? `${clubConfig.teams.bTeam.competition.name}.`
-        : "A-tým i B-tým.";
+      : `${clubConfig.teams.bTeam.competition.name}.`;
 
   return (
     <section
@@ -141,42 +138,6 @@ export function LeagueTable({
             bTeamRows
           }
         />
-      )}
-
-      {view === "all" && (
-        <div
-          className={
-            styles.allTables
-          }
-        >
-          <LeagueTableBlock
-            title="A-tým"
-            subtitle={
-              clubConfig
-                .teams
-                .aTeam
-                .competition
-                .name
-            }
-            rows={
-              aTeamRows
-            }
-          />
-
-          <LeagueTableBlock
-            title="B-tým"
-            subtitle={
-              clubConfig
-                .teams
-                .bTeam
-                .competition
-                .name
-            }
-            rows={
-              bTeamRows
-            }
-          />
-        </div>
       )}
     </section>
   );

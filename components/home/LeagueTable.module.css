@@ -176,14 +176,6 @@
     );
 }
 
-.allTables {
-  display:
-    grid;
-
-  gap:
-    32px;
-}
-
 .block {
   width:
     100%;
@@ -311,8 +303,7 @@
     650;
 }
 
-.table tbody
-tr:last-child td {
+.table tbody tr:last-child td {
   border-bottom:
     0;
 }
@@ -358,10 +349,8 @@ tr:last-child td {
     );
 }
 
-.ourTeam
-.teamName,
-.ourTeam
-.points {
+.ourTeam .teamName,
+.ourTeam .points {
   color:
     var(--primary) !important;
 }

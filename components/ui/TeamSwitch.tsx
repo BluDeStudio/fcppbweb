@@ -4,8 +4,7 @@ import styles from "./TeamSwitch.module.css";
 
 export type TeamView =
   | "a"
-  | "b"
-  | "all";
+  | "b";
 
 type TeamSwitchProps = {
   value: TeamView;
@@ -40,18 +39,6 @@ export function TeamSwitch({
         onClick={() => onChange("b")}
       >
         B-tým
-      </button>
-
-      <button
-        type="button"
-        className={
-          value === "all"
-            ? styles.active
-            : undefined
-        }
-        onClick={() => onChange("all")}
-      >
-        Celkem
       </button>
     </div>
   );
