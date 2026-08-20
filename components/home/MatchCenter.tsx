@@ -1,11 +1,12 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { clubConfig } from "@/config/club";
 
+import type { LeagueRow } from "@/types/league";
 import type { MatchResult } from "@/types/match";
 import type { NextMatch } from "@/types/nextMatch";
 
@@ -19,6 +20,9 @@ type MatchCenterProps = {
 
   aMatches: MatchResult[];
   bMatches: MatchResult[];
+
+  aLeagueTable: LeagueRow[];
+  bLeagueTable: LeagueRow[];
 };
 
 export function MatchCenter({
@@ -26,6 +30,8 @@ export function MatchCenter({
   bNextMatch,
   aMatches,
   bMatches,
+  aLeagueTable,
+  bLeagueTable,
 }: MatchCenterProps) {
   const [team, setTeam] =
     useState<TeamView>("a");
@@ -39,6 +45,11 @@ export function MatchCenter({
     team === "a"
       ? aMatches
       : bMatches;
+
+  const leagueRows =
+    team === "a"
+      ? aLeagueTable
+      : bLeagueTable;
 
   const currentTeam =
     team === "a"
@@ -68,9 +79,7 @@ export function MatchCenter({
                   ? styles.active
                   : undefined
               }
-              onClick={() =>
-                setTeam("a")
-              }
+              onClick={() => setTeam("a")}
             >
               A-tým
             </button>
@@ -82,9 +91,7 @@ export function MatchCenter({
                   ? styles.active
                   : undefined
               }
-              onClick={() =>
-                setTeam("b")
-              }
+              onClick={() => setTeam("b")}
             >
               B-tým
             </button>
@@ -98,6 +105,10 @@ export function MatchCenter({
           <div className={styles.grid}>
             <NextMatchCard
               match={nextMatch}
+              leagueRows={leagueRows}
+              competitionName={
+                currentTeam.competition.name
+              }
             />
 
             <LastMatchesCard
@@ -116,64 +127,92 @@ export function MatchCenter({
 
 function NextMatchCard({
   match,
+  leagueRows,
+  competitionName,
 }: {
   match: NextMatch | null;
+  leagueRows: LeagueRow[];
+  competitionName: string;
 }) {
+  const comparison =
+    useMemo(() => {
+      if (!match) {
+        return null;
+      }
+
+      const home =
+        findTeamRow(
+          leagueRows,
+          match.homeTeam,
+        );
+
+      const away =
+        findTeamRow(
+          leagueRows,
+          match.awayTeam,
+        );
+
+      return {
+        home,
+        away,
+      };
+    }, [
+      leagueRows,
+      match,
+    ]);
+
   return (
     <article
       className={`${styles.card} ${styles.nextMatchCard}`}
     >
-      <span className={styles.blockLabel}>
-        Následující zápas
-      </span>
+      <div className={styles.nextHeader}>
+        <span className={styles.blockLabel}>
+          Následující zápas
+        </span>
+
+        <span className={styles.competitionName}>
+          {competitionName}
+        </span>
+      </div>
 
       {match ? (
         <>
-          <div className={styles.matchVisual}>
-            <TeamLogo
+          <div className={styles.matchTeams}>
+            <MatchTeam
               teamName={match.homeTeam}
+              leagueRow={comparison?.home ?? null}
             />
 
             <div className={styles.vs}>
               VS
             </div>
 
-            <TeamLogo
+            <MatchTeam
               teamName={match.awayTeam}
+              leagueRow={comparison?.away ?? null}
             />
           </div>
 
-          <div className={styles.teamNames}>
-            <strong>
-              {match.homeTeam}
-            </strong>
-
-            <span />
-
-            <strong>
-              {match.awayTeam}
-            </strong>
-          </div>
-
-          <div className={styles.matchDetails}>
-            <MatchDetail
-              label="Kdy"
+          <div className={styles.matchMeta}>
+            <MatchMeta
+              label="Datum"
               value={
                 match.date || "—"
               }
             />
 
-            <MatchDetail
-              label="V kolik"
+            <MatchMeta
+              label="Čas"
               value={
                 match.time || "—"
               }
             />
 
-            <MatchDetail
-              label="Kde"
+            <MatchMeta
+              label="Místo"
               value={
-                match.venue || "—"
+                match.venue ||
+                "Bude doplněno"
               }
             />
           </div>
@@ -185,14 +224,108 @@ function NextMatchCard({
           </strong>
 
           <p>
-            Jakmile bude další zápas
-            zveřejněný na APF, zobrazí
-            se zde automaticky.
+            Jakmile APF zveřejní další zápas,
+            zobrazí se zde automaticky.
           </p>
         </div>
       )}
     </article>
   );
+}
+
+function MatchTeam({
+  teamName,
+  leagueRow,
+}: {
+  teamName: string;
+  leagueRow: LeagueRow | null;
+}) {
+  return (
+    <div className={styles.matchTeam}>
+      <TeamLogo
+        teamName={teamName}
+      />
+
+      <strong className={styles.matchTeamName}>
+        {teamName}
+      </strong>
+
+      <div className={styles.teamComparison}>
+        <div>
+          <strong>
+            {leagueRow
+              ? `${leagueRow.position}.`
+              : "—"}
+          </strong>
+
+          <span>
+            MÍSTO
+          </span>
+        </div>
+
+        <div>
+          <strong>
+            {leagueRow?.score || "—"}
+          </strong>
+
+          <span>
+            SKÓRE
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function findTeamRow(
+  rows: LeagueRow[],
+  teamName: string,
+): LeagueRow | null {
+  const normalized =
+    normalizeTeamName(
+      teamName,
+    );
+
+  return (
+    rows.find(
+      (row) =>
+        normalizeTeamName(
+          row.teamName,
+        ) ===
+        normalized,
+    ) ??
+    rows.find(
+      (row) =>
+        normalizeTeamName(
+          row.teamName,
+        ).includes(
+          normalized,
+        ) ||
+        normalized.includes(
+          normalizeTeamName(
+            row.teamName,
+          ),
+        ),
+    ) ??
+    null
+  );
+}
+
+function normalizeTeamName(
+  value: string,
+): string {
+  return value
+    .normalize("NFD")
+    .replace(
+      /[\u0300-\u036f]/g,
+      "",
+    )
+    .toLowerCase()
+    .replace(
+      /[^a-z0-9]+/g,
+      " ",
+    )
+    .trim();
 }
 
 function TeamLogo({
@@ -212,7 +345,7 @@ function TeamLogo({
           src="/images/fc-ppb-logo.png"
           alt={teamName}
           fill
-          sizes="90px"
+          sizes="88px"
           className={styles.teamLogo}
         />
       </div>
@@ -245,20 +378,18 @@ function getInitials(
     .join("");
 }
 
-type MatchDetailProps = {
-  label: string;
-  value: string;
-};
-
-function MatchDetail({
+function MatchMeta({
   label,
   value,
-}: MatchDetailProps) {
+}: {
+  label: string;
+  value: string;
+}) {
   return (
-    <div className={styles.matchDetail}>
-      <small>
+    <div className={styles.matchMetaItem}>
+      <span>
         {label}
-      </small>
+      </span>
 
       <strong>
         {value}
@@ -299,8 +430,7 @@ function LastMatchesCard({
 
             <p>
               Po odehrání prvních zápasů
-              se výsledky zobrazí
-              automaticky.
+              se výsledky zobrazí automaticky.
             </p>
           </div>
         )}

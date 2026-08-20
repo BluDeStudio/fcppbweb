@@ -547,6 +547,12 @@ export default async function HomePage() {
         bMatches={
           bMatches
         }
+        aLeagueTable={
+          aLeagueTable
+        }
+        bLeagueTable={
+          bLeagueTable
+        }
       />
 
       {/* =====================================
