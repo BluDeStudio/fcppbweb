@@ -1,116 +1,275 @@
 .wrap {
   display: grid;
-  gap: 14px;
+  gap: 18px;
 }
+
 .newButton {
-  justify-self: start;
-  padding: 11px 16px;
+  width: fit-content;
+  min-height: 42px;
+  padding: 0 16px;
+
   border: 0;
   border-radius: 10px;
+
   color: #061007;
   background: var(--primary);
+
   font-size: 9px;
   font-weight: 950;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+
   cursor: pointer;
 }
+
 .list {
   display: grid;
-  gap: 7px;
+  gap: 8px;
 }
+
 .row {
   display: grid;
-  grid-template-columns: minmax(0,1fr) auto auto;
+  grid-template-columns:
+    minmax(220px, 1fr)
+    minmax(220px, 0.8fr)
+    auto;
+
   align-items: center;
-  gap: 14px;
-  padding: 13px 15px;
+  gap: 16px;
+
+  padding: 15px 16px;
+
   border: 1px solid var(--border);
-  border-radius: 12px;
-  background: rgba(255,255,255,.015);
+  border-radius: 14px;
+
+  background:
+    rgba(255, 255, 255, 0.018);
 }
-.row strong {
+
+.row > div:first-child {
+  min-width: 0;
+}
+
+.row > div:first-child strong {
   display: block;
-  font-size: 15px;
+
+  color: var(--text);
+
+  font-size: 14px;
+  font-weight: 950;
 }
-.row span {
+
+.row > div:first-child span {
+  display: block;
+
+  margin-top: 5px;
+
   color: var(--text-muted);
-  font-size: 8px;
+
+  font-size: 7px;
+  font-weight: 850;
+  letter-spacing: 0.06em;
 }
+
 .links {
   display: flex;
-  gap: 12px;
-}
-.row button {
-  padding: 8px 10px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  color: var(--text);
-  background: transparent;
-  cursor: pointer;
-}
-.form {
-  display: grid;
-  gap: 13px;
-  padding: 18px;
-  border: 1px solid rgba(41,232,63,.18);
-  border-radius: 15px;
-  background: rgba(41,232,63,.025);
-}
-.form h2 { margin: 0; }
-.form label {
-  display: grid;
-  gap: 6px;
-}
-.form label span {
+  flex-wrap: wrap;
+  gap: 7px 12px;
+
   color: var(--text-muted);
+
   font-size: 8px;
-  font-weight: 900;
-  text-transform: uppercase;
+  font-weight: 800;
 }
-.form input,
-.form select {
-  width: 100%;
-  padding: 10px;
-  border: 1px solid var(--border);
-  border-radius: 9px;
-  color: var(--text);
-  background: #0b100d;
-}
-.two {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-}
-.check {
-  display: flex !important;
-  align-items: center;
-}
-.check input { width: auto; }
+
 .actions {
   display: flex;
+  flex-wrap: wrap;
   justify-content: flex-end;
   gap: 7px;
 }
-.actions button {
-  padding: 10px 14px;
+
+.actions button,
+.row button {
+  min-height: 34px;
+  padding: 0 10px;
+
   border: 1px solid var(--border);
-  border-radius: 9px;
-  color: var(--text);
-  background: transparent;
+  border-radius: 8px;
+
+  color: var(--text-soft);
+  background:
+    rgba(255, 255, 255, 0.018);
+
+  font-size: 7px;
+  font-weight: 900;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+
   cursor: pointer;
 }
-.actions .save {
-  color: #061007;
-  border-color: var(--primary);
-  background: var(--primary);
-  font-weight: 950;
+
+.actions button:hover,
+.row button:hover {
+  color: #fff;
+
+  border-color:
+    rgba(41, 232, 63, 0.32);
 }
-.empty {
+
+.form {
+  display: grid;
+  gap: 15px;
+
   padding: 20px;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  color: var(--text-muted);
+
+  border: 1px solid
+    rgba(41, 232, 63, 0.18);
+
+  border-radius: 18px;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(17, 28, 20, 0.97),
+      rgba(8, 13, 9, 0.97)
+    );
 }
-@media (max-width: 700px) {
-  .row { grid-template-columns: 1fr; }
-  .two { grid-template-columns: 1fr; }
+
+.form h2 {
+  margin: 0 0 3px;
+
+  color: #fff;
+
+  font-size: 22px;
+  font-weight: 950;
+  letter-spacing: -0.035em;
+}
+
+.form label {
+  display: grid;
+  gap: 7px;
+}
+
+.form label > span,
+.form legend {
+  color: var(--text-muted);
+
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.form input,
+.form select,
+.form textarea {
+  width: 100%;
+
+  min-height: 42px;
+
+  padding: 10px 12px;
+
+  border: 1px solid var(--border);
+  border-radius: 10px;
+
+  color: var(--text);
+  background: #0b100d;
+
+  font: inherit;
+}
+
+.form fieldset {
+  display: grid;
+  gap: 13px;
+
+  margin: 4px 0 0;
+  padding: 15px;
+
+  border: 1px solid
+    rgba(41, 232, 63, 0.16);
+
+  border-radius: 13px;
+
+  background:
+    rgba(41, 232, 63, 0.025);
+}
+
+.form legend {
+  padding: 0 6px;
+
+  color: var(--primary);
+}
+
+.two {
+  display: grid;
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+
+  gap: 10px;
+}
+
+.check {
+  display: flex !important;
+  align-items: center;
+  gap: 8px !important;
+}
+
+.check input {
+  width: auto;
+  min-height: auto;
+}
+
+.form .actions {
+  margin-top: 2px;
+}
+
+.save {
+  color: #061007 !important;
+  border-color: var(--primary) !important;
+  background: var(--primary) !important;
+}
+
+.empty {
+  padding: 24px;
+
+  border: 1px dashed var(--border);
+  border-radius: 14px;
+
+  color: var(--text-muted);
+  text-align: center;
+}
+
+@media (max-width: 900px) {
+  .row {
+    grid-template-columns: 1fr;
+  }
+
+  .actions {
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 600px) {
+  .two {
+    grid-template-columns: 1fr;
+  }
+
+  .form {
+    padding: 16px;
+  }
+
+  .row {
+    padding: 13px;
+  }
+
+  .actions {
+    display: grid;
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+  .actions button {
+    width: 100%;
+  }
 }
