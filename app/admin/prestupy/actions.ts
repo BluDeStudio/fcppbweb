@@ -17,9 +17,11 @@ const text = (fd: FormData, key: string) =>
   String(fd.get(key) ?? "").trim();
 
 function refresh() {
-  revalidatePath("/");
-  revalidatePath("/admin/prestupy");
-  revalidatePath("/admin/hraci");
+  // Přestupy jsou na homepage i na samostatné stránce /prestupy.
+  revalidatePath("/", "page");
+  revalidatePath("/prestupy", "page");
+  revalidatePath("/admin/prestupy", "page");
+  revalidatePath("/admin/hraci", "page");
 }
 
 function isDirection(value: string): value is TransferDirection {
