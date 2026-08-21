@@ -43,9 +43,7 @@ export default async function StatisticsPage() {
 
               <p>
                 Kompletní přehled A-týmu
-                a B-týmu. Řaď hráče podle
-                zápasů, gólů, asistencí,
-                známky nebo docházky.
+                a B-týmu.
               </p>
             </div>
 
