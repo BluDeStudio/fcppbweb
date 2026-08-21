@@ -1,7 +1,7 @@
 .hero {
   position: relative;
 
-  min-height: 600px;
+  min-height: auto;
 
   display: grid;
   place-items: center;
@@ -10,7 +10,7 @@
 
   padding:
     108px 28px
-    8px;
+    0;
 
   isolation: isolate;
 }
@@ -440,11 +440,11 @@
   max-width: 1050px
 ) {
   .hero {
-    min-height: 650px;
+    min-height: auto;
 
     padding:
       112px 22px
-      12px;
+      0;
   }
 
   .brandRow {
@@ -502,7 +502,7 @@
 
     padding:
       98px 14px
-      8px;
+      0;
   }
 
   .content {
