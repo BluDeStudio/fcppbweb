@@ -1,5 +1,7 @@
 .section {
-  padding: 100px 0;
+  padding:
+    26px 0
+    100px;
 }
 
 .container {
@@ -44,30 +46,37 @@
 }
 
 .timeline {
-  border-top: 1px solid var(--border);
+  border-top:
+    1px solid
+    var(--border);
 }
 
 .timelineItem {
   display: grid;
 
-  grid-template-columns: 100px 1fr;
+  grid-template-columns:
+    100px 1fr;
 
   gap: 20px;
 
   padding: 24px 0;
 
-  border-bottom: 1px solid var(--border);
+  border-bottom:
+    1px solid
+    var(--border);
 }
 
 .timelineItem > strong {
-  color: var(--primary);
+  color:
+    var(--primary);
 
   font-size: 13px;
   font-weight: 900;
 }
 
 .timelineItem h3 {
-  margin: 0 0 5px;
+  margin:
+    0 0 5px;
 
   color: #e5e9e6;
 
@@ -78,29 +87,46 @@
 .timelineItem p {
   margin: 0;
 
-  color: var(--text-muted);
+  color:
+    var(--text-muted);
 
   font-size: 13px;
 }
 
-@media (max-width: 850px) {
+@media (
+  max-width: 850px
+) {
   .section {
-    padding: 72px 0;
+    padding:
+      24px 0
+      72px;
   }
 
   .content {
-    grid-template-columns: 1fr;
+    grid-template-columns:
+      1fr;
 
     gap: 45px;
   }
 }
 
-@media (max-width: 520px) {
+@media (
+  max-width: 520px
+) {
+  .section {
+    padding-top:
+      18px;
+  }
+
   .container {
-    width: calc(100% - 22px);
+    width:
+      calc(
+        100% - 22px
+      );
   }
 
   .timelineItem {
-    grid-template-columns: 80px 1fr;
+    grid-template-columns:
+      80px 1fr;
   }
 }

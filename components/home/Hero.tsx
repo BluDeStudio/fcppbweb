@@ -1,5 +1,4 @@
 import { AnimatedLogo } from "@/components/ui/AnimatedLogo/AnimatedLogo";
-import { clubConfig } from "@/config/club";
 
 import styles from "./Hero.module.css";
 
@@ -20,14 +19,18 @@ export function Hero() {
         <div className={styles.brandRow}>
           <div className={styles.logoWrap}>
             <AnimatedLogo
-              size={255}
+              size={315}
               priority
             />
           </div>
 
           <div className={styles.heroText}>
-            <h1>
-              {clubConfig.name}
+            <h1
+              className={styles.clubName}
+              aria-label="FC PPB"
+            >
+              <span>FC</span>
+              <span>PPB</span>
             </h1>
 
             <div

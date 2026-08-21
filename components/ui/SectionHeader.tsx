@@ -29,16 +29,17 @@ export function SectionHeader({
         )}
       </div>
 
-      <h2>
-        {title}
+      <div className={styles.heading}>
+        <h2 className={styles.title}>
+          {title}
+        </h2>
 
         {secondLine && (
-          <>
-            <br />
-            <span>{secondLine}</span>
-          </>
+          <p className={styles.secondLine}>
+            {secondLine}
+          </p>
         )}
-      </h2>
+      </div>
     </div>
   );
 }
