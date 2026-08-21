@@ -1,5 +1,9 @@
 import Link from "next/link";
 
+import type {
+  ReactNode,
+} from "react";
+
 import { SectionHeader } from "@/components/ui/SectionHeader";
 
 import type {
@@ -19,8 +23,6 @@ export function Transfers({
   /*
    * Homepage:
    * MAX 2 nejnovější PŘÍCHODY + 2 nejnovější ODCHODY.
-   * Výsledkem jsou vždy 4 stejně široké sloty,
-   * stejně jako u soupisky.
    */
   const arrivals = transfers
     .filter(
@@ -132,6 +134,11 @@ export function TransferCard({
       transfer.otherClub,
     );
 
+  const playerUrl =
+    buildPlayerUrl(
+      transfer,
+    );
+
   return (
     <article
       className={`${styles.transferCard} ${
@@ -140,23 +147,35 @@ export function TransferCard({
           : styles.cardDeparture
       }`}
     >
-      <div className={styles.photo}>
-        <TransferPlayerImage
-          src={transfer.imageUrl}
-          name={transfer.playerName}
-        />
+      <PlayerProfileLink
+        transfer={transfer}
+        href={playerUrl}
+        className={styles.playerPhotoLink}
+      >
+        <div className={styles.photo}>
+          <TransferPlayerImage
+            src={transfer.imageUrl}
+            name={transfer.playerName}
+          />
 
-        <span className={styles.directionBadge}>
-          {arrival
-            ? "PŘÍCHOD <<"
-            : "ODCHOD >>"}
-        </span>
-      </div>
+          <span className={styles.directionBadge}>
+            {arrival
+              ? "PŘÍCHOD <<"
+              : "ODCHOD >>"}
+          </span>
+        </div>
+      </PlayerProfileLink>
 
       <div className={styles.cardBody}>
-        <h4>
-          {transfer.playerName}
-        </h4>
+        <PlayerProfileLink
+          transfer={transfer}
+          href={playerUrl}
+          className={styles.playerNameLink}
+        >
+          <h4>
+            {transfer.playerName}
+          </h4>
+        </PlayerProfileLink>
 
         <span className={styles.transferType}>
           {movementLabel(
@@ -233,6 +252,115 @@ export function TransferCard({
       </div>
     </article>
   );
+}
+
+function PlayerProfileLink({
+  transfer,
+  href,
+  className,
+  children,
+}: {
+  transfer: ClubTransfer;
+  href: string | null;
+  className: string;
+  children: ReactNode;
+}) {
+  if (!href) {
+    return (
+      <div
+        className={`${className} ${styles.playerNameStatic}`}
+      >
+        {children}
+      </div>
+    );
+  }
+
+  if (
+    transfer.direction ===
+    "departure"
+  ) {
+    return (
+      <a
+        href={href}
+        target="_blank"
+        rel="noreferrer"
+        className={className}
+      >
+        {children}
+      </a>
+    );
+  }
+
+  return (
+    <Link
+      href={href}
+      className={className}
+    >
+      {children}
+    </Link>
+  );
+}
+
+function buildPlayerUrl(
+  transfer: ClubTransfer,
+): string | null {
+  if (
+    transfer.playerId === null ||
+    !Number.isFinite(
+      transfer.playerId,
+    )
+  ) {
+    return null;
+  }
+
+  /*
+   * PŘÍCHOD:
+   * hráč už je náš -> interní profil.
+   */
+  if (
+    transfer.direction ===
+    "arrival"
+  ) {
+    return `/hrac/${transfer.playerId}`;
+  }
+
+  /*
+   * ODCHOD:
+   * hráč už není součástí aktuálního kádru
+   * -> profil na APF.
+   *
+   * APF používá URL:
+   * /hrac/ID/slug
+   */
+  const slug =
+    slugify(
+      transfer.playerName,
+    );
+
+  return slug
+    ? `https://futsalvplzni.cz/hrac/${transfer.playerId}/${slug}`
+    : `https://futsalvplzni.cz/hrac/${transfer.playerId}`;
+}
+
+function slugify(
+  value: string,
+): string {
+  return value
+    .normalize("NFD")
+    .replace(
+      /[\u0300-\u036f]/g,
+      "",
+    )
+    .toLowerCase()
+    .trim()
+    .replace(
+      /[^a-z0-9]+/g,
+      "-",
+    )
+    .replace(
+      /^-+|-+$/g,
+      "",
+    );
 }
 
 function TransferEmptyCard({
