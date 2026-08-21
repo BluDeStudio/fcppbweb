@@ -41,7 +41,7 @@ export function ClubStory() {
           number="01"
           label="Klub"
           title="Náš příběh."
-          secondLine="Od Thermo Boys k FC PPB."
+          secondLine="Píše se od roku 2018."
         />
 
         <div className={styles.content}>
@@ -80,10 +80,10 @@ export function ClubStory() {
             </p>
 
             <p>
-              Píšeme novou éru našeho klubu. 
-              Chceme se neustále posouvat vpřed a FC PPB 
-              reprezentovat v tom nejlepším světle – nejen 
-              svými výkony na hřišti, ale také tím, jak 
+              Píšeme novou éru našeho klubu.
+              Chceme se neustále posouvat vpřed a FC PPB
+              reprezentovat v tom nejlepším světle – nejen
+              svými výkony na hřišti, ale také tím, jak
               fungujeme a vystupujeme mimo něj.
             </p>
           </div>
