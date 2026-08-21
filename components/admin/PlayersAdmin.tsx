@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  Fragment,
   useState,
 } from "react";
 
@@ -64,6 +65,13 @@ type ManagedPlayer = {
   movements: AdminMovement[];
 };
 
+type MovementState = {
+  playerId: string;
+  direction:
+    | "arrival"
+    | "departure";
+} | null;
+
 export function PlayersAdmin({
   players,
   appPlayers,
@@ -72,12 +80,12 @@ export function PlayersAdmin({
   appPlayers: AppPlayer[];
 }) {
   const [
-    editing,
-    setEditing,
+    editingPlayerId,
+    setEditingPlayerId,
   ] =
-    useState<
-      ManagedPlayer | null
-    >(null);
+    useState<string | null>(
+      null,
+    );
 
   const [
     creating,
@@ -89,22 +97,35 @@ export function PlayersAdmin({
     movement,
     setMovement,
   ] =
-    useState<{
-      player: ManagedPlayer;
-      direction:
-        | "arrival"
-        | "departure";
-    } | null>(null);
+    useState<MovementState>(
+      null,
+    );
 
   function closeForms() {
-    setEditing(null);
-    setCreating(false);
-    setMovement(null);
+    setEditingPlayerId(
+      null,
+    );
+
+    setCreating(
+      false,
+    );
+
+    setMovement(
+      null,
+    );
   }
 
   return (
-    <div className={styles.wrap}>
-      <div className={styles.topbar}>
+    <div
+      className={
+        styles.wrap
+      }
+    >
+      <div
+        className={
+          styles.topbar
+        }
+      >
         <div>
           <strong>
             Registr hráčů
@@ -116,10 +137,16 @@ export function PlayersAdmin({
         </div>
 
         <button
-          className={styles.newButton}
+          type="button"
+          className={
+            styles.newButton
+          }
           onClick={() => {
             closeForms();
-            setCreating(true);
+
+            setCreating(
+              true,
+            );
           }}
         >
           + NOVÝ HRÁČ
@@ -128,183 +155,279 @@ export function PlayersAdmin({
 
       {creating && (
         <PlayerForm
-          player={null}
-          appPlayers={appPlayers}
-          onCancel={closeForms}
+          player={
+            null
+          }
+          appPlayers={
+            appPlayers
+          }
+          onCancel={
+            closeForms
+          }
         />
       )}
 
-      {editing && (
-        <PlayerForm
-          player={editing}
-          appPlayers={appPlayers}
-          onCancel={closeForms}
-        />
-      )}
-
-      {movement && (
-        <MovementForm
-          player={movement.player}
-          direction={movement.direction}
-          onCancel={closeForms}
-        />
-      )}
-
-      <div className={styles.list}>
+      <div
+        className={
+          styles.list
+        }
+      >
         {players.map(
-          (player) => (
-            <article
-              key={player.id}
-              className={styles.row}
-            >
-              <div>
-                <strong>
-                  {player.name}
-                </strong>
+          (
+            player,
+          ) => {
+            const isEditing =
+              editingPlayerId ===
+              player.id;
 
-                <span>
-                  {formatTeam(
-                    player.team,
-                  )}
-                  {" • "}
-                  {player.active
-                    ? "AKTIVNÍ"
-                    : "NEAKTIVNÍ"}
-                  {" • "}
-                  {player.status ===
-                  "loan"
-                    ? "HOSTOVÁNÍ"
-                    : "KMENOVÝ"}
-                </span>
+            const isMovementOpen =
+              movement?.playerId ===
+              player.id;
 
-                <span>
-                  V KLUBU OD:{" "}
-                  {formatDate(
-                    player.clubFrom,
-                  )}
-                  {" • "}
-                  DO:{" "}
-                  {player.clubTo
-                    ? formatDate(
-                        player.clubTo,
-                      )
-                    : player.active
-                      ? "SOUČASNOST"
-                      : "—"}
-                </span>
-              </div>
-
-              <div
-                className={
-                  styles.links
+            return (
+              <Fragment
+                key={
+                  player.id
                 }
               >
-                <span>
-                  APF:{" "}
-                  {player.apfPlayerId ??
-                    "—"}
-                </span>
-
-                <span>
-                  APP:{" "}
-                  {player.appPlayerId
-                    ? "PROPOJENO"
-                    : "—"}
-                </span>
-
-                <span>
-                  POHYBY:{" "}
-                  {
-                    player.movements
-                      .length
-                  }
-                </span>
-              </div>
-
-              <div
-                className={
-                  styles.actions
-                }
-              >
-                <button
-                  onClick={() => {
-                    closeForms();
-                    setMovement({
-                      player,
-                      direction:
-                        "arrival",
-                    });
-                  }}
-                >
-                  PŘÍCHOD
-                </button>
-
-                <button
-                  onClick={() => {
-                    closeForms();
-                    setMovement({
-                      player,
-                      direction:
-                        "departure",
-                    });
-                  }}
-                >
-                  ODCHOD
-                </button>
-
-                <button
-                  onClick={() => {
-                    closeForms();
-                    setEditing(
-                      player,
-                    );
-                  }}
-                >
-                  UPRAVIT
-                </button>
-
-                <ActiveToggle
-                  player={player}
-                />
-              </div>
-
-              {player.movements.length >
-                0 && (
-                <div
+                <article
                   className={
-                    styles.history
+                    styles.row
                   }
                 >
-                  {player.movements.map(
-                    (
-                      item,
-                    ) => (
-                      <span
-                        key={
-                          item.id
-                        }
-                      >
-                        {item.direction ===
-                        "arrival"
-                          ? "PŘÍCHOD"
-                          : "ODCHOD"}
-                        {" • "}
-                        {formatDate(
-                          item.date,
-                        )}
-                        {item.otherClub
-                          ? ` • ${item.otherClub}`
-                          : ""}
-                        {item.season
-                          ? ` • ${item.season}`
-                          : ""}
-                      </span>
-                    ),
+                  <div>
+                    <strong>
+                      {
+                        player.name
+                      }
+                    </strong>
+
+                    <span>
+                      {
+                        formatTeam(
+                          player.team,
+                        )
+                      }
+                      {" • "}
+                      {
+                        player.active
+                          ? "AKTIVNÍ"
+                          : "NEAKTIVNÍ"
+                      }
+                      {" • "}
+                      {
+                        player.status ===
+                        "loan"
+                          ? "HOSTOVÁNÍ"
+                          : "KMENOVÝ"
+                      }
+                    </span>
+
+                    <span>
+                      V KLUBU OD:{" "}
+                      {
+                        formatDate(
+                          player.clubFrom,
+                        )
+                      }
+                      {" • "}
+                      DO:{" "}
+                      {
+                        player.clubTo
+                          ? formatDate(
+                              player.clubTo,
+                            )
+                          : player.active
+                            ? "SOUČASNOST"
+                            : "—"
+                      }
+                    </span>
+                  </div>
+
+                  <div
+                    className={
+                      styles.links
+                    }
+                  >
+                    <span>
+                      APF:{" "}
+                      {
+                        player.apfPlayerId ??
+                        "—"
+                      }
+                    </span>
+
+                    <span>
+                      APP:{" "}
+                      {
+                        player.appPlayerId
+                          ? "PROPOJENO"
+                          : "—"
+                      }
+                    </span>
+
+                    <span>
+                      POHYBY:{" "}
+                      {
+                        player.movements
+                          .length
+                      }
+                    </span>
+                  </div>
+
+                  <div
+                    className={
+                      styles.actions
+                    }
+                  >
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setCreating(
+                          false,
+                        );
+
+                        setEditingPlayerId(
+                          null,
+                        );
+
+                        setMovement({
+                          playerId:
+                            player.id,
+
+                          direction:
+                            "arrival",
+                        });
+                      }}
+                    >
+                      PŘÍCHOD
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setCreating(
+                          false,
+                        );
+
+                        setEditingPlayerId(
+                          null,
+                        );
+
+                        setMovement({
+                          playerId:
+                            player.id,
+
+                          direction:
+                            "departure",
+                        });
+                      }}
+                    >
+                      ODCHOD
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setCreating(
+                          false,
+                        );
+
+                        setMovement(
+                          null,
+                        );
+
+                        setEditingPlayerId(
+                          player.id,
+                        );
+                      }}
+                    >
+                      UPRAVIT
+                    </button>
+
+                    <ActiveToggle
+                      player={
+                        player
+                      }
+                    />
+                  </div>
+
+                  {player.movements.length >
+                    0 && (
+                    <div
+                      className={
+                        styles.history
+                      }
+                    >
+                      {player.movements.map(
+                        (
+                          item,
+                        ) => (
+                          <span
+                            key={
+                              item.id
+                            }
+                          >
+                            {
+                              item.direction ===
+                              "arrival"
+                                ? "PŘÍCHOD"
+                                : "ODCHOD"
+                            }
+                            {" • "}
+                            {
+                              formatDate(
+                                item.date,
+                              )
+                            }
+                            {
+                              item.otherClub
+                                ? ` • ${item.otherClub}`
+                                : ""
+                            }
+                            {
+                              item.season
+                                ? ` • ${item.season}`
+                                : ""
+                            }
+                          </span>
+                        ),
+                      )}
+                    </div>
                   )}
-                </div>
-              )}
-            </article>
-          ),
+                </article>
+
+                {isEditing && (
+                  <PlayerForm
+                    player={
+                      player
+                    }
+                    appPlayers={
+                      appPlayers
+                    }
+                    onCancel={
+                      closeForms
+                    }
+                  />
+                )}
+
+                {isMovementOpen &&
+                  movement && (
+                  <MovementForm
+                    player={
+                      player
+                    }
+                    direction={
+                      movement.direction
+                    }
+                    onCancel={
+                      closeForms
+                    }
+                  />
+                )}
+              </Fragment>
+            );
+          },
         )}
       </div>
     </div>
@@ -316,14 +439,24 @@ function PlayerForm({
   appPlayers,
   onCancel,
 }: {
-  player: ManagedPlayer | null;
-  appPlayers: AppPlayer[];
-  onCancel: () => void;
+  player:
+    ManagedPlayer |
+    null;
+
+  appPlayers:
+    AppPlayer[];
+
+  onCancel:
+    () => void;
 }) {
   return (
     <form
-      action={saveWebPlayer}
-      className={styles.form}
+      action={
+        saveWebPlayer
+      }
+      className={
+        styles.form
+      }
     >
       <input
         type="hidden"
@@ -335,31 +468,43 @@ function PlayerForm({
       />
 
       <h2>
-        {player
-          ? "Upravit hráče"
-          : "Nový hráč"}
+        {
+          player
+            ? "Upravit hráče"
+            : "Nový hráč"
+        }
       </h2>
 
-      <div className={styles.two}>
+      <div
+        className={
+          styles.two
+        }
+      >
         <label>
-          <span>Jméno</span>
+          <span>
+            Jméno
+          </span>
 
           <input
             name="name"
             defaultValue={
-              player?.name ?? ""
+              player?.name ??
+              ""
             }
             required
           />
         </label>
 
         <label>
-          <span>Kmen</span>
+          <span>
+            Kmen
+          </span>
 
           <select
             name="team"
             defaultValue={
-              player?.team ?? "b"
+              player?.team ??
+              "b"
             }
           >
             <option value="a">
@@ -377,9 +522,15 @@ function PlayerForm({
         </label>
       </div>
 
-      <div className={styles.two}>
+      <div
+        className={
+          styles.two
+        }
+      >
         <label>
-          <span>Pozice</span>
+          <span>
+            Pozice
+          </span>
 
           <select
             name="position"
@@ -399,7 +550,9 @@ function PlayerForm({
         </label>
 
         <label>
-          <span>Status</span>
+          <span>
+            Status
+          </span>
 
           <select
             name="status"
@@ -419,9 +572,15 @@ function PlayerForm({
         </label>
       </div>
 
-      <div className={styles.two}>
+      <div
+        className={
+          styles.two
+        }
+      >
         <label>
-          <span>Číslo dresu</span>
+          <span>
+            Číslo dresu
+          </span>
 
           <input
             name="shirtNumber"
@@ -470,12 +629,20 @@ function PlayerForm({
               appPlayer,
             ) => (
               <option
-                key={appPlayer.id}
-                value={appPlayer.id}
+                key={
+                  appPlayer.id
+                }
+                value={
+                  appPlayer.id
+                }
               >
                 #
-                {appPlayer.number}{" "}
-                {appPlayer.name}
+                {
+                  appPlayer.number
+                }{" "}
+                {
+                  appPlayer.name
+                }
               </option>
             ),
           )}
@@ -483,7 +650,9 @@ function PlayerForm({
       </label>
 
       <label>
-        <span>URL fotky</span>
+        <span>
+          URL fotky
+        </span>
 
         <input
           name="imageUrl"
@@ -503,7 +672,9 @@ function PlayerForm({
       </label>
 
       <label
-        className={styles.check}
+        className={
+          styles.check
+        }
       >
         <input
           name="active"
@@ -518,18 +689,24 @@ function PlayerForm({
       </label>
 
       <div
-        className={styles.actions}
+        className={
+          styles.actions
+        }
       >
         <button
           type="button"
-          onClick={onCancel}
+          onClick={
+            onCancel
+          }
         >
           ZRUŠIT
         </button>
 
         <button
           type="submit"
-          className={styles.save}
+          className={
+            styles.save
+          }
         >
           ULOŽIT
         </button>
@@ -543,14 +720,19 @@ function MovementForm({
   direction,
   onCancel,
 }: {
-  player: ManagedPlayer;
+  player:
+    ManagedPlayer;
+
   direction:
     | "arrival"
     | "departure";
-  onCancel: () => void;
+
+  onCancel:
+    () => void;
 }) {
   const isArrival =
-    direction === "arrival";
+    direction ===
+    "arrival";
 
   return (
     <form
@@ -559,24 +741,36 @@ function MovementForm({
           ? createMissingArrival
           : registerPlayerDeparture
       }
-      className={styles.form}
+      className={
+        styles.form
+      }
     >
       <PlayerIdentityInputs
-        player={player}
+        player={
+          player
+        }
       />
 
       <h2>
-        {isArrival
-          ? `Příchod — ${player.name}`
-          : `Odchod — ${player.name}`}
+        {
+          isArrival
+            ? `Příchod — ${player.name}`
+            : `Odchod — ${player.name}`
+        }
       </h2>
 
-      <div className={styles.two}>
+      <div
+        className={
+          styles.two
+        }
+      >
         <label>
           <span>
-            {isArrival
-              ? "Datum příchodu"
-              : "Datum odchodu"}
+            {
+              isArrival
+                ? "Datum příchodu"
+                : "Datum odchodu"
+            }
           </span>
 
           <input
@@ -587,7 +781,9 @@ function MovementForm({
         </label>
 
         <label>
-          <span>Typ</span>
+          <span>
+            Typ
+          </span>
 
           <select
             name="movementDetail"
@@ -634,12 +830,18 @@ function MovementForm({
         </label>
       </div>
 
-      <div className={styles.two}>
+      <div
+        className={
+          styles.two
+        }
+      >
         <label>
           <span>
-            {isArrival
-              ? "APF ID původního klubu"
-              : "APF ID nového klubu"}
+            {
+              isArrival
+                ? "APF ID původního klubu"
+                : "APF ID nového klubu"
+            }
           </span>
 
           <input
@@ -650,9 +852,11 @@ function MovementForm({
 
         <label>
           <span>
-            {isArrival
-              ? "Původní klub ručně"
-              : "Nový klub ručně"}
+            {
+              isArrival
+                ? "Původní klub ručně"
+                : "Nový klub ručně"
+            }
           </span>
 
           <input
@@ -662,22 +866,30 @@ function MovementForm({
       </div>
 
       <div
-        className={styles.actions}
+        className={
+          styles.actions
+        }
       >
         <button
           type="button"
-          onClick={onCancel}
+          onClick={
+            onCancel
+          }
         >
           ZRUŠIT
         </button>
 
         <button
           type="submit"
-          className={styles.save}
+          className={
+            styles.save
+          }
         >
-          {isArrival
-            ? "ZAPSAT PŘÍCHOD"
-            : "POTVRDIT ODCHOD"}
+          {
+            isArrival
+              ? "ZAPSAT PŘÍCHOD"
+              : "POTVRDIT ODCHOD"
+          }
         </button>
       </div>
     </form>
@@ -687,12 +899,19 @@ function MovementForm({
 function ActiveToggle({
   player,
 }: {
-  player: ManagedPlayer;
+  player:
+    ManagedPlayer;
 }) {
   return (
-    <form action={setPlayerActive}>
+    <form
+      action={
+        setPlayerActive
+      }
+    >
       <PlayerIdentityInputs
-        player={player}
+        player={
+          player
+        }
       />
 
       <input
@@ -705,10 +924,14 @@ function ActiveToggle({
         }
       />
 
-      <button type="submit">
-        {player.active
-          ? "NEAKTIVNÍ"
-          : "AKTIVOVAT"}
+      <button
+        type="submit"
+      >
+        {
+          player.active
+            ? "NEAKTIVNÍ"
+            : "AKTIVOVAT"
+        }
       </button>
     </form>
   );
@@ -717,7 +940,8 @@ function ActiveToggle({
 function PlayerIdentityInputs({
   player,
 }: {
-  player: ManagedPlayer;
+  player:
+    ManagedPlayer;
 }) {
   return (
     <>
@@ -742,7 +966,9 @@ function PlayerIdentityInputs({
       <input
         type="hidden"
         name="playerName"
-        value={player.name}
+        value={
+          player.name
+        }
       />
 
       <input
@@ -757,7 +983,9 @@ function PlayerIdentityInputs({
       <input
         type="hidden"
         name="team"
-        value={player.team}
+        value={
+          player.team
+        }
       />
 
       <input
@@ -771,7 +999,9 @@ function PlayerIdentityInputs({
       <input
         type="hidden"
         name="status"
-        value={player.status}
+        value={
+          player.status
+        }
       />
 
       <input
@@ -790,7 +1020,7 @@ function PlayerIdentityInputs({
           player.imageUrl ??
           (
             player.apfPlayerId !==
-            null
+              null
               ? `/images/${player.apfPlayerId}.jpg`
               : ""
           )
@@ -801,13 +1031,20 @@ function PlayerIdentityInputs({
 }
 
 function formatTeam(
-  team: TeamValue,
+  team:
+    TeamValue,
 ): string {
-  if (team === "a") {
+  if (
+    team ===
+    "a"
+  ) {
     return "A-TÝM";
   }
 
-  if (team === "b") {
+  if (
+    team ===
+    "b"
+  ) {
     return "B-TÝM";
   }
 
@@ -815,9 +1052,13 @@ function formatTeam(
 }
 
 function formatDate(
-  value: string | null,
+  value:
+    string |
+    null,
 ): string {
-  if (!value) {
+  if (
+    !value
+  ) {
     return "—";
   }
 
@@ -836,5 +1077,7 @@ function formatDate(
 
   return new Intl.DateTimeFormat(
     "cs-CZ",
-  ).format(date);
+  ).format(
+    date,
+  );
 }
