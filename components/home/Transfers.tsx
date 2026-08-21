@@ -1,9 +1,5 @@
 import Link from "next/link";
 
-import type {
-  ReactNode,
-} from "react";
-
 import { SectionHeader } from "@/components/ui/SectionHeader";
 
 import type {
@@ -20,10 +16,6 @@ export function Transfers({
 }: {
   transfers: ClubTransfer[];
 }) {
-  /*
-   * Homepage:
-   * MAX 2 nejnovější PŘÍCHODY + 2 nejnovější ODCHODY.
-   */
   const arrivals = transfers
     .filter(
       (transfer) =>
@@ -136,7 +128,9 @@ export function TransferCard({
 
   const playerUrl =
     buildPlayerUrl(
-      transfer,
+      transfer.playerId,
+      transfer.playerName,
+      transfer.direction,
     );
 
   return (
@@ -147,11 +141,26 @@ export function TransferCard({
           : styles.cardDeparture
       }`}
     >
-      <PlayerProfileLink
-        transfer={transfer}
-        href={playerUrl}
-        className={styles.playerPhotoLink}
-      >
+      {playerUrl ? (
+        <PlayerLink
+          href={playerUrl}
+          external={!arrival}
+          className={styles.photoLink}
+        >
+          <div className={styles.photo}>
+            <TransferPlayerImage
+              src={transfer.imageUrl}
+              name={transfer.playerName}
+            />
+
+            <span className={styles.directionBadge}>
+              {arrival
+                ? "PŘÍCHOD <<"
+                : "ODCHOD >>"}
+            </span>
+          </div>
+        </PlayerLink>
+      ) : (
         <div className={styles.photo}>
           <TransferPlayerImage
             src={transfer.imageUrl}
@@ -164,18 +173,24 @@ export function TransferCard({
               : "ODCHOD >>"}
           </span>
         </div>
-      </PlayerProfileLink>
+      )}
 
       <div className={styles.cardBody}>
-        <PlayerProfileLink
-          transfer={transfer}
-          href={playerUrl}
-          className={styles.playerNameLink}
-        >
+        {playerUrl ? (
+          <PlayerLink
+            href={playerUrl}
+            external={!arrival}
+            className={styles.playerNameLink}
+          >
+            <h4>
+              {transfer.playerName}
+            </h4>
+          </PlayerLink>
+        ) : (
           <h4>
             {transfer.playerName}
           </h4>
-        </PlayerProfileLink>
+        )}
 
         <span className={styles.transferType}>
           {movementLabel(
@@ -254,31 +269,18 @@ export function TransferCard({
   );
 }
 
-function PlayerProfileLink({
-  transfer,
+function PlayerLink({
   href,
+  external,
   className,
   children,
 }: {
-  transfer: ClubTransfer;
-  href: string | null;
+  href: string;
+  external: boolean;
   className: string;
-  children: ReactNode;
+  children: React.ReactNode;
 }) {
-  if (!href) {
-    return (
-      <div
-        className={`${className} ${styles.playerNameStatic}`}
-      >
-        {children}
-      </div>
-    );
-  }
-
-  if (
-    transfer.direction ===
-    "departure"
-  ) {
+  if (external) {
     return (
       <a
         href={href}
@@ -299,68 +301,6 @@ function PlayerProfileLink({
       {children}
     </Link>
   );
-}
-
-function buildPlayerUrl(
-  transfer: ClubTransfer,
-): string | null {
-  if (
-    transfer.playerId === null ||
-    !Number.isFinite(
-      transfer.playerId,
-    )
-  ) {
-    return null;
-  }
-
-  /*
-   * PŘÍCHOD:
-   * hráč už je náš -> interní profil.
-   */
-  if (
-    transfer.direction ===
-    "arrival"
-  ) {
-    return `/hrac/${transfer.playerId}`;
-  }
-
-  /*
-   * ODCHOD:
-   * hráč už není součástí aktuálního kádru
-   * -> profil na APF.
-   *
-   * APF používá URL:
-   * /hrac/ID/slug
-   */
-  const slug =
-    slugify(
-      transfer.playerName,
-    );
-
-  return slug
-    ? `https://futsalvplzni.cz/hrac/${transfer.playerId}/${slug}`
-    : `https://futsalvplzni.cz/hrac/${transfer.playerId}`;
-}
-
-function slugify(
-  value: string,
-): string {
-  return value
-    .normalize("NFD")
-    .replace(
-      /[\u0300-\u036f]/g,
-      "",
-    )
-    .toLowerCase()
-    .trim()
-    .replace(
-      /[^a-z0-9]+/g,
-      "-",
-    )
-    .replace(
-      /^-+|-+$/g,
-      "",
-    );
 }
 
 function TransferEmptyCard({
@@ -452,7 +392,7 @@ function movementLabel(
       return "KONEC HOSTOVÁNÍ";
 
     case "released":
-      return "VYŘAZENÍ Z TÝMU";
+      return "UKONČENÍ PŮSOBENÍ";
   }
 }
 
@@ -479,8 +419,92 @@ function clubDirectionLabel(
         : "NÁVRAT DO";
 
     case "released":
-      return "BEZ KLUBU";
+      return "FC PPB";
   }
+}
+
+function buildPlayerUrl(
+  playerId: number | null,
+  playerName: string,
+  direction:
+    | "arrival"
+    | "departure",
+): string | null {
+  if (
+    playerId === null ||
+    !Number.isFinite(
+      Number(playerId),
+    )
+  ) {
+    return null;
+  }
+
+  if (
+    direction === "arrival"
+  ) {
+    return `/hrac/${playerId}`;
+  }
+
+  const slug =
+    buildApfPlayerSlug(
+      playerName,
+    );
+
+  return `https://futsalvplzni.cz/hrac/${playerId}/${slug}`;
+}
+
+function buildApfPlayerSlug(
+  playerName: string,
+): string {
+  const parts =
+    playerName
+      .trim()
+      .split(/\s+/)
+      .filter(Boolean);
+
+  /*
+   * V databázi máme většinou:
+   * "Alexandr Procházka"
+   *
+   * APF používá:
+   * "prochazka-alexandr"
+   *
+   * U více slov necháme poslední část
+   * jako příjmení a přesuneme ji dopředu.
+   */
+  const ordered =
+    parts.length >= 2
+      ? [
+          parts[
+            parts.length - 1
+          ],
+          ...parts.slice(
+            0,
+            -1,
+          ),
+        ]
+      : parts;
+
+  return ordered
+    .join("-")
+    .normalize("NFD")
+    .replace(
+      /[\u0300-\u036f]/g,
+      "",
+    )
+    .toLowerCase()
+    .replace(
+      /[^a-z0-9-]+/g,
+      "-",
+    )
+    .replace(
+      /-+/g,
+      "-",
+    )
+    .replace(
+      /^-+|-+$/g,
+      "",
+    );
 }
 
 function buildApfTeamUrl(
