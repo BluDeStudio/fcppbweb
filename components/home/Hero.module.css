@@ -125,9 +125,9 @@
 
   display: flex;
   align-items: baseline;
-  justify-content: space-between;
+  justify-content: center;
 
-  gap: 24px;
+  gap: 0.12em;
 
   margin: 0;
 

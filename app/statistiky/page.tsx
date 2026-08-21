@@ -30,22 +30,14 @@ export default async function StatisticsPage() {
         >
           <div
             className={
-              styles.kicker
-            }
-          >
-            Statistiky FC PPB
-          </div>
-
-          <div
-            className={
               styles.heroGrid
             }
           >
             <div>
               <h1>
-                Hráči.
+                Statistiky.
                 <span>
-                  Výkony pod kontrolou.
+                  Přehled hráčů.
                 </span>
               </h1>
 
