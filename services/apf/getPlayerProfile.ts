@@ -5,7 +5,9 @@ import type {
   PlayerSeasonHistory,
 } from "@/types/player";
 
-import { fetchApfPage } from "./fetchApfPage";
+import {
+  fetchApfPage,
+} from "./fetchApfPage";
 
 function clean(
   value: string,
@@ -17,9 +19,13 @@ function clean(
 }
 
 function parseNumber(
-  value: string | undefined,
+  value:
+    string |
+    undefined,
 ): number {
-  if (!value) {
+  if (
+    !value
+  ) {
     return 0;
   }
 
@@ -31,22 +37,153 @@ function parseNumber(
       ),
     );
 
-  return Number.isFinite(parsed)
+  return Number.isFinite(
+    parsed,
+  )
     ? parsed
     : 0;
+}
+
+function unique(
+  values:
+    string[],
+): string[] {
+  return Array.from(
+    new Set(
+      values.filter(
+        Boolean,
+      ),
+    ),
+  );
+}
+
+function reverseSlug(
+  value: string,
+): string {
+  const parts =
+    value
+      .split("-")
+      .filter(Boolean);
+
+  if (
+    parts.length < 2
+  ) {
+    return value;
+  }
+
+  return [
+    parts[
+      parts.length - 1
+    ],
+    ...parts.slice(
+      0,
+      -1,
+    ),
+  ].join("-");
+}
+
+async function loadProfileHtml(
+  playerId: number,
+  apfSlug: string,
+): Promise<{
+  html: string;
+  slug: string;
+} | null> {
+  /*
+   * APF profil je identifikovaný především ID.
+   * U nového hráče ale nemusíme mít slug ještě
+   * zachycený v týmové soupisce.
+   *
+   * Proto zkusíme:
+   * 1) dodaný slug
+   * 2) obrácené pořadí jména
+   * 3) obecný fallback
+   */
+  const candidates =
+    unique([
+      apfSlug,
+      reverseSlug(
+        apfSlug,
+      ),
+      "hrac",
+    ]);
+
+  for (
+    const candidate
+    of candidates
+  ) {
+    try {
+      const html =
+        await fetchApfPage(
+          `/hrac/${playerId}/${candidate}`,
+        );
+
+      const $ =
+        cheerio.load(
+          html,
+        );
+
+      const name =
+        clean(
+          $("h1")
+            .first()
+            .text(),
+        );
+
+      /*
+       * Pokud APF vrátil normální profil,
+       * máme vyhráno.
+       */
+      if (
+        name
+      ) {
+        return {
+          html,
+          slug:
+            candidate,
+        };
+      }
+    } catch (
+      error
+    ) {
+      console.warn(
+        `APF profil ${playerId}/${candidate} nebyl dostupný.`,
+      );
+    }
+  }
+
+  return null;
 }
 
 export async function getPlayerProfile(
   playerId: number,
   apfSlug: string,
-): Promise<PlayerProfile | null> {
-  const html =
-    await fetchApfPage(
-      `/hrac/${playerId}/${apfSlug}`,
+): Promise<
+  PlayerProfile | null
+> {
+  const loaded =
+    await loadProfileHtml(
+      playerId,
+      apfSlug,
     );
 
+  if (
+    !loaded
+  ) {
+    return null;
+  }
+
+  const {
+    html,
+    slug:
+      resolvedSlug,
+  } =
+    loaded;
+
   const $ =
-    cheerio.load(html);
+    cheerio.load(
+      html,
+    );
 
   /*
    * ========================================
@@ -61,7 +198,9 @@ export async function getPlayerProfile(
         .text(),
     );
 
-  if (!name) {
+  if (
+    !name
+  ) {
     return null;
   }
 
@@ -84,14 +223,16 @@ export async function getPlayerProfile(
 
   let age:
     number | null =
-    null;
+      null;
 
   const ageMatch =
     bodyText.match(
       /Věk\s*:?\s*(\d+)\s*let/i,
     );
 
-  if (ageMatch) {
+  if (
+    ageMatch
+  ) {
     age =
       Number(
         ageMatch[1],
@@ -102,30 +243,28 @@ export async function getPlayerProfile(
    * ========================================
    * KARIÉRNÍ SOUČTY APF
    * ========================================
-   *
-   * APF například:
-   *
-   * 8
-   * Sezóny
-   * 105
-   * Zápasy
-   * 64
-   * Góly
-   * 8
-   * Asistence
    */
 
-  let careerSeasons = 0;
-  let careerMatches = 0;
-  let careerGoals = 0;
-  let careerAssists = 0;
+  let careerSeasons =
+    0;
+
+  let careerMatches =
+    0;
+
+  let careerGoals =
+    0;
+
+  let careerAssists =
+    0;
 
   const careerMatch =
     bodyText.match(
       /(\d+)\s*Sezóny\s*(\d+)\s*Zápasy\s*(\d+)\s*Góly\s*(\d+)\s*Asistence/i,
     );
 
-  if (careerMatch) {
+  if (
+    careerMatch
+  ) {
     careerSeasons =
       parseNumber(
         careerMatch[1],
@@ -151,30 +290,18 @@ export async function getPlayerProfile(
    * ========================================
    * HISTORIE SEZÓN
    * ========================================
-   *
-   * APF například:
-   *
-   * 2014-2015
-   * Zápasy: 14
-   * Góly: 15
-   * AS: 0
-   * ŽK: 1
-   * ČK: 0
-   *
-   * 2015-2016
-   * Zápasy: 13
-   * Góly: 10
-   * ...
    */
 
   const seasons:
-    PlayerSeasonHistory[] = [];
+    PlayerSeasonHistory[] =
+      [];
 
   const seasonRegex =
     /(20\d{2})-(20\d{2})\s*Zápasy:\s*(\d+)\s*Góly:\s*(\d+)\s*AS:\s*(\d+)\s*ŽK:\s*(\d+)\s*ČK:\s*(\d+)/gi;
 
   let match:
-    RegExpExecArray | null;
+    RegExpExecArray |
+    null;
 
   while (
     (
@@ -182,7 +309,8 @@ export async function getPlayerProfile(
         seasonRegex.exec(
           bodyText,
         )
-    ) !== null
+    ) !==
+    null
   ) {
     const startYear =
       match[1];
@@ -191,15 +319,17 @@ export async function getPlayerProfile(
       match[2];
 
     const season =
-      `${startYear.slice(2)}/${endYear.slice(2)}`;
-
-    const team =
-      "FC PPB";
+      `${startYear.slice(
+        2,
+      )}/${endYear.slice(
+        2,
+      )}`;
 
     seasons.push({
       season,
 
-      team,
+      team:
+        "FC PPB",
 
       matches:
         parseNumber(
@@ -226,26 +356,19 @@ export async function getPlayerProfile(
           match[7],
         ),
 
-      /*
-       * Doplníme později
-       * ze Supabase.
-       */
-      rating: null,
+      rating:
+        null,
 
-      attendance: null,
+      attendance:
+        null,
     });
   }
 
-  /*
-   * ========================================
-   * ŘAZENÍ SEZÓN
-   * ========================================
-   *
-   * Nejnovější nahoře.
-   */
-
   seasons.sort(
-    (a, b) =>
+    (
+      a,
+      b,
+    ) =>
       getSeasonStartYear(
         b.season,
       ) -
@@ -258,22 +381,23 @@ export async function getPlayerProfile(
    * ========================================
    * FALLBACK KARIÉRY
    * ========================================
-   *
-   * Kdyby APF někdy odstranilo horní
-   * kariérní čítače, spočítáme je
-   * ze sezon.
    */
 
   if (
-    careerMatches === 0 &&
-    seasons.length > 0
+    careerMatches ===
+      0 &&
+    seasons.length >
+      0
   ) {
     careerSeasons =
       seasons.length;
 
     careerMatches =
       seasons.reduce(
-        (sum, season) =>
+        (
+          sum,
+          season,
+        ) =>
           sum +
           season.matches,
         0,
@@ -281,7 +405,10 @@ export async function getPlayerProfile(
 
     careerGoals =
       seasons.reduce(
-        (sum, season) =>
+        (
+          sum,
+          season,
+        ) =>
           sum +
           season.goals,
         0,
@@ -289,7 +416,10 @@ export async function getPlayerProfile(
 
     careerAssists =
       seasons.reduce(
-        (sum, season) =>
+        (
+          sum,
+          season,
+        ) =>
           sum +
           season.assists,
         0,
@@ -304,7 +434,8 @@ export async function getPlayerProfile(
 
     age,
 
-    apfSlug,
+    apfSlug:
+      resolvedSlug,
 
     career: {
       seasons:
@@ -324,12 +455,6 @@ export async function getPlayerProfile(
   };
 }
 
-/*
- * ========================================
- * POMOCNÉ FUNKCE
- * ========================================
- */
-
 function getSeasonStartYear(
   season: string,
 ): number {
@@ -338,34 +463,16 @@ function getSeasonStartYear(
       /(\d{2})\/(\d{2})/,
     );
 
-  if (!match) {
+  if (
+    !match
+  ) {
     return 0;
   }
 
-  return 2000 +
+  return (
+    2000 +
     Number(
       match[1],
-    );
-}
-
-/*
- * Tohle zatím označuje starší sezony
- * obecně.
- *
- * A/B rozdělení historických statistik
- * uděláme přesněji samostatným parserem,
- * protože hlavní APF profil sezonu
- * agreguje dohromady.
- */
-
-function getSeasonTeam(
-  startYear: number,
-): string {
-  if (
-    startYear >= 2022
-  ) {
-    return "FC PPB";
-  }
-
-  return "Před FC PPB";
+    )
+  );
 }

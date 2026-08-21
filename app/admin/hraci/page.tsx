@@ -6,6 +6,12 @@ import { getPlayerMeta } from "@/data/playerMeta";
 import { AdminShell } from "@/components/admin/AdminShell";
 import { PlayersAdmin } from "@/components/admin/PlayersAdmin";
 
+import type {
+  PlayerPosition,
+  PlayerStatus,
+  PlayerTeam,
+} from "@/types/player";
+
 type AppPlayerRow = {
   id: string;
   name: string;
@@ -20,30 +26,77 @@ type TransferMarker = {
   player_name: string;
 };
 
-function normalizeName(value: string): string {
+type AdminPlayer = {
+  id: string;
+  webProfileId: string | null;
+  name: string;
+  team: PlayerTeam;
+  position: PlayerPosition;
+  status: PlayerStatus;
+  shirtNumber: number | null;
+  imageUrl: string | null;
+  apfPlayerId: number | null;
+  appPlayerId: string | null;
+  active: boolean;
+  hasArrival: boolean;
+  source: "app" | "web" | "web+app";
+};
+
+type AppPlayerOption = {
+  id: string;
+  name: string;
+  number: number;
+  position: string | null;
+  apfPlayerId: number | null;
+  active: boolean;
+};
+
+function normalizeName(
+  value: string,
+): string {
   return value
     .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
+    .replace(
+      /[\u0300-\u036f]/g,
+      "",
+    )
     .trim()
     .toLowerCase();
 }
 
-function inferPosition(value: string | null) {
-  const normalized = (value ?? "")
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase();
+function inferPosition(
+  value: string | null,
+): PlayerPosition {
+  const normalized =
+    (value ?? "")
+      .normalize("NFD")
+      .replace(
+        /[\u0300-\u036f]/g,
+        "",
+      )
+      .toLowerCase();
 
-  return normalized.includes("brankar") ||
+  if (
+    normalized.includes("brankar") ||
     normalized.includes("goalkeeper")
-    ? "goalkeeper"
-    : "player";
+  ) {
+    return "goalkeeper";
+  }
+
+  return "player";
 }
 
 export default async function AdminPlayersPage() {
   await requireAdmin();
 
-  const supabase = getSupabaseAdmin();
+  const supabase =
+    getSupabaseAdmin();
+
+  /*
+   * ========================================
+   * NAČTENÍ DAT
+   * ========================================
+   */
 
   const [
     webPlayers,
@@ -57,232 +110,600 @@ export default async function AdminPlayersPage() {
       .select(
         "id, name, number, position, apf_player_id, is_active",
       )
-      .order("name", { ascending: true }),
+      .order(
+        "name",
+        {
+          ascending: true,
+        },
+      ),
 
     supabase
       .from("club_transfers")
-      .select("player_id, player_name")
-      .eq("direction", "arrival"),
+      .select(
+        "player_id, player_name",
+      )
+      .eq(
+        "direction",
+        "arrival",
+      ),
   ]);
 
-  const appPlayers = (
-    (appResponse.data ?? []) as AppPlayerRow[]
-  ).map((player) => ({
-    id: String(player.id),
-    name: String(player.name),
-    number:
-      player.number === null
-        ? 0
-        : Number(player.number),
-    position: player.position,
-    apfPlayerId:
-      player.apf_player_id === null
-        ? null
-        : Number(player.apf_player_id),
-    active:
-      player.is_active !== false,
-  }));
+  /*
+   * ========================================
+   * KONTROLA CHYB
+   * ========================================
+   */
 
-  const arrivalIds = new Set<number>();
-  const arrivalNames = new Set<string>();
-
-  (
-    (arrivalsResponse.data ?? []) as TransferMarker[]
-  ).forEach((row) => {
-    if (row.player_id !== null) {
-      arrivalIds.add(Number(row.player_id));
-    }
-
-    arrivalNames.add(
-      normalizeName(String(row.player_name)),
+  if (appResponse.error) {
+    console.error(
+      "ADMIN HRÁČI - chyba při načítání players:",
+      appResponse.error,
     );
-  });
+  }
 
-  const webByAppId = new Map(
-    webPlayers
-      .filter((player) => player.appPlayerId)
-      .map((player) => [
-        String(player.appPlayerId),
-        player,
-      ]),
+  if (arrivalsResponse.error) {
+    console.error(
+      "ADMIN HRÁČI - chyba při načítání příchodů:",
+      arrivalsResponse.error,
+    );
+  }
+
+  /*
+   * ========================================
+   * HRÁČI Z APLIKACE
+   * ========================================
+   */
+
+  const appPlayerRows =
+    (appResponse.data ?? []) as AppPlayerRow[];
+
+  const appPlayers: AppPlayerOption[] =
+    appPlayerRows.map(
+      (player) => ({
+        id:
+          String(
+            player.id,
+          ),
+
+        name:
+          String(
+            player.name,
+          ),
+
+        number:
+          player.number === null
+            ? 0
+            : Number(
+                player.number,
+              ),
+
+        position:
+          player.position,
+
+        apfPlayerId:
+          player.apf_player_id === null
+            ? null
+            : Number(
+                player.apf_player_id,
+              ),
+
+        active:
+          player.is_active !== false,
+      }),
+    );
+
+  /*
+   * ========================================
+   * EXISTUJÍCÍ PŘÍCHODY
+   * ========================================
+   */
+
+  const arrivalIds =
+    new Set<number>();
+
+  const arrivalNames =
+    new Set<string>();
+
+  const arrivalRows =
+    (arrivalsResponse.data ?? []) as TransferMarker[];
+
+  arrivalRows.forEach(
+    (row) => {
+      if (
+        row.player_id !== null
+      ) {
+        arrivalIds.add(
+          Number(
+            row.player_id,
+          ),
+        );
+      }
+
+      if (
+        row.player_name
+      ) {
+        arrivalNames.add(
+          normalizeName(
+            String(
+              row.player_name,
+            ),
+          ),
+        );
+      }
+    },
   );
 
-  const webByApfId = new Map(
-    webPlayers
-      .filter((player) => player.apfPlayerId !== null)
-      .map((player) => [
-        Number(player.apfPlayerId),
-        player,
-      ]),
-  );
+  /*
+   * ========================================
+   * INDEX WEB HRÁČŮ PODLE APP ID
+   * ========================================
+   */
 
-  const webByName = new Map(
-    webPlayers.map((player) => [
-      normalizeName(player.name),
-      player,
-    ]),
-  );
+  const webByAppId =
+    new Map(
+      webPlayers
+        .filter(
+          (player) =>
+            player.appPlayerId !== null &&
+            player.appPlayerId !== undefined,
+        )
+        .map(
+          (player) => [
+            String(
+              player.appPlayerId,
+            ),
+            player,
+          ],
+        ),
+    );
 
-  const usedWebIds = new Set<string>();
+  /*
+   * ========================================
+   * INDEX WEB HRÁČŮ PODLE APF ID
+   * ========================================
+   */
 
-  const mergedPlayers = appPlayers.map((appPlayer) => {
-    const webPlayer =
-      webByAppId.get(appPlayer.id) ??
-      (
-        appPlayer.apfPlayerId !== null
-          ? webByApfId.get(appPlayer.apfPlayerId)
-          : undefined
-      ) ??
-      webByName.get(normalizeName(appPlayer.name)) ??
-      null;
+  const webByApfId =
+    new Map(
+      webPlayers
+        .filter(
+          (player) =>
+            player.apfPlayerId !== null,
+        )
+        .map(
+          (player) => [
+            Number(
+              player.apfPlayerId,
+            ),
+            player,
+          ],
+        ),
+    );
 
-    if (webPlayer) {
-      usedWebIds.add(webPlayer.id);
-    }
+  /*
+   * ========================================
+   * INDEX WEB HRÁČŮ PODLE JMÉNA
+   * ========================================
+   */
 
-    const apfPlayerId =
-      webPlayer?.apfPlayerId ??
-      appPlayer.apfPlayerId ??
-      null;
+  const webByName =
+    new Map(
+      webPlayers.map(
+        (player) => [
+          normalizeName(
+            player.name,
+          ),
+          player,
+        ],
+      ),
+    );
 
-    const legacyMeta =
-      apfPlayerId !== null
-        ? getPlayerMeta(apfPlayerId)
-        : null;
+  /*
+   * ========================================
+   * POUŽITÉ WEB PROFILY
+   * ========================================
+   */
 
-    const team =
-      webPlayer?.team ??
-      legacyMeta?.team ??
-      "b";
+  const usedWebIds =
+    new Set<string>();
 
-    const position =
-      webPlayer?.position ??
-      legacyMeta?.position ??
-      inferPosition(appPlayer.position);
+  /*
+   * ========================================
+   * SPOJENÍ APLIKACE + WEB
+   * ========================================
+   */
 
-    const status =
-      webPlayer?.status ??
-      legacyMeta?.status ??
-      "club";
+  const mergedPlayers: AdminPlayer[] =
+    appPlayers.map(
+      (appPlayer): AdminPlayer => {
+        const webPlayerByApp =
+          webByAppId.get(
+            appPlayer.id,
+          );
 
-    const shirtNumber =
-      webPlayer?.shirtNumber ??
-      (
-        appPlayer.number > 0
-          ? appPlayer.number
-          : null
-      ) ??
-      legacyMeta?.shirtNumber ??
-      null;
+        const webPlayerByApf =
+          appPlayer.apfPlayerId !== null
+            ? webByApfId.get(
+                appPlayer.apfPlayerId,
+              )
+            : undefined;
 
-    const active =
-      webPlayer?.active ??
-      appPlayer.active;
+        const webPlayerByName =
+          webByName.get(
+            normalizeName(
+              appPlayer.name,
+            ),
+          );
 
-    const imageUrl =
-      webPlayer?.imageUrl ??
-      (
-        apfPlayerId !== null
-          ? `/images/${apfPlayerId}.jpg`
-          : null
+        const webPlayer =
+          webPlayerByApp ??
+          webPlayerByApf ??
+          webPlayerByName ??
+          null;
+
+        if (webPlayer) {
+          usedWebIds.add(
+            webPlayer.id,
+          );
+        }
+
+        /*
+         * ========================================
+         * APF ID
+         * ========================================
+         */
+
+        const apfPlayerId =
+          webPlayer?.apfPlayerId ??
+          appPlayer.apfPlayerId ??
+          null;
+
+        /*
+         * ========================================
+         * LEGACY META
+         * ========================================
+         */
+
+        const legacyMeta =
+          apfPlayerId !== null
+            ? getPlayerMeta(
+                apfPlayerId,
+              )
+            : null;
+
+        /*
+         * ========================================
+         * TÝM
+         * ========================================
+         */
+
+        const team: PlayerTeam =
+          webPlayer?.team ??
+          legacyMeta?.team ??
+          "b";
+
+        /*
+         * ========================================
+         * POZICE
+         * ========================================
+         */
+
+        const position: PlayerPosition =
+          webPlayer?.position ??
+          legacyMeta?.position ??
+          inferPosition(
+            appPlayer.position,
+          );
+
+        /*
+         * ========================================
+         * STATUS
+         * ========================================
+         */
+
+        const status: PlayerStatus =
+          webPlayer?.status ??
+          legacyMeta?.status ??
+          "club";
+
+        /*
+         * ========================================
+         * ČÍSLO DRESU
+         * ========================================
+         */
+
+        let shirtNumber:
+          number | null =
+            null;
+
+        if (
+          webPlayer?.shirtNumber !== null &&
+          webPlayer?.shirtNumber !== undefined
+        ) {
+          shirtNumber =
+            webPlayer.shirtNumber;
+        } else if (
+          appPlayer.number > 0
+        ) {
+          shirtNumber =
+            appPlayer.number;
+        } else if (
+          legacyMeta?.shirtNumber !== null &&
+          legacyMeta?.shirtNumber !== undefined
+        ) {
+          shirtNumber =
+            legacyMeta.shirtNumber;
+        }
+
+        /*
+         * ========================================
+         * AKTIVNÍ
+         * ========================================
+         */
+
+        const active =
+          webPlayer?.active ??
+          appPlayer.active;
+
+        /*
+         * ========================================
+         * FOTKA
+         * ========================================
+         */
+
+        let imageUrl:
+          string | null =
+            webPlayer?.imageUrl ??
+            null;
+
+        if (
+          !imageUrl &&
+          apfPlayerId !== null
+        ) {
+          imageUrl =
+            `/images/${apfPlayerId}.jpg`;
+        }
+
+        /*
+         * ========================================
+         * PŘÍCHOD
+         * ========================================
+         */
+
+        const hasArrivalById =
+          apfPlayerId !== null &&
+          arrivalIds.has(
+            apfPlayerId,
+          );
+
+        const hasArrivalByName =
+          arrivalNames.has(
+            normalizeName(
+              appPlayer.name,
+            ),
+          );
+
+        const hasArrival =
+          hasArrivalById ||
+          hasArrivalByName;
+
+        /*
+         * ========================================
+         * VÝSLEDNÝ HRÁČ
+         * ========================================
+         */
+
+        return {
+          id:
+            webPlayer?.id ??
+            `app:${appPlayer.id}`,
+
+          webProfileId:
+            webPlayer?.id ??
+            null,
+
+          name:
+            webPlayer?.name ??
+            appPlayer.name,
+
+          team,
+
+          position,
+
+          status,
+
+          shirtNumber,
+
+          imageUrl,
+
+          apfPlayerId,
+
+          /*
+           * Hráč pochází z players,
+           * takže jeho APP UUID známe.
+           */
+          appPlayerId:
+            appPlayer.id,
+
+          active,
+
+          hasArrival,
+
+          source:
+            webPlayer
+              ? "web+app"
+              : "app",
+        };
+      },
+    );
+
+  /*
+   * ========================================
+   * HRÁČI, KTEŘÍ JSOU JEN NA WEBU
+   * ========================================
+   */
+
+  const webOnlyPlayers =
+    webPlayers.filter(
+      (player) =>
+        !usedWebIds.has(
+          player.id,
+        ),
+    );
+
+  webOnlyPlayers.forEach(
+    (player) => {
+      const hasArrivalById =
+        player.apfPlayerId !== null &&
+        arrivalIds.has(
+          player.apfPlayerId,
+        );
+
+      const hasArrivalByName =
+        arrivalNames.has(
+          normalizeName(
+            player.name,
+          ),
+        );
+
+      const hasArrival =
+        hasArrivalById ||
+        hasArrivalByName;
+
+      let imageUrl:
+        string | null =
+          player.imageUrl ??
+          null;
+
+      if (
+        !imageUrl &&
+        player.apfPlayerId !== null
+      ) {
+        imageUrl =
+          `/images/${player.apfPlayerId}.jpg`;
+      }
+
+      const adminPlayer:
+        AdminPlayer = {
+          id:
+            player.id,
+
+          webProfileId:
+            player.id,
+
+          name:
+            player.name,
+
+          team:
+            player.team,
+
+          position:
+            player.position,
+
+          status:
+            player.status,
+
+          shirtNumber:
+            player.shirtNumber,
+
+          imageUrl,
+
+          apfPlayerId:
+            player.apfPlayerId,
+
+          /*
+           * Web-only hráč nemusí
+           * mít APP vazbu.
+           */
+          appPlayerId:
+            player.appPlayerId ??
+            null,
+
+          active:
+            player.active,
+
+          hasArrival,
+
+          source:
+            "web",
+        };
+
+      mergedPlayers.push(
+        adminPlayer,
       );
+    },
+  );
 
-    const hasArrival =
-      (
-        apfPlayerId !== null &&
-        arrivalIds.has(apfPlayerId)
-      ) ||
-      arrivalNames.has(
-        normalizeName(appPlayer.name),
+  /*
+   * ========================================
+   * ŘAZENÍ
+   * ========================================
+   */
+
+  mergedPlayers.sort(
+    (a, b) => {
+      if (
+        a.active !==
+        b.active
+      ) {
+        return a.active
+          ? -1
+          : 1;
+      }
+
+      return a.name.localeCompare(
+        b.name,
+        "cs",
       );
+    },
+  );
 
-    return {
-      id:
-        webPlayer?.id ??
-        `app:${appPlayer.id}`,
+  /*
+   * ========================================
+   * DEBUG
+   * ========================================
+   */
 
-      webProfileId:
-        webPlayer?.id ??
+  console.log(
+    "ADMIN HRÁČI:",
+    {
+      statppka:
+        appPlayers.length,
+
+      web:
+        webPlayers.length,
+
+      webOnly:
+        webOnlyPlayers.length,
+
+      merged:
+        mergedPlayers.length,
+
+      appError:
+        appResponse.error?.message ??
         null,
 
-      name:
-        webPlayer?.name ??
-        appPlayer.name,
+      arrivalsError:
+        arrivalsResponse.error?.message ??
+        null,
+    },
+  );
 
-      team,
-      position,
-      status,
-      shirtNumber,
-      imageUrl,
-      apfPlayerId,
-
-      appPlayerId:
-        appPlayer.id,
-
-      active,
-      hasArrival,
-
-      source:
-        webPlayer
-          ? "web+app"
-          : "app",
-    };
-  });
-
-  webPlayers
-    .filter(
-      (player) =>
-        !usedWebIds.has(player.id),
-    )
-    .forEach((player) => {
-      mergedPlayers.push({
-        id: player.id,
-        webProfileId: player.id,
-        name: player.name,
-        team: player.team,
-        position: player.position,
-        status: player.status,
-        shirtNumber: player.shirtNumber,
-        imageUrl:
-          player.imageUrl ??
-          (
-            player.apfPlayerId !== null
-              ? `/images/${player.apfPlayerId}.jpg`
-              : null
-          ),
-        apfPlayerId: player.apfPlayerId,
-        appPlayerId: player.appPlayerId,
-        active: player.active,
-
-        hasArrival:
-          (
-            player.apfPlayerId !== null &&
-            arrivalIds.has(player.apfPlayerId)
-          ) ||
-          arrivalNames.has(
-            normalizeName(player.name),
-          ),
-
-        source: "web",
-      });
-    });
-
-  mergedPlayers.sort((a, b) => {
-    if (a.active !== b.active) {
-      return a.active ? -1 : 1;
-    }
-
-    return a.name.localeCompare(
-      b.name,
-      "cs",
-    );
-  });
+  /*
+   * ========================================
+   * VYKRESLENÍ
+   * ========================================
+   */
 
   return (
     <AdminShell title="Hráči">
       <PlayersAdmin
-        players={mergedPlayers}
-        appPlayers={appPlayers}
+        players={
+          mergedPlayers
+        }
+        appPlayers={
+          appPlayers
+        }
       />
     </AdminShell>
   );
