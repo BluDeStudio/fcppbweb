@@ -1,0 +1,483 @@
+.hero {
+  position: relative;
+
+  min-height: 720px;
+
+  display: grid;
+  place-items: center;
+
+  overflow: hidden;
+
+  padding:
+    132px 22px
+    68px;
+
+  text-align: center;
+
+  isolation: isolate;
+}
+
+.glow {
+  position: absolute;
+
+  z-index: -1;
+
+  top: 48%;
+  left: 50%;
+
+  width: min(
+    820px,
+    92vw
+  );
+
+  aspect-ratio: 1;
+
+  transform:
+    translate(
+      -50%,
+      -50%
+    );
+
+  border-radius: 50%;
+
+  background:
+    radial-gradient(
+      circle,
+      rgba(
+        41,
+        232,
+        63,
+        0.075
+      ) 0%,
+      rgba(
+        41,
+        232,
+        63,
+        0.025
+      ) 34%,
+      transparent
+      70%
+    );
+
+  filter: blur(4px);
+
+  pointer-events: none;
+}
+
+.content {
+  width: min(
+    900px,
+    100%
+  );
+
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+
+.logo {
+  display: grid;
+  place-items: center;
+
+  min-height: 210px;
+}
+
+.hero h1 {
+  margin:
+    18px 0
+    0;
+
+  color:
+    #ffffff;
+
+  font-size:
+    clamp(
+      68px,
+      9vw,
+      122px
+    );
+
+  font-weight: 950;
+
+  line-height: 0.82;
+
+  letter-spacing:
+    -0.075em;
+
+  text-transform: uppercase;
+
+  text-shadow:
+    0
+    0
+    40px
+    rgba(
+      41,
+      232,
+      63,
+      0.035
+    );
+}
+
+.values {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-wrap: wrap;
+
+  gap: 14px;
+
+  margin-top: 32px;
+
+  color:
+    rgba(
+      255,
+      255,
+      255,
+      0.84
+    );
+
+  font-size:
+    clamp(
+      12px,
+      1.3vw,
+      18px
+    );
+
+  font-weight: 950;
+
+  line-height: 1;
+
+  letter-spacing:
+    0.045em;
+
+  text-transform: uppercase;
+}
+
+.values span {
+  white-space: nowrap;
+}
+
+.values i {
+  width: 5px;
+  height: 5px;
+
+  border-radius: 50%;
+
+  background:
+    var(--primary);
+
+  box-shadow:
+    0
+    0
+    14px
+    rgba(
+      41,
+      232,
+      63,
+      0.48
+    );
+}
+
+.divider {
+  width:
+    min(
+      640px,
+      84vw
+    );
+
+  display: grid;
+
+  grid-template-columns:
+    1fr auto 1fr;
+
+  align-items: center;
+
+  gap: 14px;
+
+  margin-top: 34px;
+}
+
+.divider span {
+  height: 1px;
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      rgba(
+        41,
+        232,
+        63,
+        0.42
+      )
+    );
+}
+
+.divider span:last-child {
+  background:
+    linear-gradient(
+      90deg,
+      rgba(
+        41,
+        232,
+        63,
+        0.42
+      ),
+      transparent
+    );
+}
+
+.divider b {
+  width: 7px;
+  height: 7px;
+
+  transform:
+    rotate(45deg);
+
+  border:
+    1px solid
+    rgba(
+      41,
+      232,
+      63,
+      0.72
+    );
+
+  background:
+    rgba(
+      41,
+      232,
+      63,
+      0.16
+    );
+
+  box-shadow:
+    0
+    0
+    16px
+    rgba(
+      41,
+      232,
+      63,
+      0.24
+    );
+}
+
+.motto {
+  margin:
+    28px 0
+    0;
+
+  color:
+    rgba(
+      255,
+      255,
+      255,
+      0.82
+    );
+
+  font-size:
+    clamp(
+      11px,
+      1.15vw,
+      15px
+    );
+
+  font-weight: 900;
+
+  line-height: 1.5;
+
+  letter-spacing:
+    0.34em;
+
+  text-transform: uppercase;
+}
+
+.scroll {
+  display: grid;
+  place-items: center;
+
+  width: 44px;
+  height: 44px;
+
+  margin-top: 38px;
+
+  border:
+    1px solid
+    rgba(
+      41,
+      232,
+      63,
+      0.16
+    );
+
+  border-radius: 50%;
+
+  color:
+    var(--primary);
+
+  background:
+    rgba(
+      41,
+      232,
+      63,
+      0.025
+    );
+
+  font-size: 18px;
+  font-weight: 950;
+
+  text-decoration: none;
+
+  animation:
+    heroScrollPulse
+    2.2s
+    ease-in-out
+    infinite;
+
+  transition:
+    border-color
+      180ms ease,
+    background
+      180ms ease;
+}
+
+.scroll:hover {
+  border-color:
+    rgba(
+      41,
+      232,
+      63,
+      0.5
+    );
+
+  background:
+    rgba(
+      41,
+      232,
+      63,
+      0.07
+    );
+}
+
+@keyframes heroScrollPulse {
+  0%,
+  100% {
+    transform:
+      translateY(0);
+  }
+
+  50% {
+    transform:
+      translateY(7px);
+  }
+}
+
+@media (
+  max-width: 700px
+) {
+  .hero {
+    min-height:
+      680px;
+
+    padding:
+      112px 16px
+      54px;
+  }
+
+  .logo {
+    min-height:
+      170px;
+
+    transform:
+      scale(0.82);
+  }
+
+  .hero h1 {
+    margin-top:
+      8px;
+
+    font-size:
+      clamp(
+        62px,
+        22vw,
+        92px
+      );
+  }
+
+  .values {
+    gap:
+      10px;
+
+    margin-top:
+      28px;
+
+    font-size:
+      11px;
+  }
+
+  .values i {
+    width:
+      4px;
+
+    height:
+      4px;
+  }
+
+  .divider {
+    margin-top:
+      28px;
+  }
+
+  .motto {
+    max-width:
+      340px;
+
+    margin-top:
+      24px;
+
+    font-size:
+      10px;
+
+    letter-spacing:
+      0.24em;
+  }
+
+  .scroll {
+    margin-top:
+      30px;
+  }
+}
+
+@media (
+  max-width: 470px
+) {
+  .values {
+    max-width:
+      340px;
+
+    row-gap:
+      12px;
+  }
+
+  .values i {
+    display:
+      none;
+  }
+
+  .values span {
+    flex:
+      0 0 auto;
+  }
+}
+
+@media (
+  prefers-reduced-motion:
+    reduce
+) {
+  .scroll {
+    animation:
+      none;
+  }
+}

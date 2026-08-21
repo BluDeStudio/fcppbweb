@@ -6,8 +6,8 @@ import { Squad } from "@/components/home/Squad";
 import { Results } from "@/components/home/Results";
 import { Partners } from "@/components/home/Partners";
 import { Transfers } from "@/components/home/Transfers";
+import { Hero } from "@/components/home/Hero";
 
-import { AnimatedLogo } from "@/components/ui/AnimatedLogo/AnimatedLogo";
 
 import { clubConfig } from "@/config/club";
 
@@ -334,81 +334,7 @@ export default async function HomePage() {
           HERO
       ===================================== */}
 
-      <section
-        id="home"
-        style={{
-          minHeight: "590px",
-
-          display: "grid",
-
-          placeItems: "center",
-
-          padding:
-            "70px 22px",
-
-          textAlign: "center",
-        }}
-      >
-        <div>
-          <AnimatedLogo
-            size={230}
-            priority
-          />
-
-          <h1
-            style={{
-              marginTop:
-                "28px",
-
-              marginBottom:
-                "0",
-
-              fontSize:
-                "clamp(52px, 8vw, 92px)",
-
-              fontWeight:
-                950,
-
-              lineHeight:
-                0.9,
-
-              letterSpacing:
-                "-0.065em",
-            }}
-          >
-            {clubConfig.name}
-          </h1>
-
-          <p
-            style={{
-              maxWidth:
-                "800px",
-
-              margin:
-                "24px auto 0",
-
-              color:
-                "#747d76",
-
-              fontSize:
-                "clamp(25px, 3.5vw, 42px)",
-
-              fontWeight:
-                900,
-
-              lineHeight:
-                1,
-
-              letterSpacing:
-                "-0.045em",
-            }}
-          >
-            Jeden klub.
-            Dva týmy.
-            Jedna vášeň.
-          </p>
-        </div>
-      </section>
+      <Hero />
 
       {/* =====================================
           01 / KLUB

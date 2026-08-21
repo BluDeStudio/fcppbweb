@@ -40,7 +40,7 @@ export function Transfers({
           number="05"
           label="Přestupy"
           title="Pohyby v kádru."
-          secondLine="Příchody a odchody FC PPB."
+          secondLine="Příchody a odchody."
           meta="Sezóna 2026/27"
         />
 
@@ -385,10 +385,8 @@ function movementLabel(
       return "PŘESTUP";
 
     case "loan_in":
-      return "NA HOSTOVÁNÍ";
-
     case "loan_out":
-      return "NA HOSTOVÁNÍ";
+      return "HOSTOVÁNÍ";
 
     case "loan_end":
       return "KONEC HOSTOVÁNÍ";
@@ -464,6 +462,16 @@ function buildApfPlayerSlug(
       .split(/\s+/)
       .filter(Boolean);
 
+  /*
+   * V databázi máme většinou:
+   * "Alexandr Procházka"
+   *
+   * APF používá:
+   * "prochazka-alexandr"
+   *
+   * U více slov necháme poslední část
+   * jako příjmení a přesuneme ji dopředu.
+   */
   const ordered =
     parts.length >= 2
       ? [
