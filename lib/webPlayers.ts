@@ -16,6 +16,7 @@ export type WebPlayerProfile = {
   apfPlayerId: number | null;
   appPlayerId: string | null;
   active: boolean;
+  inactiveFrom: string | null;
 };
 
 type WebPlayerRow = {
@@ -29,6 +30,7 @@ type WebPlayerRow = {
   apf_player_id: number | null;
   app_player_id: string | null;
   active: boolean;
+  inactive_from: string | null;
 };
 
 function mapRow(
@@ -45,6 +47,7 @@ function mapRow(
     apfPlayerId: row.apf_player_id,
     appPlayerId: row.app_player_id,
     active: row.active,
+    inactiveFrom: row.inactive_from,
   };
 }
 

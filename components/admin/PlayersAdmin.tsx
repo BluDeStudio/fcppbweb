@@ -59,6 +59,7 @@ type ManagedPlayer = {
   apfPlayerId: number | null;
   appPlayerId: string | null;
   active: boolean;
+  inactiveFrom: string | null;
   source: "app" | "web" | "web+app";
   clubFrom: string | null;
   clubTo: string | null;
@@ -101,6 +102,14 @@ export function PlayersAdmin({
       null,
     );
 
+  const [
+    inactivePlayerId,
+    setInactivePlayerId,
+  ] =
+    useState<string | null>(
+      null,
+    );
+
   function closeForms() {
     setEditingPlayerId(
       null,
@@ -111,6 +120,10 @@ export function PlayersAdmin({
     );
 
     setMovement(
+      null,
+    );
+
+    setInactivePlayerId(
       null,
     );
   }
@@ -242,6 +255,16 @@ export function PlayersAdmin({
                             : "—"
                       }
                     </span>
+
+                    {!player.active &&
+                      player.inactiveFrom && (
+                      <span>
+                        NEAKTIVNÍ OD:{" "}
+                        {formatDate(
+                          player.inactiveFrom,
+                        )}
+                      </span>
+                    )}
                   </div>
 
                   <div
@@ -345,11 +368,25 @@ export function PlayersAdmin({
                       UPRAVIT
                     </button>
 
-                    <ActiveToggle
-                      player={
-                        player
-                      }
-                    />
+                    {player.active ? (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setCreating(false);
+                          setEditingPlayerId(null);
+                          setMovement(null);
+                          setInactivePlayerId(
+                            player.id,
+                          );
+                        }}
+                      >
+                        NEAKTIVNÍ
+                      </button>
+                    ) : (
+                      <ActiveToggle
+                        player={player}
+                      />
+                    )}
                   </div>
 
                   {player.movements.length >
@@ -423,6 +460,14 @@ export function PlayersAdmin({
                     onCancel={
                       closeForms
                     }
+                  />
+                )}
+
+                {inactivePlayerId ===
+                  player.id && (
+                  <InactiveForm
+                    player={player}
+                    onCancel={closeForms}
                   />
                 )}
               </Fragment>
@@ -896,6 +941,70 @@ function MovementForm({
   );
 }
 
+function InactiveForm({
+  player,
+  onCancel,
+}: {
+  player: ManagedPlayer;
+  onCancel: () => void;
+}) {
+  return (
+    <form
+      action={setPlayerActive}
+      className={styles.form}
+    >
+      <PlayerIdentityInputs
+        player={player}
+      />
+
+      <input
+        type="hidden"
+        name="targetActive"
+        value="false"
+      />
+
+      <h2>
+        Zneaktivnit — {player.name}
+      </h2>
+
+      <p>
+        Hráč zmizí z aktuálního webu,
+        ale jeho historické statistiky
+        zůstanou zachované.
+      </p>
+
+      <label>
+        <span>Neaktivní od</span>
+
+        <input
+          type="date"
+          name="inactiveFrom"
+          defaultValue={
+            player.inactiveFrom ?? ""
+          }
+          required
+        />
+      </label>
+
+      <div className={styles.actions}>
+        <button
+          type="button"
+          onClick={onCancel}
+        >
+          ZRUŠIT
+        </button>
+
+        <button
+          type="submit"
+          className={styles.save}
+        >
+          POTVRDIT NEAKTIVNÍ
+        </button>
+      </div>
+    </form>
+  );
+}
+
 function ActiveToggle({
   player,
 }: {
@@ -917,21 +1026,13 @@ function ActiveToggle({
       <input
         type="hidden"
         name="targetActive"
-        value={
-          player.active
-            ? "false"
-            : "true"
-        }
+        value="true"
       />
 
       <button
         type="submit"
       >
-        {
-          player.active
-            ? "NEAKTIVNÍ"
-            : "AKTIVOVAT"
-        }
+        AKTIVOVAT
       </button>
     </form>
   );

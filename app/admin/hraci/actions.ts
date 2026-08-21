@@ -955,6 +955,9 @@ export async function createMissingArrival(
       active:
         true,
 
+      inactive_from:
+        null,
+
       updated_at:
         new Date().toISOString(),
     })
@@ -1110,6 +1113,9 @@ export async function registerPlayerDeparture(
       active:
         false,
 
+      inactive_from:
+        occurredOn,
+
       updated_at:
         new Date().toISOString(),
     })
@@ -1135,6 +1141,21 @@ export async function setPlayerActive(
       formData,
       "targetActive",
     ) === "true";
+
+  const inactiveFrom =
+    text(
+      formData,
+      "inactiveFrom",
+    );
+
+  if (
+    !targetActive &&
+    !inactiveFrom
+  ) {
+    redirect(
+      "/admin/hraci?error=inactive-date",
+    );
+  }
 
   let profile;
 
@@ -1166,6 +1187,11 @@ export async function setPlayerActive(
       .update({
         active:
           targetActive,
+
+        inactive_from:
+          targetActive
+            ? null
+            : inactiveFrom,
 
         updated_at:
           new Date().toISOString(),

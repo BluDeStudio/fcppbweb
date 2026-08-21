@@ -77,6 +77,15 @@ export function StatisticsTable({
             player,
           ) => {
             if (
+              !isVisibleForPeriod(
+                player,
+                period,
+              )
+            ) {
+              return false;
+            }
+
+            if (
               team ===
               "all"
             ) {
@@ -677,6 +686,25 @@ function getRatingClass(
   return styles.ratingBad;
 }
 
+
+function isVisibleForPeriod(
+  player: StatisticsPlayer,
+  period: PeriodFilter,
+): boolean {
+  if (
+    period === "current"
+  ) {
+    return player.currentVisible;
+  }
+
+  if (
+    period === "previous"
+  ) {
+    return player.previousVisible;
+  }
+
+  return true;
+}
 
 function hasTeamStats(
   player: StatisticsPlayer,

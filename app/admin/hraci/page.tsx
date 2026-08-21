@@ -53,6 +53,7 @@ type AdminPlayer = {
   apfPlayerId: number | null;
   appPlayerId: string | null;
   active: boolean;
+  inactiveFrom: string | null;
   source: "app" | "web" | "web+app";
   clubFrom: string | null;
   clubTo: string | null;
@@ -528,6 +529,10 @@ export default async function AdminPlayersPage() {
 
           active,
 
+          inactiveFrom:
+            webPlayer?.inactiveFrom ??
+            null,
+
           source:
             webPlayer
               ? "web+app"
@@ -603,6 +608,10 @@ export default async function AdminPlayersPage() {
 
           active:
             player.active,
+
+          inactiveFrom:
+            player.inactiveFrom ??
+            null,
 
           source:
             "web",

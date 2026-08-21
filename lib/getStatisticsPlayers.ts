@@ -62,6 +62,10 @@ export type StatisticsPlayer = {
 
   team: StatisticsTeam;
 
+  currentVisible: boolean;
+
+  previousVisible: boolean;
+
   /*
    * 2026/27
    * Zdroj hráčských výkonů:
@@ -107,6 +111,26 @@ type PlayerDbRow = {
   apf_player_id: number | null;
 };
 
+type WebProfileRow = {
+  name: string;
+  team: StatisticsTeam;
+  apf_player_id: number | null;
+  active: boolean;
+  inactive_from: string | null;
+};
+
+type TransferRow = {
+  direction: "arrival" | "departure";
+  player_id: number | null;
+  player_name: string;
+  occurred_on: string;
+};
+
+type MembershipWindow = {
+  from: string | null;
+  to: string | null;
+};
+
 const CURRENT_SEASON =
   "2026/27";
 
@@ -126,6 +150,8 @@ export async function getStatisticsPlayers(): Promise<
     aSquad,
     bSquad,
     playersResult,
+    webProfilesResult,
+    transfersResult,
   ] =
     await Promise.all([
       getSquad({
@@ -158,6 +184,28 @@ export async function getStatisticsPlayers(): Promise<
             ascending: true,
           },
         ),
+
+      supabase
+        .from(
+          "web_player_profiles",
+        )
+        .select(
+          "name, team, apf_player_id, active, inactive_from",
+        ),
+
+      supabase
+        .from(
+          "club_transfers",
+        )
+        .select(
+          "direction, player_id, player_name, occurred_on",
+        )
+        .order(
+          "occurred_on",
+          {
+            ascending: true,
+          },
+        ),
     ]);
 
   if (
@@ -176,6 +224,43 @@ export async function getStatisticsPlayers(): Promise<
       playersResult.data ??
       []
     ) as PlayerDbRow[];
+
+  const webProfiles =
+    (webProfilesResult.data ??
+      []) as WebProfileRow[];
+
+  const transferRows =
+    (transfersResult.data ??
+      []) as TransferRow[];
+
+  const profileByApfId =
+    new Map<number, WebProfileRow>();
+
+  const profileByName =
+    new Map<string, WebProfileRow>();
+
+  webProfiles.forEach(
+    (profile) => {
+      if (
+        profile.apf_player_id !==
+        null
+      ) {
+        profileByApfId.set(
+          Number(
+            profile.apf_player_id,
+          ),
+          profile,
+        );
+      }
+
+      profileByName.set(
+        normalizePlayerName(
+          profile.name,
+        ),
+        profile,
+      );
+    },
+  );
 
   const aById =
     new Map(
@@ -215,6 +300,40 @@ export async function getStatisticsPlayers(): Promise<
           ) {
             return null;
           }
+
+          const webProfile =
+            profileByApfId.get(
+              playerId,
+            ) ??
+            profileByName.get(
+              normalizePlayerName(
+                player.name,
+              ),
+            ) ??
+            null;
+
+          const membershipWindows =
+            buildMembershipWindows(
+              transferRows,
+              playerId,
+              player.name,
+              webProfile?.inactive_from ??
+                null,
+            );
+
+          const currentVisible =
+            isSeasonVisible(
+              CURRENT_SEASON,
+              membershipWindows,
+              webProfile,
+            );
+
+          const previousVisible =
+            isSeasonVisible(
+              PREVIOUS_SEASON,
+              membershipWindows,
+              webProfile,
+            );
 
           try {
             const appStats =
@@ -274,7 +393,11 @@ export async function getStatisticsPlayers(): Promise<
                   getSeasonFromDate(
                     match.date,
                   ) ===
-                  CURRENT_SEASON,
+                  CURRENT_SEASON &&
+                  isDateInMembership(
+                    match.date,
+                    membershipWindows,
+                  ),
               );
 
             const currentAppSeason =
@@ -339,7 +462,11 @@ export async function getStatisticsPlayers(): Promise<
                   getSeasonFromDate(
                     match.date,
                   ) ===
-                  PREVIOUS_SEASON,
+                  PREVIOUS_SEASON &&
+                  isDateInMembership(
+                    match.date,
+                    membershipWindows,
+                  ),
               );
 
             const previousARating =
@@ -501,23 +628,22 @@ export async function getStatisticsPlayers(): Promise<
             const team:
               StatisticsTeam =
               resolveCurrentTeam(
-                meta.team,
+                webProfile?.team ??
+                  meta.team,
                 currentA,
                 currentB,
               );
 
             const hasAnyData =
-              current.matches >
-                0 ||
-              previous.matches >
-                0 ||
-              total.matches >
-                0 ||
-              manual !==
-                null;
+              current.matches > 0 ||
+              previous.matches > 0 ||
+              total.matches > 0 ||
+              manual !== null;
 
             if (
-              !hasAnyData
+              !hasAnyData &&
+              !currentVisible &&
+              !previousVisible
             ) {
               return null;
             }
@@ -536,6 +662,10 @@ export async function getStatisticsPlayers(): Promise<
                 null,
 
               team,
+
+              currentVisible,
+
+              previousVisible,
 
               current,
 
@@ -578,6 +708,281 @@ export async function getStatisticsPlayers(): Promise<
       row,
     ): row is StatisticsPlayer =>
       row !== null,
+  );
+}
+
+function normalizePlayerName(
+  value: string,
+): string {
+  return String(value ?? "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .trim()
+    .toLowerCase();
+}
+
+function buildMembershipWindows(
+  transfers: TransferRow[],
+  playerId: number,
+  playerName: string,
+  inactiveFrom: string | null,
+): MembershipWindow[] {
+  const normalizedName =
+    normalizePlayerName(
+      playerName,
+    );
+
+  const rows =
+    transfers
+      .filter(
+        (row) =>
+          (
+            row.player_id !== null &&
+            Number(row.player_id) ===
+              playerId
+          ) ||
+          normalizePlayerName(
+            row.player_name,
+          ) === normalizedName,
+      )
+      .sort(
+        (a, b) =>
+          normalizeDate(
+            a.occurred_on,
+          ).localeCompare(
+            normalizeDate(
+              b.occurred_on,
+            ),
+          ),
+      );
+
+  const windows:
+    MembershipWindow[] = [];
+
+  let openFrom:
+    string | null = null;
+
+  rows.forEach(
+    (row) => {
+      const date =
+        normalizeDate(
+          row.occurred_on,
+        );
+
+      if (!date) {
+        return;
+      }
+
+      if (
+        row.direction ===
+        "arrival"
+      ) {
+        if (
+          openFrom !== null
+        ) {
+          windows.push({
+            from: openFrom,
+            to: null,
+          });
+        }
+
+        openFrom = date;
+        return;
+      }
+
+      if (
+        openFrom !== null
+      ) {
+        windows.push({
+          from: openFrom,
+          to: date,
+        });
+
+        openFrom = null;
+        return;
+      }
+
+      /*
+       * Historický odchod bez zapsaného
+       * příchodu: považujeme hráče za člena
+       * od začátku evidence do data odchodu.
+       */
+      windows.push({
+        from: null,
+        to: date,
+      });
+    },
+  );
+
+  if (
+    openFrom !== null
+  ) {
+    windows.push({
+      from: openFrom,
+      to: null,
+    });
+  }
+
+  const inactiveDate =
+    normalizeDate(
+      inactiveFrom,
+    );
+
+  if (
+    inactiveDate
+  ) {
+    let applied = false;
+
+    for (
+      let index =
+        windows.length - 1;
+      index >= 0;
+      index -= 1
+    ) {
+      if (
+        windows[index].to ===
+        null
+      ) {
+        windows[index] = {
+          ...windows[index],
+          to: inactiveDate,
+        };
+
+        applied = true;
+        break;
+      }
+    }
+
+    if (
+      !applied
+    ) {
+      windows.push({
+        from: null,
+        to: inactiveDate,
+      });
+    }
+  }
+
+  return windows;
+}
+
+function isDateInMembership(
+  value: string,
+  windows: MembershipWindow[],
+): boolean {
+  const date =
+    normalizeDate(value);
+
+  if (!date) {
+    return false;
+  }
+
+  if (
+    windows.length === 0
+  ) {
+    return true;
+  }
+
+  return windows.some(
+    (window) => {
+      const afterStart =
+        !window.from ||
+        date >= window.from;
+
+      const beforeEnd =
+        !window.to ||
+        date <= window.to;
+
+      return (
+        afterStart &&
+        beforeEnd
+      );
+    },
+  );
+}
+
+function getSeasonRange(
+  season: string,
+): {
+  start: string;
+  end: string;
+} | null {
+  const match =
+    normalizeSeason(
+      season,
+    ).match(
+      /^(\d{4})\/(\d{2})$/,
+    );
+
+  if (!match) {
+    return null;
+  }
+
+  const startYear =
+    Number(match[1]);
+
+  const endYear =
+    startYear + 1;
+
+  return {
+    start:
+      `${startYear}-08-01`,
+    end:
+      `${endYear}-07-31`,
+  };
+}
+
+function isSeasonVisible(
+  season: string,
+  windows: MembershipWindow[],
+  profile: WebProfileRow | null,
+): boolean {
+  const range =
+    getSeasonRange(season);
+
+  if (!range) {
+    return true;
+  }
+
+  if (
+    windows.length === 0
+  ) {
+    if (
+      !profile
+    ) {
+      return true;
+    }
+
+    const inactiveFrom =
+      normalizeDate(
+        profile.inactive_from,
+      );
+
+    if (
+      inactiveFrom &&
+      inactiveFrom < range.start
+    ) {
+      return false;
+    }
+
+    return true;
+  }
+
+  return windows.some(
+    (window) => {
+      const from =
+        window.from ??
+        "0000-01-01";
+
+      const to =
+        window.to ??
+        "9999-12-31";
+
+      return (
+        from <= range.end &&
+        to >= range.start
+      );
+    },
   );
 }
 
