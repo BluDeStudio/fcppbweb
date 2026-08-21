@@ -66,7 +66,7 @@ export function MatchCenter({
           number="03"
           label="Zápasy"
           title="Zápasy."
-          secondLine={`${currentTeam.label} ${clubConfig.name}.`}
+          secondLine={`${currentTeam.label}.`}
           meta={`Sezóna ${clubConfig.season}`}
         />
 

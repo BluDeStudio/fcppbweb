@@ -257,8 +257,8 @@ export function Squad({
           title="Naši hráči."
           secondLine={
             team === "a"
-              ? "A-tým FC PPB."
-              : "B-tým FC PPB."
+              ? "A-tým."
+              : "B-tým."
           }
           meta={`Sezóna ${clubConfig.season}`}
         />

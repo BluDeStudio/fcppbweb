@@ -63,10 +63,10 @@ export function HomeHighlights({
           title="Hráči."
           secondLine={
             view === "a"
-              ? "A-tým FC PPB."
+              ? "A-tým."
               : view === "b"
-                ? "B-tým FC PPB."
-                : "Celý klub FC PPB."
+                ? "B-tým."
+                : "Celý klub."
           }
           meta={`Sezóna ${clubConfig.season}`}
         />
