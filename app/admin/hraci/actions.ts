@@ -170,6 +170,385 @@ function refreshPlayers() {
   revalidatePath("/admin/prestupy");
 }
 
+async function syncAppApf(
+  appPlayerId: string,
+  apfPlayerId: number | null,
+) {
+  if (
+    !appPlayerId ||
+    apfPlayerId === null
+  ) {
+    return;
+  }
+
+  const supabase =
+    getSupabaseAdmin();
+
+  const {
+    error,
+  } =
+    await supabase
+      .from("players")
+      .update({
+        apf_player_id:
+          apfPlayerId,
+      })
+      .eq(
+        "id",
+        appPlayerId,
+      );
+
+  if (
+    error
+  ) {
+    throw error;
+  }
+}
+
+async function ensureWebProfile(
+  formData: FormData,
+) {
+  const supabase =
+    getSupabaseAdmin();
+
+  const profileId =
+    text(
+      formData,
+      "profileId",
+    );
+
+  const appPlayerId =
+    text(
+      formData,
+      "appPlayerId",
+    );
+
+  const name =
+    text(
+      formData,
+      "playerName",
+    );
+
+  const team =
+    text(
+      formData,
+      "team",
+    ) || "b";
+
+  const position =
+    text(
+      formData,
+      "position",
+    ) || "player";
+
+  const status =
+    text(
+      formData,
+      "status",
+    ) || "club";
+
+  const shirtNumberRaw =
+    text(
+      formData,
+      "shirtNumber",
+    );
+
+  const apfRaw =
+    text(
+      formData,
+      "apfPlayerId",
+    );
+
+  const imageUrlRaw =
+    text(
+      formData,
+      "imageUrl",
+    );
+
+  const apfPlayerId =
+    apfRaw
+      ? Number(apfRaw)
+      : null;
+
+  if (
+    profileId
+  ) {
+    const {
+      data,
+      error,
+    } =
+      await supabase
+        .from(
+          "web_player_profiles",
+        )
+        .select(
+          "id, name, apf_player_id, image_url",
+        )
+        .eq(
+          "id",
+          profileId,
+        )
+        .single();
+
+    if (
+      error ||
+      !data
+    ) {
+      throw (
+        error ??
+        new Error(
+          "Web profile not found",
+        )
+      );
+    }
+
+    return {
+      id:
+        String(data.id),
+
+      name:
+        String(data.name),
+
+      apfPlayerId:
+        data.apf_player_id ===
+        null
+          ? null
+          : Number(
+              data.apf_player_id,
+            ),
+
+      imageUrl:
+        data.image_url
+          ? String(
+              data.image_url,
+            )
+          : (
+              data.apf_player_id
+                ? `/images/${data.apf_player_id}.jpg`
+                : null
+            ),
+    };
+  }
+
+  let existingId:
+    string | null =
+      null;
+
+  if (
+    appPlayerId
+  ) {
+    const {
+      data,
+    } =
+      await supabase
+        .from(
+          "web_player_profiles",
+        )
+        .select("id")
+        .eq(
+          "app_player_id",
+          appPlayerId,
+        )
+        .maybeSingle();
+
+    existingId =
+      data?.id
+        ? String(
+            data.id,
+          )
+        : null;
+  }
+
+  if (
+    !existingId &&
+    apfPlayerId !==
+      null
+  ) {
+    const {
+      data,
+    } =
+      await supabase
+        .from(
+          "web_player_profiles",
+        )
+        .select("id")
+        .eq(
+          "apf_player_id",
+          apfPlayerId,
+        )
+        .maybeSingle();
+
+    existingId =
+      data?.id
+        ? String(
+            data.id,
+          )
+        : null;
+  }
+
+  if (
+    existingId
+  ) {
+    const {
+      data,
+      error,
+    } =
+      await supabase
+        .from(
+          "web_player_profiles",
+        )
+        .select(
+          "id, name, apf_player_id, image_url",
+        )
+        .eq(
+          "id",
+          existingId,
+        )
+        .single();
+
+    if (
+      error ||
+      !data
+    ) {
+      throw (
+        error ??
+        new Error(
+          "Existing web profile not found",
+        )
+      );
+    }
+
+    return {
+      id:
+        String(data.id),
+
+      name:
+        String(data.name),
+
+      apfPlayerId:
+        data.apf_player_id ===
+        null
+          ? null
+          : Number(
+              data.apf_player_id,
+            ),
+
+      imageUrl:
+        data.image_url
+          ? String(
+              data.image_url,
+            )
+          : (
+              data.apf_player_id
+                ? `/images/${data.apf_player_id}.jpg`
+                : null
+            ),
+    };
+  }
+
+  if (
+    !name
+  ) {
+    throw new Error(
+      "Missing player name",
+    );
+  }
+
+  const imageUrl =
+    imageUrlRaw ||
+    (
+      apfPlayerId !==
+      null
+        ? `/images/${apfPlayerId}.jpg`
+        : null
+    );
+
+  const {
+    data,
+    error,
+  } =
+    await supabase
+      .from(
+        "web_player_profiles",
+      )
+      .insert({
+        name,
+        team,
+        position,
+        status,
+
+        shirt_number:
+          shirtNumberRaw
+            ? Number(
+                shirtNumberRaw,
+              )
+            : null,
+
+        image_url:
+          imageUrl,
+
+        apf_player_id:
+          apfPlayerId,
+
+        app_player_id:
+          appPlayerId || null,
+
+        active:
+          true,
+
+        updated_at:
+          new Date().toISOString(),
+      })
+      .select(
+        "id, name, apf_player_id, image_url",
+      )
+      .single();
+
+  if (
+    error ||
+    !data
+  ) {
+    throw (
+      error ??
+      new Error(
+        "Could not create web profile",
+      )
+    );
+  }
+
+  await syncAppApf(
+    appPlayerId,
+    apfPlayerId,
+  );
+
+  return {
+    id:
+      String(data.id),
+
+    name:
+      String(data.name),
+
+    apfPlayerId:
+      data.apf_player_id ===
+      null
+        ? null
+        : Number(
+            data.apf_player_id,
+          ),
+
+    imageUrl:
+      data.image_url
+        ? String(
+            data.image_url,
+          )
+        : (
+            data.apf_player_id
+              ? `/images/${data.apf_player_id}.jpg`
+              : null
+          ),
+  };
+}
+
 export async function saveWebPlayer(
   formData: FormData,
 ) {
@@ -183,9 +562,6 @@ export async function saveWebPlayer(
       formData,
       "id",
     );
-
-  const isCreating =
-    !id;
 
   const name =
     text(
@@ -229,7 +605,7 @@ export async function saveWebPlayer(
       "appPlayerId",
     );
 
-  const imageUrl =
+  const imageUrlRaw =
     text(
       formData,
       "imageUrl",
@@ -294,7 +670,13 @@ export async function saveWebPlayer(
         : null,
 
     image_url:
-      imageUrl || null,
+      imageUrlRaw ||
+      (
+        apfPlayerId !==
+        null
+          ? `/images/${apfPlayerId}.jpg`
+          : null
+      ),
 
     apf_player_id:
       apfPlayerId,
@@ -308,37 +690,108 @@ export async function saveWebPlayer(
       new Date().toISOString(),
   };
 
-  const profileResponse =
-    isCreating
-      ? await supabase
-          .from(
-            "web_player_profiles",
-          )
-          .insert(
-            payload,
-          )
-          .select("id")
-          .single()
-      : await supabase
-          .from(
-            "web_player_profiles",
-          )
-          .update(
-            payload,
-          )
-          .eq(
-            "id",
-            id,
-          )
-          .select("id")
-          .single();
+  let response;
 
   if (
-    profileResponse.error
+    id
+  ) {
+    response =
+      await supabase
+        .from(
+          "web_player_profiles",
+        )
+        .update(
+          payload,
+        )
+        .eq(
+          "id",
+          id,
+        );
+  } else {
+    let existingId:
+      string | null =
+        null;
+
+    if (
+      appPlayerId
+    ) {
+      const {
+        data,
+      } =
+        await supabase
+          .from(
+            "web_player_profiles",
+          )
+          .select("id")
+          .eq(
+            "app_player_id",
+            appPlayerId,
+          )
+          .maybeSingle();
+
+      existingId =
+        data?.id
+          ? String(
+              data.id,
+            )
+          : null;
+    }
+
+    if (
+      !existingId &&
+      apfPlayerId !==
+        null
+    ) {
+      const {
+        data,
+      } =
+        await supabase
+          .from(
+            "web_player_profiles",
+          )
+          .select("id")
+          .eq(
+            "apf_player_id",
+            apfPlayerId,
+          )
+          .maybeSingle();
+
+      existingId =
+        data?.id
+          ? String(
+              data.id,
+            )
+          : null;
+    }
+
+    response =
+      existingId
+        ? await supabase
+            .from(
+              "web_player_profiles",
+            )
+            .update(
+              payload,
+            )
+            .eq(
+              "id",
+              existingId,
+            )
+        : await supabase
+            .from(
+              "web_player_profiles",
+            )
+            .insert(
+              payload,
+            );
+  }
+
+  if (
+    response.error
   ) {
     console.error(
       "Save web player:",
-      profileResponse.error,
+      response.error,
     );
 
     redirect(
@@ -346,169 +799,28 @@ export async function saveWebPlayer(
     );
   }
 
-  /*
-   * Propojení STATPPKA ↔ APF.
-   */
-  if (
-    appPlayerId &&
-    apfPlayerId !==
-      null
+  try {
+    await syncAppApf(
+      appPlayerId,
+      apfPlayerId,
+    );
+  } catch (
+    error
   ) {
-    const {
-      error:
-        appLinkError,
-    } =
-      await supabase
-        .from(
-          "players",
-        )
-        .update({
-          apf_player_id:
-            apfPlayerId,
-        })
-        .eq(
-          "id",
-          appPlayerId,
-        );
+    console.error(
+      "STATPPKA/APF link:",
+      error,
+    );
 
-    if (
-      appLinkError
-    ) {
-      console.error(
-        "STATPPKA/APF link:",
-        appLinkError,
-      );
-
-      redirect(
-        "/admin/hraci?error=app-link",
-      );
-    }
-  }
-
-  /*
-   * ========================================
-   * NOVÝ HRÁČ = AUTOMATICKÝ PŘÍCHOD
-   * ========================================
-   */
-  if (
-    isCreating
-  ) {
-    const arrivalDate =
-      text(
-        formData,
-        "arrivalDate",
-      );
-
-    const arrivalDetailRaw =
-      text(
-        formData,
-        "arrivalMovementDetail",
-      );
-
-    if (
-      !arrivalDate ||
-      !isArrivalDetail(
-        arrivalDetailRaw,
-      )
-    ) {
-      /*
-       * Profil už je uložený, ale příchod nebyl.
-       * Admin pak nabídne "DOPLNIT PŘÍCHOD".
-       */
-      refreshPlayers();
-
-      redirect(
-        "/admin/hraci?success=player-created&warning=arrival",
-      );
-    }
-
-    const club =
-      await resolveClub(
-        formData,
-        "arrivalClub",
-        "arrivalClubApfId",
-      );
-
-    const {
-      error:
-        transferError,
-    } =
-      await supabase
-        .from(
-          "club_transfers",
-        )
-        .insert({
-          direction:
-            "arrival",
-
-          movement_type:
-            movementType(
-              arrivalDetailRaw,
-            ),
-
-          movement_detail:
-            arrivalDetailRaw,
-
-          player_id:
-            apfPlayerId,
-
-          player_name:
-            name,
-
-          description:
-            null,
-
-          image_url:
-            imageUrl ||
-            (
-              apfPlayerId
-                ? `/images/${apfPlayerId}.jpg`
-                : null
-            ),
-
-          other_club:
-            club.name,
-
-          other_club_apf_id:
-            club.apfId,
-
-          other_club_logo_url:
-            club.logoUrl,
-
-          occurred_on:
-            arrivalDate,
-
-          season:
-            seasonFromDate(
-              arrivalDate,
-            ),
-
-          published:
-            true,
-        });
-
-    if (
-      transferError
-    ) {
-      console.error(
-        "Automatic arrival:",
-        transferError,
-      );
-
-      refreshPlayers();
-
-      redirect(
-        "/admin/hraci?success=player-created&warning=arrival",
-      );
-    }
+    redirect(
+      "/admin/hraci?error=app-link",
+    );
   }
 
   refreshPlayers();
 
   redirect(
-    isCreating
-      ? "/admin/hraci?success=created"
-      : "/admin/hraci?success=updated",
+    "/admin/hraci?success=updated",
   );
 }
 
@@ -516,15 +828,6 @@ export async function createMissingArrival(
   formData: FormData,
 ) {
   await requireAdmin();
-
-  const supabase =
-    getSupabaseAdmin();
-
-  const profileId =
-    text(
-      formData,
-      "profileId",
-    );
 
   const occurredOn =
     text(
@@ -539,7 +842,6 @@ export async function createMissingArrival(
     );
 
   if (
-    !profileId ||
     !occurredOn ||
     !isArrivalDetail(
       detailRaw,
@@ -550,29 +852,21 @@ export async function createMissingArrival(
     );
   }
 
-  const {
-    data:
-      profile,
-    error:
-      profileError,
-  } =
-    await supabase
-      .from(
-        "web_player_profiles",
-      )
-      .select(
-        "id, name, apf_player_id, image_url",
-      )
-      .eq(
-        "id",
-        profileId,
-      )
-      .single();
+  let profile;
 
-  if (
-    profileError ||
-    !profile
+  try {
+    profile =
+      await ensureWebProfile(
+        formData,
+      );
+  } catch (
+    error
   ) {
+    console.error(
+      "Ensure player for arrival:",
+      error,
+    );
+
     redirect(
       "/admin/hraci?error=player",
     );
@@ -584,6 +878,9 @@ export async function createMissingArrival(
       "otherClub",
       "otherClubApfId",
     );
+
+  const supabase =
+    getSupabaseAdmin();
 
   const {
     error,
@@ -605,27 +902,16 @@ export async function createMissingArrival(
           detailRaw,
 
         player_id:
-          profile.apf_player_id
-            ? Number(
-                profile.apf_player_id,
-              )
-            : null,
+          profile.apfPlayerId,
 
         player_name:
-          String(
-            profile.name,
-          ),
+          profile.name,
 
         description:
           null,
 
         image_url:
-          profile.image_url ||
-          (
-            profile.apf_player_id
-              ? `/images/${profile.apf_player_id}.jpg`
-              : null
-          ),
+          profile.imageUrl,
 
         other_club:
           club.name,
@@ -652,7 +938,7 @@ export async function createMissingArrival(
     error
   ) {
     console.error(
-      "Missing arrival:",
+      "Arrival:",
       error,
     );
 
@@ -660,6 +946,22 @@ export async function createMissingArrival(
       "/admin/hraci?error=arrival",
     );
   }
+
+  await supabase
+    .from(
+      "web_player_profiles",
+    )
+    .update({
+      active:
+        true,
+
+      updated_at:
+        new Date().toISOString(),
+    })
+    .eq(
+      "id",
+      profile.id,
+    );
 
   refreshPlayers();
 
@@ -672,15 +974,6 @@ export async function registerPlayerDeparture(
   formData: FormData,
 ) {
   await requireAdmin();
-
-  const supabase =
-    getSupabaseAdmin();
-
-  const profileId =
-    text(
-      formData,
-      "profileId",
-    );
 
   const occurredOn =
     text(
@@ -695,7 +988,6 @@ export async function registerPlayerDeparture(
     );
 
   if (
-    !profileId ||
     !occurredOn ||
     !isDepartureDetail(
       detailRaw,
@@ -706,29 +998,21 @@ export async function registerPlayerDeparture(
     );
   }
 
-  const {
-    data:
-      profile,
-    error:
-      profileError,
-  } =
-    await supabase
-      .from(
-        "web_player_profiles",
-      )
-      .select(
-        "id, name, apf_player_id, image_url",
-      )
-      .eq(
-        "id",
-        profileId,
-      )
-      .single();
+  let profile;
 
-  if (
-    profileError ||
-    !profile
+  try {
+    profile =
+      await ensureWebProfile(
+        formData,
+      );
+  } catch (
+    error
   ) {
+    console.error(
+      "Ensure player for departure:",
+      error,
+    );
+
     redirect(
       "/admin/hraci?error=player",
     );
@@ -741,9 +1025,11 @@ export async function registerPlayerDeparture(
       "otherClubApfId",
     );
 
+  const supabase =
+    getSupabaseAdmin();
+
   const {
-    error:
-      transferError,
+    error,
   } =
     await supabase
       .from(
@@ -762,27 +1048,16 @@ export async function registerPlayerDeparture(
           detailRaw,
 
         player_id:
-          profile.apf_player_id
-            ? Number(
-                profile.apf_player_id,
-              )
-            : null,
+          profile.apfPlayerId,
 
         player_name:
-          String(
-            profile.name,
-          ),
+          profile.name,
 
         description:
           null,
 
         image_url:
-          profile.image_url ||
-          (
-            profile.apf_player_id
-              ? `/images/${profile.apf_player_id}.jpg`
-              : null
-          ),
+          profile.imageUrl,
 
         other_club:
           detailRaw ===
@@ -815,11 +1090,11 @@ export async function registerPlayerDeparture(
       });
 
   if (
-    transferError
+    error
   ) {
     console.error(
       "Departure:",
-      transferError,
+      error,
     );
 
     redirect(
@@ -827,42 +1102,97 @@ export async function registerPlayerDeparture(
     );
   }
 
+  await supabase
+    .from(
+      "web_player_profiles",
+    )
+    .update({
+      active:
+        false,
+
+      updated_at:
+        new Date().toISOString(),
+    })
+    .eq(
+      "id",
+      profile.id,
+    );
+
+  refreshPlayers();
+
+  redirect(
+    "/admin/hraci?success=departure",
+  );
+}
+
+export async function setPlayerActive(
+  formData: FormData,
+) {
+  await requireAdmin();
+
+  const targetActive =
+    text(
+      formData,
+      "targetActive",
+    ) === "true";
+
+  let profile;
+
+  try {
+    profile =
+      await ensureWebProfile(
+        formData,
+      );
+  } catch (
+    error
+  ) {
+    console.error(
+      "Ensure player for active toggle:",
+      error,
+    );
+
+    redirect(
+      "/admin/hraci?error=player",
+    );
+  }
+
   const {
-    error:
-      profileUpdateError,
+    error,
   } =
-    await supabase
+    await getSupabaseAdmin()
       .from(
         "web_player_profiles",
       )
       .update({
         active:
-          false,
+          targetActive,
 
         updated_at:
           new Date().toISOString(),
       })
       .eq(
         "id",
-        profileId,
+        profile.id,
       );
 
   if (
-    profileUpdateError
+    error
   ) {
     console.error(
-      "Deactivate player:",
-      profileUpdateError,
+      "Player active toggle:",
+      error,
     );
 
     redirect(
-      "/admin/hraci?error=deactivate",
+      "/admin/hraci?error=active",
     );
   }
 
   refreshPlayers();
 
   redirect(
-    "/admin/hraci?success=departure",
+    targetActive
+      ? "/admin/hraci?success=activated"
+      : "/admin/hraci?success=deactivated",
   );
 }

@@ -21,9 +21,24 @@ type AppPlayerRow = {
   is_active: boolean | null;
 };
 
-type TransferMarker = {
+type TransferRow = {
+  id: string;
+  direction: "arrival" | "departure";
+  movement_detail: string | null;
   player_id: number | null;
   player_name: string;
+  other_club: string | null;
+  occurred_on: string;
+  season: string | null;
+};
+
+type AdminMovement = {
+  id: string;
+  direction: "arrival" | "departure";
+  detail: string | null;
+  date: string;
+  season: string | null;
+  otherClub: string | null;
 };
 
 type AdminPlayer = {
@@ -38,8 +53,10 @@ type AdminPlayer = {
   apfPlayerId: number | null;
   appPlayerId: string | null;
   active: boolean;
-  hasArrival: boolean;
   source: "app" | "web" | "web+app";
+  clubFrom: string | null;
+  clubTo: string | null;
+  movements: AdminMovement[];
 };
 
 type AppPlayerOption = {
@@ -51,15 +68,10 @@ type AppPlayerOption = {
   active: boolean;
 };
 
-function normalizeName(
-  value: string,
-): string {
+function normalizeName(value: string): string {
   return value
     .normalize("NFD")
-    .replace(
-      /[\u0300-\u036f]/g,
-      "",
-    )
+    .replace(/[\u0300-\u036f]/g, "")
     .trim()
     .toLowerCase();
 }
@@ -70,20 +82,61 @@ function inferPosition(
   const normalized =
     (value ?? "")
       .normalize("NFD")
-      .replace(
-        /[\u0300-\u036f]/g,
-        "",
-      )
+      .replace(/[\u0300-\u036f]/g, "")
       .toLowerCase();
 
-  if (
-    normalized.includes("brankar") ||
+  return normalized.includes("brankar") ||
     normalized.includes("goalkeeper")
-  ) {
-    return "goalkeeper";
-  }
+    ? "goalkeeper"
+    : "player";
+}
 
-  return "player";
+function sortMovements(
+  movements: AdminMovement[],
+): AdminMovement[] {
+  return [...movements].sort(
+    (a, b) =>
+      a.date.localeCompare(b.date),
+  );
+}
+
+function getCurrentPeriod(
+  movements: AdminMovement[],
+): {
+  clubFrom: string | null;
+  clubTo: string | null;
+} {
+  const sorted =
+    sortMovements(movements);
+
+  let clubFrom: string | null =
+    null;
+
+  let clubTo: string | null =
+    null;
+
+  sorted.forEach(
+    (movement) => {
+      if (
+        movement.direction ===
+        "arrival"
+      ) {
+        clubFrom =
+          movement.date;
+
+        clubTo =
+          null;
+      } else {
+        clubTo =
+          movement.date;
+      }
+    },
+  );
+
+  return {
+    clubFrom,
+    clubTo,
+  };
 }
 
 export default async function AdminPlayersPage() {
@@ -92,16 +145,10 @@ export default async function AdminPlayersPage() {
   const supabase =
     getSupabaseAdmin();
 
-  /*
-   * ========================================
-   * NAČTENÍ DAT
-   * ========================================
-   */
-
   const [
     webPlayers,
     appResponse,
-    arrivalsResponse,
+    transfersResponse,
   ] = await Promise.all([
     getWebPlayers(),
 
@@ -110,65 +157,47 @@ export default async function AdminPlayersPage() {
       .select(
         "id, name, number, position, apf_player_id, is_active",
       )
-      .order(
-        "name",
-        {
-          ascending: true,
-        },
-      ),
+      .order("name", {
+        ascending: true,
+      }),
 
     supabase
       .from("club_transfers")
       .select(
-        "player_id, player_name",
+        "id, direction, movement_detail, player_id, player_name, other_club, occurred_on, season",
       )
-      .eq(
-        "direction",
-        "arrival",
-      ),
+      .order("occurred_on", {
+        ascending: true,
+      }),
   ]);
-
-  /*
-   * ========================================
-   * KONTROLA CHYB
-   * ========================================
-   */
 
   if (appResponse.error) {
     console.error(
-      "ADMIN HRÁČI - chyba při načítání players:",
+      "ADMIN HRÁČI - players:",
       appResponse.error,
     );
   }
 
-  if (arrivalsResponse.error) {
+  if (transfersResponse.error) {
     console.error(
-      "ADMIN HRÁČI - chyba při načítání příchodů:",
-      arrivalsResponse.error,
+      "ADMIN HRÁČI - transfers:",
+      transfersResponse.error,
     );
   }
 
-  /*
-   * ========================================
-   * HRÁČI Z APLIKACE
-   * ========================================
-   */
-
   const appPlayerRows =
-    (appResponse.data ?? []) as AppPlayerRow[];
+    (appResponse.data ??
+      []) as AppPlayerRow[];
 
-  const appPlayers: AppPlayerOption[] =
+  const appPlayers:
+    AppPlayerOption[] =
     appPlayerRows.map(
       (player) => ({
         id:
-          String(
-            player.id,
-          ),
+          String(player.id),
 
         name:
-          String(
-            player.name,
-          ),
+          String(player.name),
 
         number:
           player.number === null
@@ -181,71 +210,113 @@ export default async function AdminPlayersPage() {
           player.position,
 
         apfPlayerId:
-          player.apf_player_id === null
+          player.apf_player_id ===
+          null
             ? null
             : Number(
                 player.apf_player_id,
               ),
 
         active:
-          player.is_active !== false,
+          player.is_active !==
+          false,
       }),
     );
 
-  /*
-   * ========================================
-   * EXISTUJÍCÍ PŘÍCHODY
-   * ========================================
-   */
+  const transferRows =
+    (transfersResponse.data ??
+      []) as TransferRow[];
 
-  const arrivalIds =
-    new Set<number>();
+  const movementsByApfId =
+    new Map<
+      number,
+      AdminMovement[]
+    >();
 
-  const arrivalNames =
-    new Set<string>();
+  const movementsByName =
+    new Map<
+      string,
+      AdminMovement[]
+    >();
 
-  const arrivalRows =
-    (arrivalsResponse.data ?? []) as TransferMarker[];
-
-  arrivalRows.forEach(
+  transferRows.forEach(
     (row) => {
+      const movement:
+        AdminMovement = {
+          id:
+            String(row.id),
+
+          direction:
+            row.direction,
+
+          detail:
+            row.movement_detail,
+
+          date:
+            row.occurred_on,
+
+          season:
+            row.season,
+
+          otherClub:
+            row.other_club,
+        };
+
       if (
-        row.player_id !== null
+        row.player_id !==
+        null
       ) {
-        arrivalIds.add(
+        const playerId =
           Number(
             row.player_id,
-          ),
+          );
+
+        const current =
+          movementsByApfId.get(
+            playerId,
+          ) ?? [];
+
+        current.push(
+          movement,
+        );
+
+        movementsByApfId.set(
+          playerId,
+          current,
         );
       }
 
-      if (
-        row.player_name
-      ) {
-        arrivalNames.add(
-          normalizeName(
-            String(
-              row.player_name,
-            ),
+      const key =
+        normalizeName(
+          String(
+            row.player_name,
           ),
         );
-      }
+
+      const currentByName =
+        movementsByName.get(
+          key,
+        ) ?? [];
+
+      currentByName.push(
+        movement,
+      );
+
+      movementsByName.set(
+        key,
+        currentByName,
+      );
     },
   );
-
-  /*
-   * ========================================
-   * INDEX WEB HRÁČŮ PODLE APP ID
-   * ========================================
-   */
 
   const webByAppId =
     new Map(
       webPlayers
         .filter(
           (player) =>
-            player.appPlayerId !== null &&
-            player.appPlayerId !== undefined,
+            Boolean(
+              player.appPlayerId,
+            ),
         )
         .map(
           (player) => [
@@ -257,18 +328,13 @@ export default async function AdminPlayersPage() {
         ),
     );
 
-  /*
-   * ========================================
-   * INDEX WEB HRÁČŮ PODLE APF ID
-   * ========================================
-   */
-
   const webByApfId =
     new Map(
       webPlayers
         .filter(
           (player) =>
-            player.apfPlayerId !== null,
+            player.apfPlayerId !==
+            null,
         )
         .map(
           (player) => [
@@ -279,12 +345,6 @@ export default async function AdminPlayersPage() {
           ],
         ),
     );
-
-  /*
-   * ========================================
-   * INDEX WEB HRÁČŮ PODLE JMÉNA
-   * ========================================
-   */
 
   const webByName =
     new Map(
@@ -298,47 +358,74 @@ export default async function AdminPlayersPage() {
       ),
     );
 
-  /*
-   * ========================================
-   * POUŽITÉ WEB PROFILY
-   * ========================================
-   */
-
   const usedWebIds =
     new Set<string>();
 
-  /*
-   * ========================================
-   * SPOJENÍ APLIKACE + WEB
-   * ========================================
-   */
+  function getMovements(
+    name: string,
+    apfPlayerId:
+      number | null,
+  ): AdminMovement[] {
+    const byId =
+      apfPlayerId !== null
+        ? movementsByApfId.get(
+            apfPlayerId,
+          ) ?? []
+        : [];
 
-  const mergedPlayers: AdminPlayer[] =
+    const byName =
+      movementsByName.get(
+        normalizeName(name),
+      ) ?? [];
+
+    const deduped =
+      new Map<
+        string,
+        AdminMovement
+      >();
+
+    [
+      ...byId,
+      ...byName,
+    ].forEach(
+      (movement) => {
+        deduped.set(
+          movement.id,
+          movement,
+        );
+      },
+    );
+
+    return sortMovements(
+      Array.from(
+        deduped.values(),
+      ),
+    );
+  }
+
+  const mergedPlayers:
+    AdminPlayer[] =
     appPlayers.map(
-      (appPlayer): AdminPlayer => {
-        const webPlayerByApp =
+      (
+        appPlayer,
+      ): AdminPlayer => {
+        const webPlayer =
           webByAppId.get(
             appPlayer.id,
-          );
-
-        const webPlayerByApf =
-          appPlayer.apfPlayerId !== null
-            ? webByApfId.get(
-                appPlayer.apfPlayerId,
-              )
-            : undefined;
-
-        const webPlayerByName =
+          ) ??
+          (
+            appPlayer.apfPlayerId !==
+            null
+              ? webByApfId.get(
+                  appPlayer.apfPlayerId,
+                )
+              : undefined
+          ) ??
           webByName.get(
             normalizeName(
               appPlayer.name,
             ),
-          );
-
-        const webPlayer =
-          webPlayerByApp ??
-          webPlayerByApf ??
-          webPlayerByName ??
+          ) ??
           null;
 
         if (webPlayer) {
@@ -347,22 +434,10 @@ export default async function AdminPlayersPage() {
           );
         }
 
-        /*
-         * ========================================
-         * APF ID
-         * ========================================
-         */
-
         const apfPlayerId =
           webPlayer?.apfPlayerId ??
           appPlayer.apfPlayerId ??
           null;
-
-        /*
-         * ========================================
-         * LEGACY META
-         * ========================================
-         */
 
         const legacyMeta =
           apfPlayerId !== null
@@ -371,127 +446,65 @@ export default async function AdminPlayersPage() {
               )
             : null;
 
-        /*
-         * ========================================
-         * TÝM
-         * ========================================
-         */
-
-        const team: PlayerTeam =
+        const team:
+          PlayerTeam =
           webPlayer?.team ??
           legacyMeta?.team ??
           "b";
 
-        /*
-         * ========================================
-         * POZICE
-         * ========================================
-         */
-
-        const position: PlayerPosition =
+        const position:
+          PlayerPosition =
           webPlayer?.position ??
           legacyMeta?.position ??
           inferPosition(
             appPlayer.position,
           );
 
-        /*
-         * ========================================
-         * STATUS
-         * ========================================
-         */
-
-        const status: PlayerStatus =
+        const status:
+          PlayerStatus =
           webPlayer?.status ??
           legacyMeta?.status ??
           "club";
 
-        /*
-         * ========================================
-         * ČÍSLO DRESU
-         * ========================================
-         */
-
-        let shirtNumber:
-          number | null =
-            null;
-
-        if (
-          webPlayer?.shirtNumber !== null &&
-          webPlayer?.shirtNumber !== undefined
-        ) {
-          shirtNumber =
-            webPlayer.shirtNumber;
-        } else if (
-          appPlayer.number > 0
-        ) {
-          shirtNumber =
-            appPlayer.number;
-        } else if (
-          legacyMeta?.shirtNumber !== null &&
-          legacyMeta?.shirtNumber !== undefined
-        ) {
-          shirtNumber =
-            legacyMeta.shirtNumber;
-        }
-
-        /*
-         * ========================================
-         * AKTIVNÍ
-         * ========================================
-         */
+        const shirtNumber =
+          webPlayer?.shirtNumber ??
+          (
+            appPlayer.number > 0
+              ? appPlayer.number
+              : null
+          ) ??
+          legacyMeta?.shirtNumber ??
+          null;
 
         const active =
           webPlayer?.active ??
           appPlayer.active;
 
-        /*
-         * ========================================
-         * FOTKA
-         * ========================================
-         */
+        const imageUrl =
+          webPlayer?.imageUrl ??
+          (
+            apfPlayerId !== null
+              ? `/images/${apfPlayerId}.jpg`
+              : null
+          );
 
-        let imageUrl:
-          string | null =
-            webPlayer?.imageUrl ??
-            null;
+        const name =
+          webPlayer?.name ??
+          appPlayer.name;
 
-        if (
-          !imageUrl &&
-          apfPlayerId !== null
-        ) {
-          imageUrl =
-            `/images/${apfPlayerId}.jpg`;
-        }
-
-        /*
-         * ========================================
-         * PŘÍCHOD
-         * ========================================
-         */
-
-        const hasArrivalById =
-          apfPlayerId !== null &&
-          arrivalIds.has(
+        const movements =
+          getMovements(
+            name,
             apfPlayerId,
           );
 
-        const hasArrivalByName =
-          arrivalNames.has(
-            normalizeName(
-              appPlayer.name,
-            ),
+        const {
+          clubFrom,
+          clubTo,
+        } =
+          getCurrentPeriod(
+            movements,
           );
-
-        const hasArrival =
-          hasArrivalById ||
-          hasArrivalByName;
-
-        /*
-         * ========================================
-         * VÝSLEDNÝ HRÁČ
-         * ========================================
-         */
 
         return {
           id:
@@ -502,89 +515,55 @@ export default async function AdminPlayersPage() {
             webPlayer?.id ??
             null,
 
-          name:
-            webPlayer?.name ??
-            appPlayer.name,
-
+          name,
           team,
-
           position,
-
           status,
-
           shirtNumber,
-
           imageUrl,
-
           apfPlayerId,
 
-          /*
-           * Hráč pochází z players,
-           * takže jeho APP UUID známe.
-           */
           appPlayerId:
             appPlayer.id,
 
           active,
 
-          hasArrival,
-
           source:
             webPlayer
               ? "web+app"
               : "app",
+
+          clubFrom,
+          clubTo,
+          movements,
         };
       },
     );
 
-  /*
-   * ========================================
-   * HRÁČI, KTEŘÍ JSOU JEN NA WEBU
-   * ========================================
-   */
-
-  const webOnlyPlayers =
-    webPlayers.filter(
+  webPlayers
+    .filter(
       (player) =>
         !usedWebIds.has(
           player.id,
         ),
-    );
-
-  webOnlyPlayers.forEach(
-    (player) => {
-      const hasArrivalById =
-        player.apfPlayerId !== null &&
-        arrivalIds.has(
-          player.apfPlayerId,
-        );
-
-      const hasArrivalByName =
-        arrivalNames.has(
-          normalizeName(
+    )
+    .forEach(
+      (player) => {
+        const movements =
+          getMovements(
             player.name,
-          ),
-        );
+            player.apfPlayerId,
+          );
 
-      const hasArrival =
-        hasArrivalById ||
-        hasArrivalByName;
+        const {
+          clubFrom,
+          clubTo,
+        } =
+          getCurrentPeriod(
+            movements,
+          );
 
-      let imageUrl:
-        string | null =
-          player.imageUrl ??
-          null;
-
-      if (
-        !imageUrl &&
-        player.apfPlayerId !== null
-      ) {
-        imageUrl =
-          `/images/${player.apfPlayerId}.jpg`;
-      }
-
-      const adminPlayer:
-        AdminPlayer = {
+        mergedPlayers.push({
           id:
             player.id,
 
@@ -606,15 +585,18 @@ export default async function AdminPlayersPage() {
           shirtNumber:
             player.shirtNumber,
 
-          imageUrl,
+          imageUrl:
+            player.imageUrl ??
+            (
+              player.apfPlayerId !==
+              null
+                ? `/images/${player.apfPlayerId}.jpg`
+                : null
+            ),
 
           apfPlayerId:
             player.apfPlayerId,
 
-          /*
-           * Web-only hráč nemusí
-           * mít APP vazbu.
-           */
           appPlayerId:
             player.appPlayerId ??
             null,
@@ -622,23 +604,15 @@ export default async function AdminPlayersPage() {
           active:
             player.active,
 
-          hasArrival,
-
           source:
             "web",
-        };
 
-      mergedPlayers.push(
-        adminPlayer,
-      );
-    },
-  );
-
-  /*
-   * ========================================
-   * ŘAZENÍ
-   * ========================================
-   */
+          clubFrom,
+          clubTo,
+          movements,
+        });
+      },
+    );
 
   mergedPlayers.sort(
     (a, b) => {
@@ -657,43 +631,6 @@ export default async function AdminPlayersPage() {
       );
     },
   );
-
-  /*
-   * ========================================
-   * DEBUG
-   * ========================================
-   */
-
-  console.log(
-    "ADMIN HRÁČI:",
-    {
-      statppka:
-        appPlayers.length,
-
-      web:
-        webPlayers.length,
-
-      webOnly:
-        webOnlyPlayers.length,
-
-      merged:
-        mergedPlayers.length,
-
-      appError:
-        appResponse.error?.message ??
-        null,
-
-      arrivalsError:
-        arrivalsResponse.error?.message ??
-        null,
-    },
-  );
-
-  /*
-   * ========================================
-   * VYKRESLENÍ
-   * ========================================
-   */
 
   return (
     <AdminShell title="Hráči">

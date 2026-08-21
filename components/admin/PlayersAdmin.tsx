@@ -8,204 +8,189 @@ import {
   createMissingArrival,
   registerPlayerDeparture,
   saveWebPlayer,
+  setPlayerActive,
 } from "@/app/admin/hraci/actions";
 
-import type {
-  WebPlayerProfile,
-} from "@/lib/webPlayers";
-
 import styles from "./PlayersAdmin.module.css";
+
+type TeamValue =
+  | "a"
+  | "b"
+  | "both";
+
+type PositionValue =
+  | "player"
+  | "goalkeeper";
+
+type StatusValue =
+  | "club"
+  | "loan";
+
+type AdminMovement = {
+  id: string;
+  direction:
+    | "arrival"
+    | "departure";
+  detail: string | null;
+  date: string;
+  season: string | null;
+  otherClub: string | null;
+};
 
 type AppPlayer = {
   id: string;
   name: string;
   number: number;
+  position: string | null;
+  apfPlayerId: number | null;
+  active: boolean;
 };
 
-type ManagedPlayer =
-  WebPlayerProfile & {
-    hasArrival:
-      boolean;
-  };
+type ManagedPlayer = {
+  id: string;
+  webProfileId: string | null;
+  name: string;
+  team: TeamValue;
+  position: PositionValue;
+  status: StatusValue;
+  shirtNumber: number | null;
+  imageUrl: string | null;
+  apfPlayerId: number | null;
+  appPlayerId: string | null;
+  active: boolean;
+  source: "app" | "web" | "web+app";
+  clubFrom: string | null;
+  clubTo: string | null;
+  movements: AdminMovement[];
+};
 
 export function PlayersAdmin({
   players,
   appPlayers,
 }: {
-  players:
-    ManagedPlayer[];
-
-  appPlayers:
-    AppPlayer[];
+  players: ManagedPlayer[];
+  appPlayers: AppPlayer[];
 }) {
   const [
     editing,
     setEditing,
   ] =
-    useState<ManagedPlayer | null>(
-      null,
-    );
+    useState<
+      ManagedPlayer | null
+    >(null);
 
   const [
     creating,
     setCreating,
   ] =
-    useState(
-      false,
-    );
+    useState(false);
 
   const [
-    departurePlayer,
-    setDeparturePlayer,
+    movement,
+    setMovement,
   ] =
-    useState<ManagedPlayer | null>(
-      null,
-    );
+    useState<{
+      player: ManagedPlayer;
+      direction:
+        | "arrival"
+        | "departure";
+    } | null>(null);
 
-  const [
-    arrivalPlayer,
-    setArrivalPlayer,
-  ] =
-    useState<ManagedPlayer | null>(
-      null,
-    );
+  function closeForms() {
+    setEditing(null);
+    setCreating(false);
+    setMovement(null);
+  }
 
   return (
-    <div
-      className={
-        styles.wrap
-      }
-    >
-      <button
-        className={
-          styles.newButton
-        }
-        onClick={() => {
-          setEditing(
-            null,
-          );
+    <div className={styles.wrap}>
+      <div className={styles.topbar}>
+        <div>
+          <strong>
+            Registr hráčů
+          </strong>
 
-          setDeparturePlayer(
-            null,
-          );
+          <span>
+            {players.length} hráčů
+          </span>
+        </div>
 
-          setArrivalPlayer(
-            null,
-          );
-
-          setCreating(
-            true,
-          );
-        }}
-      >
-        + PŘIDAT HRÁČE
-      </button>
+        <button
+          className={styles.newButton}
+          onClick={() => {
+            closeForms();
+            setCreating(true);
+          }}
+        >
+          + NOVÝ HRÁČ
+        </button>
+      </div>
 
       {creating && (
         <PlayerForm
-          player={
-            null
-          }
-          appPlayers={
-            appPlayers
-          }
-          creating
-          onCancel={() =>
-            setCreating(
-              false,
-            )
-          }
+          player={null}
+          appPlayers={appPlayers}
+          onCancel={closeForms}
         />
       )}
 
       {editing && (
         <PlayerForm
-          player={
-            editing
-          }
-          appPlayers={
-            appPlayers
-          }
-          creating={
-            false
-          }
-          onCancel={() =>
-            setEditing(
-              null,
-            )
-          }
+          player={editing}
+          appPlayers={appPlayers}
+          onCancel={closeForms}
         />
       )}
 
-      {arrivalPlayer && (
-        <ArrivalForm
-          player={
-            arrivalPlayer
-          }
-          onCancel={() =>
-            setArrivalPlayer(
-              null,
-            )
-          }
+      {movement && (
+        <MovementForm
+          player={movement.player}
+          direction={movement.direction}
+          onCancel={closeForms}
         />
       )}
 
-      {departurePlayer && (
-        <DepartureForm
-          player={
-            departurePlayer
-          }
-          onCancel={() =>
-            setDeparturePlayer(
-              null,
-            )
-          }
-        />
-      )}
-
-      <div
-        className={
-          styles.list
-        }
-      >
+      <div className={styles.list}>
         {players.map(
-          (
-            player,
-          ) => (
+          (player) => (
             <article
-              key={
-                player.id
-              }
-              className={
-                styles.row
-              }
+              key={player.id}
+              className={styles.row}
             >
               <div>
                 <strong>
-                  {
-                    player.name
-                  }
+                  {player.name}
                 </strong>
 
                 <span>
-                  {
-                    formatTeam(
-                      player.team,
-                    )
-                  }
+                  {formatTeam(
+                    player.team,
+                  )}
                   {" • "}
-                  {
-                    player.active
-                      ? "AKTIVNÍ"
-                      : "NEAKTIVNÍ"
-                  }
+                  {player.active
+                    ? "AKTIVNÍ"
+                    : "NEAKTIVNÍ"}
                   {" • "}
-                  {
-                    player.status ===
-                    "loan"
-                      ? "HOSTOVÁNÍ"
-                      : "KMENOVÝ"
-                  }
+                  {player.status ===
+                  "loan"
+                    ? "HOSTOVÁNÍ"
+                    : "KMENOVÝ"}
+                </span>
+
+                <span>
+                  V KLUBU OD:{" "}
+                  {formatDate(
+                    player.clubFrom,
+                  )}
+                  {" • "}
+                  DO:{" "}
+                  {player.clubTo
+                    ? formatDate(
+                        player.clubTo,
+                      )
+                    : player.active
+                      ? "SOUČASNOST"
+                      : "—"}
                 </span>
               </div>
 
@@ -216,27 +201,22 @@ export function PlayersAdmin({
               >
                 <span>
                   APF:{" "}
-                  {
-                    player.apfPlayerId ??
-                    "—"
-                  }
+                  {player.apfPlayerId ??
+                    "—"}
                 </span>
 
                 <span>
                   APP:{" "}
-                  {
-                    player.appPlayerId
-                      ? "PROPOJENO"
-                      : "—"
-                  }
+                  {player.appPlayerId
+                    ? "PROPOJENO"
+                    : "—"}
                 </span>
 
                 <span>
-                  PŘÍCHOD:{" "}
+                  POHYBY:{" "}
                   {
-                    player.hasArrival
-                      ? "ZAPSÁN"
-                      : "CHYBÍ"
+                    player.movements
+                      .length
                   }
                 </span>
               </div>
@@ -246,44 +226,35 @@ export function PlayersAdmin({
                   styles.actions
                 }
               >
-                {!player.hasArrival && (
-                  <button
-                    onClick={() => {
-                      setEditing(
-                        null,
-                      );
-
-                      setCreating(
-                        false,
-                      );
-
-                      setDeparturePlayer(
-                        null,
-                      );
-
-                      setArrivalPlayer(
-                        player,
-                      );
-                    }}
-                  >
-                    DOPLNIT PŘÍCHOD
-                  </button>
-                )}
+                <button
+                  onClick={() => {
+                    closeForms();
+                    setMovement({
+                      player,
+                      direction:
+                        "arrival",
+                    });
+                  }}
+                >
+                  PŘÍCHOD
+                </button>
 
                 <button
                   onClick={() => {
-                    setCreating(
-                      false,
-                    );
+                    closeForms();
+                    setMovement({
+                      player,
+                      direction:
+                        "departure",
+                    });
+                  }}
+                >
+                  ODCHOD
+                </button>
 
-                    setDeparturePlayer(
-                      null,
-                    );
-
-                    setArrivalPlayer(
-                      null,
-                    );
-
+                <button
+                  onClick={() => {
+                    closeForms();
                     setEditing(
                       player,
                     );
@@ -292,44 +263,48 @@ export function PlayersAdmin({
                   UPRAVIT
                 </button>
 
-                {player.active && (
-                  <button
-                    onClick={() => {
-                      setEditing(
-                        null,
-                      );
-
-                      setCreating(
-                        false,
-                      );
-
-                      setArrivalPlayer(
-                        null,
-                      );
-
-                      setDeparturePlayer(
-                        player,
-                      );
-                    }}
-                  >
-                    ODCHOD
-                  </button>
-                )}
+                <ActiveToggle
+                  player={player}
+                />
               </div>
+
+              {player.movements.length >
+                0 && (
+                <div
+                  className={
+                    styles.history
+                  }
+                >
+                  {player.movements.map(
+                    (
+                      item,
+                    ) => (
+                      <span
+                        key={
+                          item.id
+                        }
+                      >
+                        {item.direction ===
+                        "arrival"
+                          ? "PŘÍCHOD"
+                          : "ODCHOD"}
+                        {" • "}
+                        {formatDate(
+                          item.date,
+                        )}
+                        {item.otherClub
+                          ? ` • ${item.otherClub}`
+                          : ""}
+                        {item.season
+                          ? ` • ${item.season}`
+                          : ""}
+                      </span>
+                    ),
+                  )}
+                </div>
+              )}
             </article>
           ),
-        )}
-
-        {players.length ===
-          0 && (
-          <div
-            className={
-              styles.empty
-            }
-          >
-            Zatím nejsou vytvořené
-            žádné webové profily.
-          </div>
         )}
       </div>
     </div>
@@ -339,78 +314,52 @@ export function PlayersAdmin({
 function PlayerForm({
   player,
   appPlayers,
-  creating,
   onCancel,
 }: {
-  player:
-    ManagedPlayer |
-    null;
-
-  appPlayers:
-    AppPlayer[];
-
-  creating:
-    boolean;
-
-  onCancel:
-    () => void;
+  player: ManagedPlayer | null;
+  appPlayers: AppPlayer[];
+  onCancel: () => void;
 }) {
   return (
     <form
-      action={
-        saveWebPlayer
-      }
-      className={
-        styles.form
-      }
+      action={saveWebPlayer}
+      className={styles.form}
     >
       <input
         type="hidden"
         name="id"
         value={
-          player?.id ??
+          player?.webProfileId ??
           ""
         }
       />
 
       <h2>
-        {
-          creating
-            ? "Přidat hráče"
-            : "Upravit hráče"
-        }
+        {player
+          ? "Upravit hráče"
+          : "Nový hráč"}
       </h2>
 
-      <div
-        className={
-          styles.two
-        }
-      >
+      <div className={styles.two}>
         <label>
-          <span>
-            Jméno
-          </span>
+          <span>Jméno</span>
 
           <input
             name="name"
             defaultValue={
-              player?.name ??
-              ""
+              player?.name ?? ""
             }
             required
           />
         </label>
 
         <label>
-          <span>
-            Kmen
-          </span>
+          <span>Kmen</span>
 
           <select
             name="team"
             defaultValue={
-              player?.team ??
-              "b"
+              player?.team ?? "b"
             }
           >
             <option value="a">
@@ -428,15 +377,9 @@ function PlayerForm({
         </label>
       </div>
 
-      <div
-        className={
-          styles.two
-        }
-      >
+      <div className={styles.two}>
         <label>
-          <span>
-            Pozice
-          </span>
+          <span>Pozice</span>
 
           <select
             name="position"
@@ -456,9 +399,7 @@ function PlayerForm({
         </label>
 
         <label>
-          <span>
-            Status
-          </span>
+          <span>Status</span>
 
           <select
             name="status"
@@ -478,15 +419,9 @@ function PlayerForm({
         </label>
       </div>
 
-      <div
-        className={
-          styles.two
-        }
-      >
+      <div className={styles.two}>
         <label>
-          <span>
-            Číslo dresu
-          </span>
+          <span>Číslo dresu</span>
 
           <input
             name="shirtNumber"
@@ -535,20 +470,12 @@ function PlayerForm({
               appPlayer,
             ) => (
               <option
-                key={
-                  appPlayer.id
-                }
-                value={
-                  appPlayer.id
-                }
+                key={appPlayer.id}
+                value={appPlayer.id}
               >
                 #
-                {
-                  appPlayer.number
-                }{" "}
-                {
-                  appPlayer.name
-                }
+                {appPlayer.number}{" "}
+                {appPlayer.name}
               </option>
             ),
           )}
@@ -556,24 +483,27 @@ function PlayerForm({
       </label>
 
       <label>
-        <span>
-          URL fotky
-        </span>
+        <span>URL fotky</span>
 
         <input
           name="imageUrl"
           defaultValue={
             player?.imageUrl ??
-            ""
+            (
+              player?.apfPlayerId !==
+                null &&
+              player?.apfPlayerId !==
+                undefined
+                ? `/images/${player.apfPlayerId}.jpg`
+                : ""
+            )
           }
-          placeholder="/images/4247.jpg nebo Supabase URL"
+          placeholder="/images/532.jpg"
         />
       </label>
 
       <label
-        className={
-          styles.check
-        }
+        className={styles.check}
       >
         <input
           name="active"
@@ -587,38 +517,88 @@ function PlayerForm({
         Aktivní hráč
       </label>
 
-      {creating && (
-        <fieldset>
-          <legend>
-            PŘÍCHOD DO FC PPB
-          </legend>
+      <div
+        className={styles.actions}
+      >
+        <button
+          type="button"
+          onClick={onCancel}
+        >
+          ZRUŠIT
+        </button>
 
-          <div
-            className={
-              styles.two
+        <button
+          type="submit"
+          className={styles.save}
+        >
+          ULOŽIT
+        </button>
+      </div>
+    </form>
+  );
+}
+
+function MovementForm({
+  player,
+  direction,
+  onCancel,
+}: {
+  player: ManagedPlayer;
+  direction:
+    | "arrival"
+    | "departure";
+  onCancel: () => void;
+}) {
+  const isArrival =
+    direction === "arrival";
+
+  return (
+    <form
+      action={
+        isArrival
+          ? createMissingArrival
+          : registerPlayerDeparture
+      }
+      className={styles.form}
+    >
+      <PlayerIdentityInputs
+        player={player}
+      />
+
+      <h2>
+        {isArrival
+          ? `Příchod — ${player.name}`
+          : `Odchod — ${player.name}`}
+      </h2>
+
+      <div className={styles.two}>
+        <label>
+          <span>
+            {isArrival
+              ? "Datum příchodu"
+              : "Datum odchodu"}
+          </span>
+
+          <input
+            name="occurredOn"
+            type="date"
+            required
+          />
+        </label>
+
+        <label>
+          <span>Typ</span>
+
+          <select
+            name="movementDetail"
+            defaultValue={
+              isArrival
+                ? "transfer_from"
+                : "transfer_to"
             }
           >
-            <label>
-              <span>
-                Datum příchodu
-              </span>
-
-              <input
-                name="arrivalDate"
-                type="date"
-                required
-              />
-            </label>
-
-            <label>
-              <span>
-                Typ příchodu
-              </span>
-
-              <select
-                name="arrivalMovementDetail"
-                defaultValue="transfer_from"
-              >
+            {isArrival ? (
+              <>
                 <option value="transfer_from">
                   Přestup z týmu
                 </option>
@@ -630,161 +610,49 @@ function PlayerForm({
                 <option value="loan_end">
                   Návrat z hostování
                 </option>
-              </select>
-            </label>
-          </div>
+              </>
+            ) : (
+              <>
+                <option value="transfer_to">
+                  Přestup do týmu
+                </option>
 
-          <div
-            className={
-              styles.two
-            }
-          >
-            <label>
-              <span>
-                APF ID původního klubu
-              </span>
+                <option value="loan_out">
+                  Na hostování
+                </option>
 
-              <input
-                name="arrivalClubApfId"
-                inputMode="numeric"
-              />
-            </label>
+                <option value="loan_end">
+                  Konec hostování
+                </option>
 
-            <label>
-              <span>
-                Původní klub ručně
-              </span>
-
-              <input
-                name="arrivalClub"
-              />
-            </label>
-          </div>
-        </fieldset>
-      )}
-
-      <div
-        className={
-          styles.actions
-        }
-      >
-        <button
-          type="button"
-          onClick={
-            onCancel
-          }
-        >
-          ZRUŠIT
-        </button>
-
-        <button
-          type="submit"
-          className={
-            styles.save
-          }
-        >
-          {
-            creating
-              ? "PŘIDAT HRÁČE"
-              : "ULOŽIT"
-          }
-        </button>
-      </div>
-    </form>
-  );
-}
-
-function ArrivalForm({
-  player,
-  onCancel,
-}: {
-  player:
-    ManagedPlayer;
-
-  onCancel:
-    () => void;
-}) {
-  return (
-    <form
-      action={
-        createMissingArrival
-      }
-      className={
-        styles.form
-      }
-    >
-      <input
-        type="hidden"
-        name="profileId"
-        value={
-          player.id
-        }
-      />
-
-      <h2>
-        Doplnit příchod —{" "}
-        {player.name}
-      </h2>
-
-      <div
-        className={
-          styles.two
-        }
-      >
-        <label>
-          <span>
-            Datum příchodu
-          </span>
-
-          <input
-            name="occurredOn"
-            type="date"
-            required
-          />
-        </label>
-
-        <label>
-          <span>
-            Typ
-          </span>
-
-          <select
-            name="movementDetail"
-            defaultValue="transfer_from"
-          >
-            <option value="transfer_from">
-              Přestup z týmu
-            </option>
-
-            <option value="loan_in">
-              Na hostování
-            </option>
-
-            <option value="loan_end">
-              Návrat z hostování
-            </option>
+                <option value="released">
+                  Vyřazení z týmu
+                </option>
+              </>
+            )}
           </select>
         </label>
       </div>
 
-      <div
-        className={
-          styles.two
-        }
-      >
+      <div className={styles.two}>
         <label>
           <span>
-            APF ID původního klubu
+            {isArrival
+              ? "APF ID původního klubu"
+              : "APF ID nového klubu"}
           </span>
 
           <input
             name="otherClubApfId"
+            inputMode="numeric"
           />
         </label>
 
         <label>
           <span>
-            Původní klub ručně
+            {isArrival
+              ? "Původní klub ručně"
+              : "Nový klub ručně"}
           </span>
 
           <input
@@ -794,181 +662,179 @@ function ArrivalForm({
       </div>
 
       <div
-        className={
-          styles.actions
-        }
+        className={styles.actions}
       >
         <button
           type="button"
-          onClick={
-            onCancel
-          }
+          onClick={onCancel}
         >
           ZRUŠIT
         </button>
 
         <button
           type="submit"
-          className={
-            styles.save
-          }
+          className={styles.save}
         >
-          ZAPSAT PŘÍCHOD
+          {isArrival
+            ? "ZAPSAT PŘÍCHOD"
+            : "POTVRDIT ODCHOD"}
         </button>
       </div>
     </form>
   );
 }
 
-function DepartureForm({
+function ActiveToggle({
   player,
-  onCancel,
 }: {
-  player:
-    ManagedPlayer;
-
-  onCancel:
-    () => void;
+  player: ManagedPlayer;
 }) {
   return (
-    <form
-      action={
-        registerPlayerDeparture
-      }
-      className={
-        styles.form
-      }
-    >
+    <form action={setPlayerActive}>
+      <PlayerIdentityInputs
+        player={player}
+      />
+
+      <input
+        type="hidden"
+        name="targetActive"
+        value={
+          player.active
+            ? "false"
+            : "true"
+        }
+      />
+
+      <button type="submit">
+        {player.active
+          ? "NEAKTIVNÍ"
+          : "AKTIVOVAT"}
+      </button>
+    </form>
+  );
+}
+
+function PlayerIdentityInputs({
+  player,
+}: {
+  player: ManagedPlayer;
+}) {
+  return (
+    <>
       <input
         type="hidden"
         name="profileId"
         value={
-          player.id
+          player.webProfileId ??
+          ""
         }
       />
 
-      <h2>
-        Odchod —{" "}
-        {player.name}
-      </h2>
-
-      <div
-        className={
-          styles.two
+      <input
+        type="hidden"
+        name="appPlayerId"
+        value={
+          player.appPlayerId ??
+          ""
         }
-      >
-        <label>
-          <span>
-            Datum odchodu
-          </span>
+      />
 
-          <input
-            name="occurredOn"
-            type="date"
-            required
-          />
-        </label>
+      <input
+        type="hidden"
+        name="playerName"
+        value={player.name}
+      />
 
-        <label>
-          <span>
-            Typ odchodu
-          </span>
-
-          <select
-            name="movementDetail"
-            defaultValue="transfer_to"
-          >
-            <option value="transfer_to">
-              Přestup do týmu
-            </option>
-
-            <option value="loan_out">
-              Na hostování
-            </option>
-
-            <option value="loan_end">
-              Konec hostování
-            </option>
-
-            <option value="released">
-              Vyřazení z týmu
-            </option>
-          </select>
-        </label>
-      </div>
-
-      <div
-        className={
-          styles.two
+      <input
+        type="hidden"
+        name="apfPlayerId"
+        value={
+          player.apfPlayerId ??
+          ""
         }
-      >
-        <label>
-          <span>
-            APF ID nového klubu
-          </span>
+      />
 
-          <input
-            name="otherClubApfId"
-          />
-        </label>
+      <input
+        type="hidden"
+        name="team"
+        value={player.team}
+      />
 
-        <label>
-          <span>
-            Nový klub ručně
-          </span>
-
-          <input
-            name="otherClub"
-          />
-        </label>
-      </div>
-
-      <div
-        className={
-          styles.actions
+      <input
+        type="hidden"
+        name="position"
+        value={
+          player.position
         }
-      >
-        <button
-          type="button"
-          onClick={
-            onCancel
-          }
-        >
-          ZRUŠIT
-        </button>
+      />
 
-        <button
-          type="submit"
-          className={
-            styles.save
-          }
-        >
-          POTVRDIT ODCHOD
-        </button>
-      </div>
-    </form>
+      <input
+        type="hidden"
+        name="status"
+        value={player.status}
+      />
+
+      <input
+        type="hidden"
+        name="shirtNumber"
+        value={
+          player.shirtNumber ??
+          ""
+        }
+      />
+
+      <input
+        type="hidden"
+        name="imageUrl"
+        value={
+          player.imageUrl ??
+          (
+            player.apfPlayerId !==
+            null
+              ? `/images/${player.apfPlayerId}.jpg`
+              : ""
+          )
+        }
+      />
+    </>
   );
 }
 
 function formatTeam(
-  team:
-    "a" |
-    "b" |
-    "both",
-) {
-  if (
-    team ===
-    "a"
-  ) {
+  team: TeamValue,
+): string {
+  if (team === "a") {
     return "A-TÝM";
   }
 
-  if (
-    team ===
-    "b"
-  ) {
+  if (team === "b") {
     return "B-TÝM";
   }
 
   return "A-TÝM + B-TÝM";
+}
+
+function formatDate(
+  value: string | null,
+): string {
+  if (!value) {
+    return "—";
+  }
+
+  const date =
+    new Date(
+      `${value}T12:00:00`,
+    );
+
+  if (
+    Number.isNaN(
+      date.getTime(),
+    )
+  ) {
+    return value;
+  }
+
+  return new Intl.DateTimeFormat(
+    "cs-CZ",
+  ).format(date);
 }
