@@ -68,16 +68,6 @@ export function Hero() {
             </p>
           </div>
         </div>
-
-        <a
-          href="#klub"
-          className={styles.scroll}
-          aria-label="Pokračovat na obsah webu"
-        >
-          <span>
-            ↓
-          </span>
-        </a>
       </div>
     </section>
   );

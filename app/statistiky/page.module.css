@@ -101,8 +101,28 @@
 .hero h1 span {
   display: block;
 
+  width: fit-content;
+
+  max-width: 100%;
+
+  margin-top: 10px;
+
   color:
-    var(--primary);
+    #747d76;
+
+  font-size:
+    clamp(
+      20px,
+      2.7vw,
+      34px
+    );
+
+  font-weight: 850;
+
+  line-height: 1.05;
+
+  letter-spacing:
+    -0.035em;
 }
 
 .hero p {
@@ -201,6 +221,19 @@
         14vw,
         66px
       );
+  }
+
+  .hero h1 span {
+    margin-top: 7px;
+
+    font-size:
+      clamp(
+        17px,
+        5.4vw,
+        22px
+      );
+
+    line-height: 1.08;
   }
 
   .season {
