@@ -135,9 +135,9 @@
 
   font-size:
     clamp(
-      108px,
-      10.7vw,
-      176px
+      128px,
+      12.6vw,
+      208px
     );
 
   font-weight: 950;
@@ -145,7 +145,7 @@
   line-height: 0.78;
 
   letter-spacing:
-    -0.078em;
+    -0.085em;
 
   text-transform: uppercase;
 
