@@ -105,16 +105,24 @@ export type StatisticsPlayer = {
 
 type PlayerDbRow = {
   name: string;
-
   number: number | null;
-
   apf_player_id: number | null;
+  is_active: boolean | null;
+};
+
+type UnifiedPlayerRow = {
+  name: string;
+  number: number | null;
+  apf_player_id: number;
+  active: boolean;
 };
 
 type WebProfileRow = {
   name: string;
   team: StatisticsTeam;
+  shirt_number: number | null;
   apf_player_id: number | null;
+  app_player_id: string | null;
   active: boolean;
   inactive_from: string | null;
 };
@@ -171,7 +179,7 @@ export async function getStatisticsPlayers(): Promise<
           "players",
         )
         .select(
-          "name, number, apf_player_id",
+          "name, number, apf_player_id, is_active",
         )
         .not(
           "apf_player_id",
@@ -190,7 +198,7 @@ export async function getStatisticsPlayers(): Promise<
           "web_player_profiles",
         )
         .select(
-          "name, team, apf_player_id, active, inactive_from",
+          "name, team, shirt_number, apf_player_id, app_player_id, active, inactive_from",
         ),
 
       supabase
@@ -219,7 +227,7 @@ export async function getStatisticsPlayers(): Promise<
     return [];
   }
 
-  const players =
+  const appPlayers =
     (
       playersResult.data ??
       []
@@ -228,6 +236,67 @@ export async function getStatisticsPlayers(): Promise<
   const webProfiles =
     (webProfilesResult.data ??
       []) as WebProfileRow[];
+
+  /*
+   * ========================================
+   * SJEDNOCENÝ REGISTR HRÁČŮ PRO STATISTIKY
+   * ========================================
+   *
+   * Statistiky nesmí stát jen na tabulce players.
+   * Historický nebo ručně spravovaný hráč může být
+   * už jen ve web_player_profiles.
+   *
+   * Klíč je APF ID. Pokud je hráč v obou zdrojích,
+   * webový profil má přednost pro číslo a aktivitu.
+   */
+  const unifiedByApfId =
+    new Map<number, UnifiedPlayerRow>();
+
+  appPlayers.forEach((player) => {
+    if (player.apf_player_id === null) {
+      return;
+    }
+
+    const apfId = Number(player.apf_player_id);
+
+    if (!Number.isFinite(apfId)) {
+      return;
+    }
+
+    unifiedByApfId.set(apfId, {
+      name: player.name,
+      number: player.number,
+      apf_player_id: apfId,
+      active: player.is_active !== false,
+    });
+  });
+
+  webProfiles.forEach((profile) => {
+    if (profile.apf_player_id === null) {
+      return;
+    }
+
+    const apfId = Number(profile.apf_player_id);
+
+    if (!Number.isFinite(apfId)) {
+      return;
+    }
+
+    const existing = unifiedByApfId.get(apfId);
+
+    unifiedByApfId.set(apfId, {
+      name: profile.name || existing?.name || `Hráč ${apfId}`,
+      number: profile.shirt_number ?? existing?.number ?? null,
+      apf_player_id: apfId,
+      active: profile.active,
+    });
+  });
+
+  const players = Array.from(
+    unifiedByApfId.values(),
+  ).sort((a, b) =>
+    a.name.localeCompare(b.name, "cs"),
+  );
 
   const transferRows =
     (transfersResult.data ??
@@ -321,14 +390,14 @@ export async function getStatisticsPlayers(): Promise<
                 null,
             );
 
-          const currentVisible =
+          const currentMembershipVisible =
             isSeasonVisible(
               CURRENT_SEASON,
               membershipWindows,
               webProfile,
             );
 
-          const previousVisible =
+          const previousMembershipVisible =
             isSeasonVisible(
               PREVIOUS_SEASON,
               membershipWindows,
@@ -359,12 +428,13 @@ export async function getStatisticsPlayers(): Promise<
               null;
 
             const profile =
-              apfSlug
-                ? await getPlayerProfile(
-                    playerId,
-                    apfSlug,
-                  )
-                : null;
+              await getPlayerProfile(
+                playerId,
+                apfSlug ??
+                  buildApfSlug(
+                    player.name,
+                  ),
+              );
 
             const meta =
               getPlayerMeta(
@@ -429,6 +499,17 @@ export async function getStatisticsPlayers(): Promise<
                 currentAppSeason?.attendancePercentage ??
                   null,
               );
+
+            /*
+             * Aktivní hráč je v aktuální sezoně vidět i s nulami.
+             * Neaktivní/odešlý hráč zůstane v aktuální sezoně pouze
+             * pokud v ní skutečně odehrál alespoň jeden zápas.
+             * Tím zmizí hráči, kteří skončili před ostrou sezonou,
+             * ale jejich odchod byl administrativně zapsán až v srpnu.
+             */
+            const currentVisible =
+              currentMembershipVisible &&
+              (player.active || current.matches > 0);
 
             /*
              * ==================================
@@ -580,6 +661,14 @@ export async function getStatisticsPlayers(): Promise<
                   0,
               };
 
+            const previousVisible =
+              previousMembershipVisible &&
+              (
+                previous.matches > 0 ||
+                manual !== null ||
+                previousMatches.length > 0
+              );
+
             /*
              * ==================================
              * KARIÉRA
@@ -709,6 +798,31 @@ export async function getStatisticsPlayers(): Promise<
     ): row is StatisticsPlayer =>
       row !== null,
   );
+}
+
+function buildApfSlug(
+  value: string,
+): string {
+  const parts = String(value ?? "")
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean);
+
+  const ordered =
+    parts.length > 1
+      ? [
+          parts[parts.length - 1],
+          ...parts.slice(0, -1),
+        ]
+      : parts;
+
+  return ordered
+    .join(" " )
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
 }
 
 function normalizePlayerName(
