@@ -5,172 +5,129 @@ import { useState } from "react";
 
 import { AnimatedLogo } from "@/components/ui/AnimatedLogo/AnimatedLogo";
 import { clubConfig } from "@/config/club";
-import { navigation } from "@/data/navigation";
 
 import styles from "./Header.module.css";
 
-const socialLinks = [
-  {
-    label: "Instagram",
-    shortLabel: "IG",
-    href: "",
-  },
-  {
-    label: "Facebook",
-    shortLabel: "FB",
-    href: "",
-  },
-  {
-    label: "TikTok",
-    shortLabel: "TT",
-    href: "",
-  },
+const teamLinks = [
+  { label: "A-tým", href: "/tymy/a" },
+  { label: "B-tým", href: "/tymy/b" },
+  { label: "Soupisky", href: "/tymy#soupisky" },
+  { label: "Statistiky", href: "/tymy#statistiky" },
+  { label: "Přestupy", href: "/prestupy" },
+  { label: "Realizační tým", href: "/tymy#realizacni-tym" },
 ] as const;
 
 export function Header() {
-  const [isMenuOpen, setIsMenuOpen] =
-    useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [teamsOpen, setTeamsOpen] = useState(false);
 
-  function closeMenu() {
-    setIsMenuOpen(false);
+  function closeAll() {
+    setMenuOpen(false);
+    setTeamsOpen(false);
   }
 
   return (
     <header className={styles.header}>
       <div className={styles.container}>
-        <Link
-          className={styles.brand}
-          href="/"
-          onClick={closeMenu}
-        >
-          <AnimatedLogo
-            size={58}
-            priority
-          />
+        <Link href="/" className={styles.brand} onClick={closeAll}>
+          <AnimatedLogo size={52} priority />
 
           <div className={styles.brandText}>
-            <strong>
-              {clubConfig.name}
-            </strong>
-
-            <span>
-              Futsal Plzeň
-            </span>
+            <strong>{clubConfig.name}</strong>
+            <span>Futsal Plzeň</span>
           </div>
         </Link>
 
-        <nav
-          className={
-            styles.desktopNavigation
-          }
-        >
-          {navigation.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-            >
-              {item.label}
-            </Link>
-          ))}
+        <nav className={styles.desktopNav} aria-label="Hlavní navigace">
+          <Link href="/">Domů</Link>
+
+          <div className={styles.desktopDropdown}>
+            <button type="button" className={styles.dropdownTrigger}>
+              Týmy
+              <span aria-hidden="true">⌄</span>
+            </button>
+
+            <div className={styles.megaMenu}>
+              <div className={styles.megaIntro}>
+                <span>FC PPB</span>
+                <strong>Dva týmy.<br />Jeden klub.</strong>
+              </div>
+
+              <div className={styles.megaTeams}>
+                <Link href="/tymy/a" className={styles.teamCard}>
+                  <span>01</span>
+                  <strong>A-TÝM</strong>
+                  <small>{clubConfig.teams.aTeam.competition.name}</small>
+                  <b>→</b>
+                </Link>
+
+                <Link href="/tymy/b" className={styles.teamCard}>
+                  <span>02</span>
+                  <strong>B-TÝM</strong>
+                  <small>{clubConfig.teams.bTeam.competition.name}</small>
+                  <b>→</b>
+                </Link>
+              </div>
+
+              <div className={styles.megaLinks}>
+                {teamLinks.slice(2).map((item) => (
+                  <Link key={item.href + item.label} href={item.href}>
+                    {item.label}
+                    <span>→</span>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <Link href="/#klub">Klub</Link>
+          <Link href="/#partneri">Partneři</Link>
         </nav>
 
         <button
-          className={styles.menuButton}
           type="button"
-          aria-label={
-            isMenuOpen
-              ? "Zavřít hlavní menu"
-              : "Otevřít hlavní menu"
-          }
-          aria-expanded={isMenuOpen}
-          onClick={() =>
-            setIsMenuOpen(
-              (current) => !current,
-            )
-          }
+          className={`${styles.menuButton} ${menuOpen ? styles.menuButtonOpen : ""}`}
+          aria-label={menuOpen ? "Zavřít menu" : "Otevřít menu"}
+          aria-expanded={menuOpen}
+          onClick={() => setMenuOpen((value) => !value)}
         >
-          <span />
           <span />
           <span />
         </button>
       </div>
 
-      <nav
-        className={`${styles.mobileNavigation} ${
-          isMenuOpen
-            ? styles.mobileNavigationOpen
-            : ""
-        }`}
-      >
-        <div
-          className={
-            styles.mobileNavigationInner
-          }
-        >
-          <div
-            className={
-              styles.mobileLinks
-            }
+      <div className={`${styles.mobileMenu} ${menuOpen ? styles.mobileMenuOpen : ""}`}>
+        <div className={styles.mobileInner}>
+          <Link href="/" onClick={closeAll}>Domů</Link>
+
+          <button
+            type="button"
+            className={styles.mobileTeamsTrigger}
+            onClick={() => setTeamsOpen((value) => !value)}
           >
-            {navigation.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                onClick={closeMenu}
-              >
+            <span>Týmy</span>
+            <b>{teamsOpen ? "−" : "+"}</b>
+          </button>
+
+          <div className={`${styles.mobileTeams} ${teamsOpen ? styles.mobileTeamsOpen : ""}`}>
+            {teamLinks.map((item) => (
+              <Link key={item.href + item.label} href={item.href} onClick={closeAll}>
                 {item.label}
+                <span>→</span>
               </Link>
             ))}
           </div>
 
-          <div
-            className={
-              styles.mobileSocials
-            }
-          >
-            <span>
-              Sleduj nás
-            </span>
+          <Link href="/#klub" onClick={closeAll}>Klub</Link>
+          <Link href="/#partneri" onClick={closeAll}>Partneři</Link>
 
-            <div
-              className={
-                styles.mobileSocialLinks
-              }
-            >
-              {socialLinks.map(
-                (social) =>
-                  social.href ? (
-                    <a
-                      key={social.label}
-                      href={social.href}
-                      target="_blank"
-                      rel="noreferrer"
-                      aria-label={
-                        social.label
-                      }
-                    >
-                      {
-                        social.shortLabel
-                      }
-                    </a>
-                  ) : (
-                    <span
-                      key={social.label}
-                      className={
-                        styles.socialDisabled
-                      }
-                      title={`${social.label} doplníme`}
-                    >
-                      {
-                        social.shortLabel
-                      }
-                    </span>
-                  ),
-              )}
-            </div>
+          <div className={styles.mobileClaim}>
+            <span>Přátelství.</span>
+            <span>Pokora.</span>
+            <span>Bojovnost.</span>
           </div>
         </div>
-      </nav>
+      </div>
     </header>
   );
 }

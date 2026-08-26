@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 
 import { Header } from "@/components/layout/Header";
+import { Footer } from "@/components/layout/Footer";
 import { SiteWatermark } from "@/components/layout/SiteWatermark";
 
 import "./globals.css";
@@ -40,9 +41,13 @@ export default function RootLayout({
           style={{
             position: "relative",
             zIndex: 1,
+            display: "flex",
+            minHeight: "100vh",
+            flexDirection: "column",
           }}
         >
           {children}
+          <Footer />
         </div>
       </body>
     </html>

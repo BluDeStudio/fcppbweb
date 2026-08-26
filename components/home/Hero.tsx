@@ -1,71 +1,38 @@
 import { AnimatedLogo } from "@/components/ui/AnimatedLogo/AnimatedLogo";
-
 import styles from "./Hero.module.css";
 
 export function Hero() {
   return (
-    <section
-      id="home"
-      className={styles.hero}
-    >
-      <div
-        className={styles.glow}
-        aria-hidden="true"
-      />
+    <section id="home" className={styles.hero}>
+      <div className={styles.noise} aria-hidden="true" />
+      <div className={styles.glow} aria-hidden="true" />
 
-      <div
-        className={styles.content}
-      >
-        <div className={styles.brandRow}>
-          <div className={styles.logoWrap}>
-            <AnimatedLogo
-              size={315}
-              priority
-            />
+      <div className={styles.container}>
+        <div className={styles.logoStage}>
+          <div className={styles.logoRing} aria-hidden="true" />
+          <AnimatedLogo size={350} priority />
+        </div>
+
+        <div className={styles.content}>
+          <div className={styles.eyebrow}>
+            <span>FUTSAL / PLZEŇ</span>
+            <b>2018—2026</b>
           </div>
 
-          <div className={styles.heroText}>
-            <h1
-              className={styles.clubName}
-              aria-label="FC PPB"
-            >
-              <span>FC</span>
-              <span>PPB</span>
-            </h1>
+          <h1>
+            <span>FC</span>
+            <span>PPB</span>
+          </h1>
 
-            <div
-              className={styles.values}
-              aria-label="Hodnoty klubu"
-            >
-              <span>
-                PŘÁTELSTVÍ.
-              </span>
+          <div className={styles.values}>
+            <span>Přátelství.</span><i />
+            <span>Pokora.</span><i />
+            <span>Bojovnost.</span>
+          </div>
 
-              <i aria-hidden="true" />
-
-              <span>
-                POKORA.
-              </span>
-
-              <i aria-hidden="true" />
-
-              <span>
-                BOJOVNOST.
-              </span>
-            </div>
-
-            <div
-              className={styles.divider}
-              aria-hidden="true"
-            >
-              <span />
-              <b />
-              <span />
-            </div>
-
-            <p className={styles.motto}>
-              SPOJUJE NÁS VÍC NEŽ HRA.
-            </p>
+          <div className={styles.claim}>
+            <span />
+            <p>Spojuje nás víc než hra.</p>
           </div>
         </div>
       </div>
