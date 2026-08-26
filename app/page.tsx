@@ -1,17 +1,17 @@
 import { ClubStory } from "@/components/home/ClubStory";
 import { Hero } from "@/components/home/Hero";
 import { HomeAwards } from "@/components/home/HomeAwards";
+import { HomeContact } from "@/components/home/HomeContact";
 import { MatchCenter } from "@/components/home/MatchCenter";
 import { Partners } from "@/components/home/Partners";
 
 import { clubConfig } from "@/config/club";
 
+import { testSupabaseConnection } from "@/lib/testSupabase";
 import { getLeagueTable } from "@/services/apf/getLeagueTable";
 import { getMatchResults } from "@/services/apf/getMatchResults";
 import { getNextMatch } from "@/services/apf/getNextMatch";
 import { getTopScorer } from "@/services/apf/getTopScorer";
-
-import { testSupabaseConnection } from "@/lib/testSupabase";
 
 import type { LeagueRow } from "@/types/league";
 import type { MatchResult } from "@/types/match";
@@ -26,20 +26,13 @@ export default async function HomePage() {
 
   let aLeagueTable: LeagueRow[] = [];
   let bLeagueTable: LeagueRow[] = [];
-
   let aMatches: MatchResult[] = [];
   let bMatches: MatchResult[] = [];
-
   let aNextMatch: NextMatch | null = null;
   let bNextMatch: NextMatch | null = null;
-
   let aTopScorer: TopScorer | null = null;
   let bTopScorer: TopScorer | null = null;
 
-  /*
-   * Datové zdroje zůstávají stejné jako před redesignem.
-   * Mění se pouze vizuální vrstva homepage.
-   */
   try {
     [aLeagueTable, bLeagueTable] = await Promise.all([
       getLeagueTable({
@@ -93,14 +86,8 @@ export default async function HomePage() {
 
   try {
     [aTopScorer, bTopScorer] = await Promise.all([
-      getTopScorer({
-        teamId: aTeam.teamId,
-        teamSlug: aTeam.teamSlug,
-      }),
-      getTopScorer({
-        teamId: bTeam.teamId,
-        teamSlug: bTeam.teamSlug,
-      }),
+      getTopScorer({ teamId: aTeam.teamId, teamSlug: aTeam.teamSlug }),
+      getTopScorer({ teamId: bTeam.teamId, teamSlug: bTeam.teamSlug }),
     ]);
   } catch (error) {
     console.error("Chyba při načítání střelců APF:", error);
@@ -109,7 +96,6 @@ export default async function HomePage() {
   return (
     <main>
       <Hero />
-
       <ClubStory />
 
       <MatchCenter
@@ -121,12 +107,9 @@ export default async function HomePage() {
         bLeagueTable={bLeagueTable}
       />
 
-      <HomeAwards
-        aTopScorer={aTopScorer}
-        bTopScorer={bTopScorer}
-      />
-
+      <HomeAwards aTopScorer={aTopScorer} bTopScorer={bTopScorer} />
       <Partners />
+      <HomeContact />
     </main>
   );
 }

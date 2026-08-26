@@ -4,7 +4,6 @@ import Image from "next/image";
 import { useMemo, useState } from "react";
 
 import { clubConfig } from "@/config/club";
-
 import type { LeagueRow } from "@/types/league";
 import type { MatchResult } from "@/types/match";
 import type { NextMatch } from "@/types/nextMatch";
@@ -13,7 +12,7 @@ import styles from "./MatchCenter.module.css";
 
 type TeamView = "a" | "b";
 
-type MatchCenterProps = {
+type Props = {
   aNextMatch: NextMatch | null;
   bNextMatch: NextMatch | null;
   aMatches: MatchResult[];
@@ -22,207 +21,128 @@ type MatchCenterProps = {
   bLeagueTable: LeagueRow[];
 };
 
-export function MatchCenter({
-  aNextMatch,
-  bNextMatch,
-  aMatches,
-  bMatches,
-  aLeagueTable,
-  bLeagueTable,
-}: MatchCenterProps) {
+export function MatchCenter(props: Props) {
   const [team, setTeam] = useState<TeamView>("a");
 
-  const nextMatch = team === "a" ? aNextMatch : bNextMatch;
-  const matches = team === "a" ? aMatches : bMatches;
-  const leagueRows = team === "a" ? aLeagueTable : bLeagueTable;
-  const currentTeam =
-    team === "a" ? clubConfig.teams.aTeam : clubConfig.teams.bTeam;
-
+  const nextMatch = team === "a" ? props.aNextMatch : props.bNextMatch;
+  const matches = team === "a" ? props.aMatches : props.bMatches;
+  const leagueRows = team === "a" ? props.aLeagueTable : props.bLeagueTable;
+  const currentTeam = team === "a" ? clubConfig.teams.aTeam : clubConfig.teams.bTeam;
   const lastMatch = matches[0] ?? null;
 
   return (
     <section id="zapasy" className={styles.section}>
       <div className={styles.container}>
         <div className={styles.head}>
-          <div className={styles.index}>
-            <span>02</span>
-            <b>ZÁPASOVÉ CENTRUM</b>
-          </div>
+          <div className={styles.index}><span>02</span><b>ZÁPASY</b></div>
 
           <div>
-            <h2>
-              Zápasy.
-              <span>To nejdůležitější na jednom místě.</span>
-            </h2>
+            <h2>Zápasy.</h2>
+            <p>Poslední a následující.</p>
           </div>
 
           <div className={styles.switch}>
-            <button type="button" className={team === "a" ? styles.active : ""} onClick={() => setTeam("a")}>
-              A-tým
-            </button>
-            <button type="button" className={team === "b" ? styles.active : ""} onClick={() => setTeam("b")}>
-              B-tým
-            </button>
+            <button className={team === "a" ? styles.active : ""} onClick={() => setTeam("a")}>A-tým</button>
+            <button className={team === "b" ? styles.active : ""} onClick={() => setTeam("b")}>B-tým</button>
           </div>
         </div>
 
-        <div className={styles.matchGrid}>
+        <div className={styles.grid}>
           <LastMatchCard match={lastMatch} competitionName={currentTeam.competition.name} />
-
-          <NextMatchCard
-            match={nextMatch}
-            leagueRows={leagueRows}
-            competitionName={currentTeam.competition.name}
-          />
+          <NextMatchCard match={nextMatch} leagueRows={leagueRows} competitionName={currentTeam.competition.name} />
         </div>
       </div>
     </section>
   );
 }
 
-function LastMatchCard({
-  match,
-  competitionName,
-}: {
-  match: MatchResult | null;
-  competitionName: string;
-}) {
+function LastMatchCard({ match, competitionName }: { match: MatchResult | null; competitionName: string }) {
   return (
-    <article className={`${styles.matchCard} ${styles.lastCard}`}>
-      <div className={styles.cardTop}>
-        <span>POSLEDNÍ ZÁPAS</span>
-        <b>{competitionName}</b>
-      </div>
+    <article className={styles.card}>
+      <div className={styles.cardTop}><span>POSLEDNÍ ZÁPAS</span><b>{competitionName}</b></div>
 
       {match ? (
         <>
-          <div className={styles.lastScore}>
+          <div className={styles.score}>
             <span>{match.homeTeam}</span>
-
-            <strong>
-              {match.homeScore}
-              <i>:</i>
-              {match.awayScore}
-            </strong>
-
+            <strong>{match.homeScore}<i>:</i>{match.awayScore}</strong>
             <span>{match.awayTeam}</span>
           </div>
-
           <div className={styles.cardBottom}>
             <span>{match.date}</span>
-
-            <a href={match.detailUrl} target="_blank" rel="noreferrer">
-              Detail zápasu
-              <b>↗</b>
-            </a>
+            <a href={match.detailUrl} target="_blank" rel="noreferrer">Detail zápasu <b>↗</b></a>
           </div>
         </>
       ) : (
-        <EmptyState text="Sezóna zatím nemá odehraný zápas." />
+        <div className={styles.empty}>Zatím bez odehraného zápasu.</div>
       )}
     </article>
   );
 }
 
-function NextMatchCard({
-  match,
-  leagueRows,
-  competitionName,
-}: {
-  match: NextMatch | null;
-  leagueRows: LeagueRow[];
-  competitionName: string;
-}) {
+function NextMatchCard({ match, leagueRows, competitionName }: { match: NextMatch | null; leagueRows: LeagueRow[]; competitionName: string }) {
   const comparison = useMemo(() => {
     if (!match) return null;
-
-    return {
-      home: findTeamRow(leagueRows, match.homeTeam),
-      away: findTeamRow(leagueRows, match.awayTeam),
-    };
+    return { home: findTeamRow(leagueRows, match.homeTeam), away: findTeamRow(leagueRows, match.awayTeam) };
   }, [leagueRows, match]);
 
   return (
-    <article className={`${styles.matchCard} ${styles.nextCard}`}>
-      <div className={styles.cardTop}>
-        <span>NÁSLEDUJÍCÍ ZÁPAS</span>
-        <b>{competitionName}</b>
-      </div>
+    <article className={`${styles.card} ${styles.next}`}>
+      <div className={styles.cardTop}><span>NÁSLEDUJÍCÍ ZÁPAS</span><b>{competitionName}</b></div>
 
       {match ? (
         <>
           <div className={styles.teams}>
-            <MatchTeam teamName={match.homeTeam} leagueRow={comparison?.home ?? null} />
+            <MatchTeam name={match.homeTeam} row={comparison?.home ?? null} />
             <div className={styles.vs}>VS</div>
-            <MatchTeam teamName={match.awayTeam} leagueRow={comparison?.away ?? null} />
+            <MatchTeam name={match.awayTeam} row={comparison?.away ?? null} />
           </div>
-
-          <div className={styles.nextMeta}>
+          <div className={styles.meta}>
             <Meta label="Datum" value={match.date || "—"} />
             <Meta label="Čas" value={match.time || "—"} />
-            <Meta label="Místo" value={match.venue || "Bude doplněno"} />
+            <Meta label="Místo" value={match.venue || "—"} />
           </div>
         </>
       ) : (
-        <EmptyState text="Další zápas zatím není v rozpisu." />
+        <div className={styles.empty}>Další zápas zatím není v rozpisu.</div>
       )}
     </article>
   );
 }
 
-function MatchTeam({ teamName, leagueRow }: { teamName: string; leagueRow: LeagueRow | null }) {
+function MatchTeam({ name, row }: { name: string; row: LeagueRow | null }) {
+  const isPpb = name.toLowerCase().includes("fc ppb");
+
   return (
     <div className={styles.team}>
-      <TeamLogo teamName={teamName} />
-      <strong>{teamName}</strong>
-
-      <div className={styles.teamData}>
-        <span><b>{leagueRow ? `${leagueRow.position}.` : "—"}</b>MÍSTO</span>
-        <span><b>{leagueRow?.score || "—"}</b>SKÓRE</span>
+      <div className={styles.teamLogo}>
+        {isPpb ? (
+          <Image src="/images/fc-ppb-logo.png" alt={name} fill sizes="82px" />
+        ) : (
+          <span>{getInitials(name)}</span>
+        )}
       </div>
+      <strong>{name}</strong>
+      <small>{row ? `${row.position}. místo` : "—"}</small>
     </div>
   );
-}
-
-function TeamLogo({ teamName }: { teamName: string }) {
-  const isPpb = teamName.toLowerCase().includes("fc ppb");
-
-  if (isPpb) {
-    return (
-      <div className={styles.logo}>
-        <Image src="/images/fc-ppb-logo.png" alt={teamName} fill sizes="96px" className={styles.logoImage} />
-      </div>
-    );
-  }
-
-  return <div className={styles.logoFallback}>{getInitials(teamName)}</div>;
 }
 
 function Meta({ label, value }: { label: string; value: string }) {
   return <div><span>{label}</span><strong>{value}</strong></div>;
 }
 
-function EmptyState({ text }: { text: string }) {
-  return <div className={styles.empty}><strong>Čekáme na data.</strong><p>{text}</p></div>;
-}
-
 function findTeamRow(rows: LeagueRow[], teamName: string): LeagueRow | null {
-  const normalized = normalizeTeamName(teamName);
-
-  return (
-    rows.find((row) => normalizeTeamName(row.teamName) === normalized) ??
-    rows.find((row) => {
-      const current = normalizeTeamName(row.teamName);
-      return current.includes(normalized) || normalized.includes(current);
-    }) ??
-    null
-  );
+  const normalized = normalize(teamName);
+  return rows.find((row) => normalize(row.teamName) === normalized) ??
+    rows.find((row) => normalize(row.teamName).includes(normalized) || normalized.includes(normalize(row.teamName))) ??
+    null;
 }
 
-function normalizeTeamName(value: string): string {
+function normalize(value: string) {
   return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
 }
 
-function getInitials(teamName: string): string {
-  return teamName.split(/\s+/).filter(Boolean).slice(0, 2).map((word) => word[0]?.toUpperCase() ?? "").join("");
+function getInitials(value: string) {
+  return value.split(/\s+/).filter(Boolean).slice(0, 2).map((word) => word[0]?.toUpperCase() ?? "").join("");
 }

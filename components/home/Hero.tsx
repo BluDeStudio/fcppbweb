@@ -1,39 +1,36 @@
 import { AnimatedLogo } from "@/components/ui/AnimatedLogo/AnimatedLogo";
+
 import styles from "./Hero.module.css";
 
 export function Hero() {
   return (
-    <section id="home" className={styles.hero}>
+    <section className={styles.hero}>
       <div className={styles.noise} aria-hidden="true" />
       <div className={styles.glow} aria-hidden="true" />
 
-      <div className={styles.container}>
-        <div className={styles.logoStage}>
-          <div className={styles.logoRing} aria-hidden="true" />
-          <AnimatedLogo size={350} priority />
+      <div className={styles.inner}>
+        <div className={styles.logo}>
+          <AnimatedLogo size={240} priority />
         </div>
 
         <div className={styles.content}>
-          <div className={styles.eyebrow}>
-            <span>FUTSAL / PLZEŇ</span>
-            <b>2018—2026</b>
-          </div>
-
-          <h1>
-            <span>FC</span>
-            <span>PPB</span>
-          </h1>
+          <h1 className={styles.title}>FC PPB</h1>
 
           <div className={styles.values}>
-            <span>Přátelství.</span><i />
-            <span>Pokora.</span><i />
-            <span>Bojovnost.</span>
+            <span>PŘÁTELSTVÍ.</span>
+            <i />
+            <span>POKORA.</span>
+            <i />
+            <span>BOJOVNOST.</span>
           </div>
 
-          <div className={styles.claim}>
+          <div className={styles.line}>
             <span />
-            <p>Spojuje nás víc než hra.</p>
+            <b />
+            <span />
           </div>
+
+          <p className={styles.claim}>SPOJUJE NÁS VÍC NEŽ HRA.</p>
         </div>
       </div>
     </section>

@@ -11,7 +11,6 @@ export function Footer() {
         <div className={styles.top}>
           <div className={styles.brand}>
             <strong>{clubConfig.name}</strong>
-
             <div>
               <span>PŘÁTELSTVÍ.</span>
               <span>POKORA.</span>
@@ -19,23 +18,12 @@ export function Footer() {
             </div>
           </div>
 
-          <div className={styles.links}>
-            <div>
-              <span>WEB</span>
-              <Link href="/">Domů</Link>
-              <Link href="/tymy">Týmy</Link>
-              <Link href="/#klub">Klub</Link>
-              <Link href="/#partneri">Partneři</Link>
-            </div>
-
-            <div>
-              <span>TÝMY</span>
-              <Link href="/tymy/a">A-tým</Link>
-              <Link href="/tymy/b">B-tým</Link>
-              <Link href="/prestupy">Přestupy</Link>
-              <Link href="/statistiky">Statistiky</Link>
-            </div>
-          </div>
+          <nav className={styles.links}>
+            <Link href="/klub">Klub</Link>
+            <Link href="/tymy">Týmy</Link>
+            <Link href="/zapasy">Zápasy</Link>
+            <Link href="/partneri">Partneři</Link>
+          </nav>
         </div>
 
         <div className={styles.bottom}>
