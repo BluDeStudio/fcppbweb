@@ -1,39 +1,10 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-
+import { Geist } from "next/font/google";
 import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
 import { SiteWatermark } from "@/components/layout/SiteWatermark";
-
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
-export const metadata: Metadata = {
-  title: "FC PPB",
-  description: "Oficiální web futsalového klubu FC PPB",
-};
-
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return (
-    <html lang="cs" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
-      <body className="min-h-full flex flex-col">
-        <Header />
-        <SiteWatermark />
-
-        <div style={{ position: "relative", zIndex: 1, display: "flex", minHeight: "100vh", flexDirection: "column" }}>
-          {children}
-          <Footer />
-        </div>
-      </body>
-    </html>
-  );
-}
+const geist=Geist({variable:"--font-geist-sans",subsets:["latin"]});
+export const metadata:Metadata={title:{default:"FC PPB | Futsal Plzeň",template:"%s | FC PPB"},description:"Oficiální web futsalového klubu FC PPB Plzeň.",metadataBase:new URL("https://fcppb.cz"),openGraph:{title:"FC PPB | Futsal Plzeň",description:"Přátelství. Pokora. Bojovnost. Spojuje nás víc než hra.",url:"https://fcppb.cz",siteName:"FC PPB",locale:"cs_CZ",type:"website"}};
+export default function RootLayout({children}:{children:React.ReactNode}){return <html lang="cs" className={geist.variable}><body><Header/><SiteWatermark/><div className="site-content">{children}</div><Footer/></body></html>}
