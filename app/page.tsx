@@ -1,6 +1,5 @@
 import { HomeDashboard } from "@/components/home/HomeDashboard";
 import type { PlayerOfMatch } from "@/components/home/HomeDashboard";
-import { Partners } from "@/components/home/Partners";
 
 import { clubConfig } from "@/config/club";
 
@@ -340,8 +339,6 @@ export default async function HomePage() {
           transfers
         }
       />
-
-      <Partners />
     </>
   );
 }

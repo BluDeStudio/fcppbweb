@@ -1,649 +1,266 @@
 .card {
   position: relative;
-
+  display: block;
   overflow: hidden;
-
-  border:
-    1px solid
-    var(--border);
-
-  border-radius: 16px;
-
-  background:
-    linear-gradient(
-      145deg,
-      rgba(
-        18,
-        26,
-        20,
-        0.95
-      ),
-      rgba(
-        8,
-        12,
-        9,
-        0.95
-      )
-    );
-
+  border-radius: 18px;
   color: inherit;
-
+  background: #0b0e0c;
   text-decoration: none;
+  box-shadow: 0 20px 50px rgba(0,0,0,.18);
+  transition: transform .25s ease,box-shadow .25s ease;
+}
 
-  transition:
-    transform 200ms ease,
-    border-color 200ms ease,
-    box-shadow 200ms ease;
+.card::after {
+  position: absolute;
+  inset: 0;
+  border: 1px solid rgba(255,255,255,.07);
+  border-radius: inherit;
+  content: "";
+  pointer-events: none;
+  transition: border-color .25s ease;
 }
 
 .card:hover {
-  transform:
-    translateY(-5px);
-
-  border-color:
-    rgba(
-      41,
-      232,
-      63,
-      0.38
-    );
-
-  box-shadow:
-    0 18px 42px
-    rgba(
-      0,
-      0,
-      0,
-      0.2
-    );
+  transform: translateY(-6px);
+  box-shadow: 0 30px 70px rgba(0,0,0,.28);
 }
 
-.imageWrapper {
+.card:hover::after {
+  border-color: rgba(255,255,255,.14);
+}
+
+.visual {
   position: relative;
-
   width: 100%;
-
-  aspect-ratio:
-    4 / 5;
-
+  aspect-ratio: .88 / 1;
   overflow: hidden;
-
   background:
-    linear-gradient(
-      145deg,
-      #151d17,
-      #080c09
-    );
+    radial-gradient(circle at 60% 25%,rgba(41,232,63,.07),transparent 30%),
+    linear-gradient(155deg,#171b18,#090c0a 58%,#060806);
+}
+
+.watermark {
+  z-index: 1;
+  padding: 14%;
+  object-fit: contain;
+  opacity: .055;
+  filter: grayscale(1);
+  transform: scale(1.12);
+  transition: opacity .25s ease,transform .45s ease;
+}
+
+.glow {
+  position: absolute;
+  z-index: 1;
+  top: 20%;
+  left: 55%;
+  width: 55%;
+  aspect-ratio: 1;
+  transform: translate(-50%,-50%);
+  border-radius: 50%;
+  background: rgba(41,232,63,.06);
+  filter: blur(45px);
 }
 
 .image {
+  z-index: 2;
+  transition: transform .42s ease,filter .3s ease;
+}
+
+.cutout {
+  padding: 5% 5% 0;
+  object-fit: contain;
+  object-position: center bottom;
+  filter: drop-shadow(0 20px 22px rgba(0,0,0,.38));
+}
+
+.photo {
   object-fit: cover;
-
-  object-position:
-    center top;
-
-  transition:
-    transform 350ms ease,
-    filter 350ms ease;
+  object-position: center top;
 }
 
 .card:hover .image {
-  transform:
-    scale(1.035);
+  transform: scale(1.035);
+}
 
+.card:hover .cutout {
   filter:
-    brightness(1.06);
+    drop-shadow(0 20px 22px rgba(0,0,0,.42))
+    drop-shadow(0 0 13px rgba(41,232,63,.1));
 }
 
-.overlay {
-  position: absolute;
+.card:hover .watermark {
+  opacity: .08;
+  transform: scale(1.16) rotate(-1deg);
+}
 
+.shade {
+  position: absolute;
+  z-index: 3;
   inset: 0;
-
-  z-index: 2;
-
-  background:
-    linear-gradient(
-      180deg,
-      transparent 42%,
-      rgba(
-        5,
-        7,
-        5,
-        0.82
-      ) 100%
-    );
-
   pointer-events: none;
+  background:
+    linear-gradient(180deg,transparent 44%,rgba(5,7,5,.22) 62%,rgba(5,7,5,.95) 100%);
 }
 
-.topInfo {
+.number {
   position: absolute;
-
-  top: 12px;
-  left: 12px;
-  right: 12px;
-
   z-index: 5;
-
-  display: flex;
-
-  align-items: center;
-  justify-content:
-    space-between;
-
-  gap: 8px;
+  top: 18px;
+  left: 18px;
+  color: rgba(255,255,255,.16);
+  font-size: 28px;
+  font-weight: 1000;
+  letter-spacing: -.06em;
 }
 
-.position,
-.numberBadge,
-.teamBadge,
-.loanBadge {
-  display: inline-flex;
-
-  align-items: center;
-
-  min-height: 27px;
-
-  padding:
-    0 10px;
-
-  border:
-    1px solid
-    rgba(
-      255,
-      255,
-      255,
-      0.08
-    );
-
-  border-radius:
-    999px;
-
-  font-size: 9px;
-  font-weight: 900;
-
-  letter-spacing: 0.07em;
-  text-transform: uppercase;
-
-  backdrop-filter:
-    blur(8px);
-}
-
-.position {
-  background:
-    rgba(
-      5,
-      7,
-      5,
-      0.78
-    );
-
-  color:
-    var(--primary);
-}
-
-.numberBadge {
-  background:
-    var(--primary);
-
-  color:
-    #061007;
-}
-
-.teamInfo {
+.name {
   position: absolute;
-
-  left: 12px;
-  bottom: 12px;
-
   z-index: 5;
-
-  display: flex;
-
-  gap: 6px;
+  right: 18px;
+  bottom: 18px;
+  left: 18px;
 }
 
-.teamBadge {
-  color: #ffffff;
-
-  background:
-    rgba(
-      5,
-      7,
-      5,
-      0.8
-    );
-}
-
-.loanBadge {
-  color: #ffffff;
-
-  background:
-    #637078;
-}
-
-.content {
-  padding: 16px;
-}
-
-.content h3 {
-  margin:
-    0 0 15px;
-
-  color:
-    var(--text);
-
-  font-size: 17px;
-  font-weight: 900;
-
-  line-height: 1.1;
-}
-
-.stats {
-  display: grid;
-
-  grid-template-columns:
-    repeat(
-      3,
-      minmax(
-        0,
-        1fr
-      )
-    );
-
-  gap: 7px;
-}
-
-.stats > div {
-  padding:
-    9px 8px;
-
-  border:
-    1px solid
-    rgba(
-      255,
-      255,
-      255,
-      0.06
-    );
-
-  border-radius: 9px;
-
-  background:
-    rgba(
-      255,
-      255,
-      255,
-      0.018
-    );
-}
-
-.stats span {
-  display: block;
-
-  margin-bottom: 3px;
-
-  color:
-    var(--text-muted);
-
+.name > span {
+  color: #29e83f;
   font-size: 7px;
-  font-weight: 850;
-
-  letter-spacing: 0.07em;
-
-  text-transform:
-    uppercase;
+  font-weight: 1000;
+  letter-spacing: .12em;
 }
 
-.stats strong {
-  color:
-    var(--text);
-
-  font-size: 16px;
-  font-weight: 950;
-}
-
-.mobileStatLabel {
-  display: none !important;
-}
-
-.detail {
-  display: flex;
-
-  align-items: center;
-  justify-content:
-    space-between;
-
-  margin-top: 14px;
-
-  padding-top: 12px;
-
-  border-top:
-    1px solid
-    rgba(
-      255,
-      255,
-      255,
-      0.06
-    );
-
-  color:
-    var(--text-muted);
-
-  font-size: 9px;
-  font-weight: 850;
-
-  letter-spacing: 0.07em;
+.name h3 {
+  max-width: 90%;
+  margin: 6px 0 4px;
+  color: #fff;
+  font-size: clamp(22px,2vw,31px);
+  font-weight: 1000;
+  line-height: .9;
+  letter-spacing: -.055em;
   text-transform: uppercase;
-
-  transition:
-    color 180ms ease;
 }
 
-.arrow {
-  font-size: 14px;
-
-  transition:
-    transform 180ms ease;
+.name p {
+  margin: 0;
+  color: #7f8981;
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: .07em;
 }
 
-.card:hover .detail {
-  color:
-    var(--primary);
+.footer {
+  min-height: 66px;
+  padding: 13px 15px;
+  display: grid;
+  grid-template-columns: repeat(3,1fr) 22px;
+  align-items: center;
+  gap: 7px;
+  background: #090c0a;
+}
+
+.footer > div {
+  display: grid;
+  gap: 3px;
+}
+
+.footer span {
+  color: #69736b;
+  font-size: 5px;
+  font-weight: 950;
+  letter-spacing: .07em;
+}
+
+.footer strong {
+  color: #e4e8e5;
+  font-size: 13px;
+  font-weight: 1000;
+}
+
+.footer .arrow {
+  color: #29e83f;
+  font-size: 17px;
+  text-align: right;
+  transition: transform .2s ease;
 }
 
 .card:hover .arrow {
-  transform:
-    translateX(3px);
+  transform: translateX(3px);
 }
 
 .fallback {
   position: absolute;
-
+  z-index: 2;
   inset: 0;
-
-  display: flex;
-
-  align-items: center;
-  justify-content:
-    center;
-
-  overflow: hidden;
-
-  background:
-    radial-gradient(
-      circle at
-      50% 35%,
-      rgba(
-        41,
-        232,
-        63,
-        0.1
-      ),
-      transparent 42%
-    ),
-    linear-gradient(
-      145deg,
-      #121a14,
-      #080c09
-    );
-}
-
-.fallbackGlow {
-  position: absolute;
-
-  top: 18%;
-  left: 50%;
-
-  width: 170px;
-  height: 170px;
-
-  transform:
-    translateX(-50%);
-
-  border-radius: 50%;
-
-  background:
-    rgba(
-      41,
-      232,
-      63,
-      0.08
-    );
-
-  filter:
-    blur(25px);
 }
 
 .fallbackHead {
   position: absolute;
-
-  top: 21%;
+  top: 24%;
   left: 50%;
-
-  width: 82px;
-  height: 82px;
-
-  transform:
-    translateX(-50%);
-
+  width: 25%;
+  aspect-ratio: 1;
+  transform: translateX(-50%);
   border-radius: 50%;
-
-  background:
-    linear-gradient(
-      145deg,
-      #59635c,
-      #2d342f
-    );
+  background: #303832;
 }
 
 .fallbackBody {
   position: absolute;
-
-  bottom: -14%;
+  bottom: -8%;
   left: 50%;
-
-  width: 78%;
-  height: 66%;
-
-  transform:
-    translateX(-50%);
-
-  border-radius:
-    48% 48%
-    12% 12%;
-
-  background:
-    linear-gradient(
-      145deg,
-      #4d5750,
-      #222923
-    );
+  width: 72%;
+  height: 57%;
+  transform: translateX(-50%);
+  border-radius: 50% 50% 8% 8%;
+  background: #222924;
 }
 
-.fallback span {
-  position: absolute;
-
-  bottom: 20px;
-  left: 20px;
-
-  color:
-    rgba(
-      41,
-      232,
-      63,
-      0.18
-    );
-
-  font-size: 32px;
-  font-weight: 950;
-
-  letter-spacing:
-    -0.06em;
-}
-
-/* ========================================
-   MOBIL — 3 HRÁČI VEDLE SEBE
-======================================== */
-
-@media (
-  max-width: 760px
-) {
+@media (max-width:760px) {
   .card {
-    border-radius: 11px;
+    border-radius: 13px;
   }
 
-  .imageWrapper {
-    aspect-ratio:
-      0.86 / 1;
+  .visual {
+    aspect-ratio: .86 / 1;
   }
 
-  .topInfo {
-    top: 6px;
-    left: 6px;
-    right: 6px;
-
-    gap: 4px;
+  .number {
+    top: 9px;
+    left: 9px;
+    font-size: 16px;
   }
 
-  .position,
-  .numberBadge,
-  .teamBadge,
-  .loanBadge {
-    min-height: 18px;
+  .name {
+    right: 9px;
+    bottom: 9px;
+    left: 9px;
+  }
 
-    padding:
-      0 5px;
+  .name h3 {
+    max-width: 100%;
+    font-size: 14px;
+  }
 
+  .name > span,
+  .name p {
     font-size: 5px;
-
-    letter-spacing:
-      0.04em;
   }
 
-  .numberBadge {
-    font-size: 7px;
-  }
-
-  .teamInfo {
-    left: 6px;
-    bottom: 6px;
-
+  .footer {
+    min-height: 51px;
+    padding: 8px 7px;
     gap: 3px;
   }
 
-  .content {
-    padding:
-      8px 6px 7px;
+  .footer span {
+    font-size: 4px;
   }
 
-  .content h3 {
-    overflow: hidden;
-
-    margin:
-      0 0 7px;
-
-    font-size:
-      clamp(
-        9px,
-        2.65vw,
-        12px
-      );
-
-    line-height: 1.05;
-
-    text-overflow:
-      ellipsis;
-
-    white-space:
-      nowrap;
-  }
-
-  .stats {
-    gap: 3px;
-  }
-
-  .stats > div {
-    padding:
-      5px 2px;
-
-    border-radius:
-      6px;
-
-    text-align: center;
-  }
-
-  .desktopStatLabel {
-    display:
-      none !important;
-  }
-
-  .mobileStatLabel {
-    display:
-      block !important;
-
-    margin-bottom: 2px;
-
-    font-size: 5px !important;
-
-    letter-spacing: 0;
-  }
-
-  .stats strong {
-    font-size: 10px;
-  }
-
-  .detail {
-    margin-top: 7px;
-
-    padding-top: 6px;
-
-    font-size: 5px;
-
-    letter-spacing:
-      0.035em;
-  }
-
-  .arrow {
+  .footer strong {
     font-size: 9px;
   }
 
-  .fallbackGlow {
-    width: 90px;
-    height: 90px;
-  }
-
-  .fallbackHead {
-    width: 40px;
-    height: 40px;
-  }
-
-  .fallbackBody {
-    width: 78%;
-    height: 65%;
-  }
-
-  .fallback span {
-    bottom: 8px;
-    left: 8px;
-
-    font-size: 13px;
-  }
-}
-
-@media (
-  max-width: 380px
-) {
-  .position {
-    display: none;
-  }
-
-  .content h3 {
-    font-size: 9px;
-  }
-
-  .stats strong {
-    font-size: 9px;
+  .footer .arrow {
+    font-size: 11px;
   }
 }

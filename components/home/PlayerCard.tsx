@@ -2,9 +2,9 @@
 
 import Image from "next/image";
 import Link from "next/link";
-
 import {
   useEffect,
+  useMemo,
   useState,
 } from "react";
 
@@ -15,23 +15,23 @@ import type {
 import styles from "./PlayerCard.module.css";
 
 type PlayerCardProps = {
-  player:
-    SquadPlayer;
-
-  team:
-    "a" |
-    "b";
-
+  player: SquadPlayer;
+  team: "a" | "b";
   stats: {
     matches: number;
-
     goals: number;
-
     assists: number;
   };
-
   statsLoaded: boolean;
 };
+
+const PNG_PLAYER_IDS =
+  new Set([
+    532,
+    997,
+    1562,
+    3937,
+  ]);
 
 export function PlayerCard({
   player,
@@ -39,17 +39,59 @@ export function PlayerCard({
   stats,
   statsLoaded,
 }: PlayerCardProps) {
+  const sources =
+    useMemo(
+      () => {
+        const result:
+          Array<{
+            src: string;
+            cutout: boolean;
+          }> = [];
+
+        if (
+          PNG_PLAYER_IDS.has(
+            player.id,
+          )
+        ) {
+          result.push({
+            src:
+              `/images/${player.id}.png`,
+            cutout: true,
+          });
+        }
+
+        if (
+          player.imageUrl
+        ) {
+          result.push({
+            src:
+              player.imageUrl,
+            cutout: false,
+          });
+        }
+
+        return result;
+      },
+      [
+        player.id,
+        player.imageUrl,
+      ],
+    );
+
   const [
-    imageFailed,
-    setImageFailed,
+    sourceIndex,
+    setSourceIndex,
   ] =
-    useState(false);
+    useState(0);
 
   useEffect(() => {
-    setImageFailed(
-      false,
-    );
+    setSourceIndex(0);
   }, [player.id]);
+
+  const source =
+    sources[
+      sourceIndex
+    ];
 
   return (
     <Link
@@ -59,35 +101,56 @@ export function PlayerCard({
       href={
         player.profileUrl
       }
-      title={
-        `Profil hráče ${player.name}`
-      }
+      title={`Profil hráče ${player.name}`}
     >
       <div
         className={
-          styles.imageWrapper
+          styles.visual
         }
       >
-        {!imageFailed ? (
+        <Image
+          className={
+            styles.watermark
+          }
+          src="/images/fc-ppb-logo.png"
+          alt=""
+          fill
+          sizes="25vw"
+          aria-hidden="true"
+        />
+
+        <div
+          className={
+            styles.glow
+          }
+        />
+
+        {source ? (
           <Image
-            className={
-              styles.image
-            }
+            className={`${styles.image} ${
+              source.cutout
+                ? styles.cutout
+                : styles.photo
+            }`}
             src={
-              player.imageUrl
+              source.src
             }
             alt={
               player.name
             }
             fill
             sizes="
-              (max-width: 760px) 33vw,
-              (max-width: 1000px) 33vw,
+              (max-width: 760px) 50vw,
+              (max-width: 1100px) 33vw,
               25vw
             "
             onError={() =>
-              setImageFailed(
-                true,
+              setSourceIndex(
+                (
+                  current,
+                ) =>
+                  current +
+                  1,
               )
             }
           />
@@ -97,131 +160,88 @@ export function PlayerCard({
 
         <div
           className={
-            styles.overlay
+            styles.shade
           }
         />
 
-        <div
-          className={
-            styles.topInfo
-          }
-        >
+        {player.shirtNumber !==
+          null && (
           <span
             className={
-              styles.position
+              styles.number
             }
           >
+            #
+            {
+              player.shirtNumber
+            }
+          </span>
+        )}
+
+        <div
+          className={
+            styles.name
+          }
+        >
+          <span>
+            {team ===
+            "a"
+              ? "A-TÝM"
+              : "B-TÝM"}
+          </span>
+
+          <h3>
+            {player.name}
+          </h3>
+
+          <p>
             {player.position ===
             "goalkeeper"
-              ? "Brankář"
-              : "Hráč"}
-          </span>
-
-          {player.shirtNumber !==
-            null && (
-            <span
-              className={
-                styles.numberBadge
-              }
-            >
-              #
-              {
-                player.shirtNumber
-              }
-            </span>
-          )}
-        </div>
-
-        <div
-          className={
-            styles.teamInfo
-          }
-        >
-          <span
-            className={
-              styles.teamBadge
-            }
-          >
-            {team === "a"
-              ? "A-tým"
-              : "B-tým"}
-          </span>
-
-          {player.status ===
-            "loan" && (
-            <span
-              className={
-                styles.loanBadge
-              }
-            >
-              Host
-            </span>
-          )}
+              ? "BRANKÁŘ"
+              : "HRÁČ"}
+          </p>
         </div>
       </div>
 
       <div
         className={
-          styles.content
+          styles.footer
         }
       >
-        <h3>
-          {player.name}
-        </h3>
+        <Stat
+          label="ZÁPASY"
+          value={
+            statsLoaded
+              ? stats.matches
+              : "·"
+          }
+        />
 
-        <div
+        <Stat
+          label="GÓLY"
+          value={
+            statsLoaded
+              ? stats.goals
+              : "·"
+          }
+        />
+
+        <Stat
+          label="ASISTENCE"
+          value={
+            statsLoaded
+              ? stats.assists
+              : "·"
+          }
+        />
+
+        <span
           className={
-            styles.stats
+            styles.arrow
           }
         >
-          <Stat
-            label="Zápasy"
-            mobileLabel="Z"
-            value={
-              statsLoaded
-                ? stats.matches
-                : "·"
-            }
-          />
-
-          <Stat
-            label="Góly"
-            mobileLabel="G"
-            value={
-              statsLoaded
-                ? stats.goals
-                : "·"
-            }
-          />
-
-          <Stat
-            label="Asistence"
-            mobileLabel="A"
-            value={
-              statsLoaded
-                ? stats.assists
-                : "·"
-            }
-          />
-        </div>
-
-        <div
-          className={
-            styles.detail
-          }
-        >
-          <span>
-            Profil hráče
-          </span>
-
-          <span
-            className={
-              styles.arrow
-            }
-          >
-            →
-          </span>
-        </div>
+          →
+        </span>
       </div>
     </Link>
   );
@@ -229,33 +249,17 @@ export function PlayerCard({
 
 function Stat({
   label,
-  mobileLabel,
   value,
 }: {
   label: string;
-
-  mobileLabel: string;
-
   value:
-    string |
-    number;
+    number |
+    string;
 }) {
   return (
     <div>
-      <span
-        className={
-          styles.desktopStatLabel
-        }
-      >
+      <span>
         {label}
-      </span>
-
-      <span
-        className={
-          styles.mobileStatLabel
-        }
-      >
-        {mobileLabel}
       </span>
 
       <strong>
@@ -274,12 +278,6 @@ function PlayerSilhouette() {
     >
       <div
         className={
-          styles.fallbackGlow
-        }
-      />
-
-      <div
-        className={
           styles.fallbackHead
         }
       />
@@ -289,10 +287,6 @@ function PlayerSilhouette() {
           styles.fallbackBody
         }
       />
-
-      <span>
-        FC PPB
-      </span>
     </div>
   );
 }
