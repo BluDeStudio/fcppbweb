@@ -1381,3 +1381,408 @@
     grid-template-columns: 1fr 1fr;
   }
 }
+
+
+/* =========================================================
+   V6 — DALŠÍ ZÁPASY + 4 HRÁČI V NÁHLEDU SOUPISKY
+   ========================================================= */
+
+.nextMatchCards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.nextCompactTile {
+  min-height: 320px;
+}
+
+.compactClub {
+  min-width: 0;
+  display: grid;
+  justify-items: center;
+  text-align: center;
+}
+
+.compactClub > b {
+  max-width: 100%;
+  margin-top: 5px;
+  overflow: hidden;
+  color: #e8ece9;
+  font-size: 8px;
+  font-weight: 950;
+  line-height: 1.15;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.compactClubStats {
+  width: 100%;
+  margin-top: 10px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5px;
+}
+
+.compactClubStats span {
+  padding-top: 7px;
+  display: grid;
+  gap: 2px;
+  border-top: 1px solid var(--line);
+  color: #687269;
+  font-size: 5px;
+  font-weight: 950;
+  letter-spacing: .06em;
+}
+
+.compactClubStats strong {
+  overflow: hidden;
+  color: #dfe4e0;
+  font-size: 9px;
+  font-weight: 1000;
+  letter-spacing: 0;
+  text-overflow: ellipsis;
+}
+
+.compactMatchMeta {
+  margin: 0 0 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 7px 12px;
+  color: #707a72;
+  font-size: 7px;
+  font-weight: 850;
+  text-align: center;
+}
+
+.compactMatchMeta strong {
+  color: #dfe4e0;
+  font-size: 8px;
+}
+
+.compactMatchMeta span {
+  color: var(--green);
+  font-weight: 1000;
+}
+
+.compactMatchMeta small {
+  flex-basis: 100%;
+  font-size: 6px;
+  text-transform: uppercase;
+}
+
+.teamSectionBar {
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.playerCarouselControls {
+  display: flex;
+  gap: 6px;
+}
+
+.playerCarouselControls button {
+  width: 42px;
+  height: 36px;
+  border: 1px solid var(--line);
+  color: #f5f7f5;
+  background: #111412;
+  font-size: 16px;
+  cursor: pointer;
+  transition: color .18s ease,border-color .18s ease,background .18s ease;
+}
+
+.playerCarouselControls button:hover:not(:disabled) {
+  color: var(--green);
+  border-color: rgba(41,232,63,.35);
+  background: #151916;
+}
+
+.playerCarouselControls button:disabled {
+  opacity: .22;
+  cursor: default;
+}
+
+.squadPreview {
+  position: relative;
+  min-height: 510px;
+  padding: 24px 24px 54px;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 50% 36%,rgba(41,232,63,.055),transparent 34%),
+    linear-gradient(145deg,#141815,#090c0a);
+}
+
+.squadWatermark {
+  position: absolute;
+  z-index: 0;
+  top: 50%;
+  left: 50%;
+  width: 48%;
+  height: 82%;
+  transform: translate(-50%,-50%);
+  object-fit: contain;
+  opacity: .035;
+  filter: grayscale(1);
+}
+
+.squadCards {
+  position: relative;
+  z-index: 2;
+  height: 430px;
+  display: grid;
+  grid-template-columns: repeat(4,minmax(0,1fr));
+  gap: 10px;
+}
+
+.previewPlayer {
+  position: relative;
+  min-width: 0;
+  height: 100%;
+  overflow: hidden;
+  color: inherit;
+  background: linear-gradient(180deg,rgba(255,255,255,.018),rgba(255,255,255,.008));
+  text-decoration: none;
+  transition: transform .22s ease,background .22s ease;
+}
+
+.previewPlayer::after {
+  position: absolute;
+  inset: 0;
+  border: 1px solid rgba(255,255,255,.05);
+  content: "";
+  pointer-events: none;
+  transition: border-color .22s ease;
+}
+
+.previewPlayer:hover {
+  z-index: 5;
+  transform: translateY(-5px);
+  background: linear-gradient(180deg,rgba(41,232,63,.035),rgba(255,255,255,.008));
+}
+
+.previewPlayer:hover::after {
+  border-color: rgba(41,232,63,.16);
+}
+
+.previewPlayerVisual {
+  position: absolute;
+  inset: 0 0 74px;
+  overflow: hidden;
+}
+
+.previewPlayerLogo {
+  position: absolute;
+  z-index: 1;
+  top: 50%;
+  left: 50%;
+  width: 82%;
+  height: 82%;
+  transform: translate(-50%,-50%);
+  object-fit: contain;
+  opacity: .045;
+  filter: grayscale(1);
+  transition: opacity .22s ease,transform .4s ease;
+}
+
+.previewPlayerImage {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center bottom;
+  filter: drop-shadow(0 18px 22px rgba(0,0,0,.38));
+  transition: transform .34s ease,filter .25s ease;
+}
+
+.previewPlayer:hover .previewPlayerImage {
+  transform: scale(1.025);
+  filter: drop-shadow(0 18px 22px rgba(0,0,0,.42)) drop-shadow(0 0 13px rgba(41,232,63,.08));
+}
+
+.previewPlayer:hover .previewPlayerLogo {
+  opacity: .065;
+  transform: translate(-50%,-50%) scale(1.04);
+}
+
+.previewPlayerShade {
+  position: absolute;
+  z-index: 3;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(180deg,transparent 48%,rgba(6,8,6,.15) 70%,rgba(6,8,6,.92) 100%);
+}
+
+.previewPlayerNumber {
+  position: absolute;
+  z-index: 4;
+  top: 16px;
+  left: 16px;
+  color: rgba(255,255,255,.15);
+  font-size: 26px;
+  font-weight: 1000;
+  letter-spacing: -.06em;
+}
+
+.previewPlayerCopy {
+  position: absolute;
+  z-index: 5;
+  right: 16px;
+  bottom: 14px;
+  left: 16px;
+  display: grid;
+  gap: 3px;
+}
+
+.previewPlayerCopy > span {
+  color: var(--green);
+  font-size: 6px;
+  font-weight: 1000;
+  letter-spacing: .1em;
+}
+
+.previewPlayerCopy strong {
+  overflow: hidden;
+  color: #fff;
+  font-size: clamp(17px,1.55vw,26px);
+  font-weight: 1000;
+  line-height: .9;
+  letter-spacing: -.045em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+}
+
+.previewPlayerCopy small {
+  color: #747e76;
+  font-size: 6px;
+  font-weight: 900;
+  letter-spacing: .06em;
+}
+
+.playerSilhouette {
+  position: absolute;
+  z-index: 2;
+  inset: 16% 16% 0;
+  display: grid;
+  place-items: center;
+  color: rgba(255,255,255,.08);
+  font-size: 44px;
+  font-weight: 1000;
+}
+
+.squadLink {
+  position: absolute;
+  z-index: 7;
+  right: 25px;
+  bottom: 18px;
+  left: 25px;
+  padding-top: 11px;
+  display: flex;
+  justify-content: space-between;
+  border-top: 1px solid var(--line);
+  color: #b4bcb6;
+  font-size: 8px;
+  font-weight: 950;
+  letter-spacing: .06em;
+  text-decoration: none;
+}
+
+.squadLink span {
+  color: var(--green);
+  font-size: 15px;
+}
+
+.teamTableWide {
+  margin-top: 10px;
+  padding: 28px 30px 24px;
+  background: #1d201e;
+}
+
+.teamTableWide .tableHead,
+.teamTableWide .tableRow {
+  grid-template-columns: 34px minmax(0,1fr) 60px 110px 60px;
+}
+
+.teamTableWide .tableRow {
+  min-height: 50px;
+}
+
+@media (max-width:1100px) {
+  .squadCards {
+    grid-template-columns: repeat(2,minmax(0,1fr));
+    height: auto;
+  }
+
+  .squadPreview {
+    min-height: 760px;
+  }
+
+  .previewPlayer {
+    min-height: 330px;
+  }
+}
+
+@media (max-width:720px) {
+  .nextMatchCards {
+    grid-template-columns: 1fr;
+  }
+
+  .nextCompactTile {
+    min-height: 290px;
+  }
+
+  .teamSectionBar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .teamSectionBar .toggle {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .playerCarouselControls {
+    justify-content: flex-end;
+  }
+
+  .squadPreview {
+    min-height: 470px;
+    padding-right: 12px;
+    padding-left: 12px;
+  }
+
+  .squadCards {
+    height: 390px;
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+
+  .squadCards::-webkit-scrollbar {
+    display: none;
+  }
+
+  .previewPlayer {
+    flex: 0 0 84%;
+    min-height: 390px;
+    scroll-snap-align: center;
+  }
+
+  .teamTableWide {
+    padding: 20px 12px;
+  }
+
+  .teamTableWide .tableHead,
+  .teamTableWide .tableRow {
+    grid-template-columns: 25px minmax(0,1fr) 28px 62px 28px;
+  }
+}
