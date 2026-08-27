@@ -1786,3 +1786,301 @@
     grid-template-columns: 25px minmax(0,1fr) 28px 62px 28px;
   }
 }
+
+
+/* =========================================================
+   V7 — TÝMY: TEAM SHOWCASE 50/50 S TABULKOU
+   ========================================================= */
+
+.teamsSplit {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  min-height: 500px;
+  background: #111412;
+}
+
+.teamShowcase {
+  position: relative;
+  min-width: 0;
+  min-height: 500px;
+  overflow: hidden;
+  isolation: isolate;
+  background:
+    radial-gradient(circle at 50% 48%, rgba(41, 232, 63, .10), transparent 34%),
+    radial-gradient(circle at 50% 100%, rgba(41, 232, 63, .055), transparent 38%),
+    linear-gradient(145deg, #121713 0%, #080b09 72%, #050705 100%);
+}
+
+.teamShowcase::before {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  content: "";
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, rgba(255,255,255,.018), transparent 18%, transparent 82%, rgba(255,255,255,.012)),
+    linear-gradient(180deg, rgba(255,255,255,.012), transparent 25%);
+}
+
+.teamShowcaseLogo {
+  position: absolute;
+  z-index: 1;
+  top: 43%;
+  left: 50%;
+  width: 66%;
+  height: 74%;
+  transform: translate(-50%, -50%);
+  object-fit: contain;
+  opacity: .09;
+  filter:
+    grayscale(.2)
+    drop-shadow(0 0 28px rgba(41, 232, 63, .10));
+  pointer-events: none;
+}
+
+.teamShowcasePlayers {
+  position: absolute;
+  z-index: 3;
+  inset: 20px 0 42px;
+}
+
+.showcasePlayer {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  height: 92%;
+  width: 43%;
+  transform-origin: center bottom;
+  transition:
+    transform .38s cubic-bezier(.2,.75,.25,1),
+    filter .25s ease,
+    opacity .25s ease;
+  pointer-events: auto;
+}
+
+.showcasePlayer img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+  object-position: center bottom;
+  filter:
+    drop-shadow(0 22px 22px rgba(0,0,0,.48))
+    drop-shadow(0 0 10px rgba(41,232,63,.035));
+  transition:
+    transform .32s ease,
+    filter .32s ease;
+}
+
+.showcasePlayer:hover img {
+  transform: translateY(-7px) scale(1.025);
+  filter:
+    drop-shadow(0 26px 25px rgba(0,0,0,.55))
+    drop-shadow(0 0 17px rgba(41,232,63,.12));
+}
+
+/* 1 hráč */
+.showcasePlayer[data-slot="center"] {
+  z-index: 6;
+  width: 50%;
+  height: 98%;
+  transform: translateX(-50%);
+}
+
+/* 2–3 hráči */
+.showcasePlayer[data-slot="left"] {
+  z-index: 4;
+  transform: translateX(-92%) scale(.91);
+}
+
+.showcasePlayer[data-slot="right"] {
+  z-index: 4;
+  transform: translateX(-8%) scale(.91);
+}
+
+/* 4 hráči – překrytý týmový náhled */
+.showcasePlayer[data-slot="far-left"] {
+  z-index: 2;
+  width: 40%;
+  height: 84%;
+  transform: translateX(-126%) scale(.90);
+  opacity: .91;
+}
+
+.showcasePlayer[data-slot="left-center"] {
+  z-index: 6;
+  width: 45%;
+  height: 98%;
+  transform: translateX(-82%) scale(1);
+}
+
+.showcasePlayer[data-slot="right-center"] {
+  z-index: 5;
+  width: 44%;
+  height: 94%;
+  transform: translateX(-20%) scale(.97);
+}
+
+.showcasePlayer[data-slot="far-right"] {
+  z-index: 2;
+  width: 40%;
+  height: 84%;
+  transform: translateX(27%) scale(.90);
+  opacity: .91;
+}
+
+.showcasePlayer[data-slot="far-left"]:hover {
+  z-index: 8;
+  transform: translateX(-126%) scale(.94);
+}
+
+.showcasePlayer[data-slot="left-center"]:hover {
+  z-index: 8;
+  transform: translateX(-82%) scale(1.035);
+}
+
+.showcasePlayer[data-slot="right-center"]:hover {
+  z-index: 8;
+  transform: translateX(-20%) scale(1.005);
+}
+
+.showcasePlayer[data-slot="far-right"]:hover {
+  z-index: 8;
+  transform: translateX(27%) scale(.94);
+}
+
+.showcaseSilhouette {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  color: rgba(255,255,255,.08);
+  font-size: 42px;
+  font-weight: 1000;
+}
+
+.teamShowcaseFade {
+  position: absolute;
+  z-index: 7;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 32%;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, transparent, rgba(6,9,7,.32) 44%, rgba(6,9,7,.96) 100%);
+}
+
+.teamShowcaseLink {
+  position: absolute;
+  z-index: 9;
+  right: 26px;
+  bottom: 20px;
+  left: 26px;
+  padding-top: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid rgba(255,255,255,.08);
+  color: #c4cbc5;
+  font-size: 8px;
+  font-weight: 1000;
+  letter-spacing: .08em;
+  text-decoration: none;
+}
+
+.teamShowcaseLink span {
+  color: var(--green);
+  font-size: 16px;
+  transition: transform .18s ease;
+}
+
+.teamShowcaseLink:hover span {
+  transform: translateX(5px);
+}
+
+/* Tabulka zůstává přesně napravo – 50 % sekce */
+.teamsSplit > .teamTable {
+  min-width: 0;
+  min-height: 500px;
+  padding: 38px 34px 28px;
+  background: #1d201e;
+}
+
+/* V7 ruší layout tabulky pod hráči z předchozí varianty. */
+.teamTableWide {
+  margin-top: 0;
+}
+
+/* Na větším desktopu mají hráči dost prostoru pro výrazné PNG. */
+@media (min-width: 1500px) {
+  .teamsSplit {
+    min-height: 550px;
+  }
+
+  .teamShowcase,
+  .teamsSplit > .teamTable {
+    min-height: 550px;
+  }
+}
+
+/* Tablet: pořád 50/50, jen kompaktnější. */
+@media (max-width: 1100px) {
+  .teamsSplit {
+    min-height: 440px;
+  }
+
+  .teamShowcase,
+  .teamsSplit > .teamTable {
+    min-height: 440px;
+  }
+
+  .teamsSplit > .teamTable {
+    padding: 28px 22px 22px;
+  }
+
+  .teamShowcaseLogo {
+    width: 74%;
+  }
+}
+
+/* Mobil: náhled týmu nad tabulkou. */
+@media (max-width: 760px) {
+  .teamsSplit {
+    grid-template-columns: 1fr;
+  }
+
+  .teamShowcase {
+    min-height: 430px;
+  }
+
+  .teamsSplit > .teamTable {
+    min-height: auto;
+    padding: 24px 14px 18px;
+  }
+
+  .teamShowcaseLogo {
+    width: 78%;
+    height: 68%;
+  }
+
+  .showcasePlayer {
+    width: 50%;
+  }
+
+  .showcasePlayer[data-slot="far-left"] {
+    transform: translateX(-119%) scale(.88);
+  }
+
+  .showcasePlayer[data-slot="left-center"] {
+    transform: translateX(-80%) scale(.98);
+  }
+
+  .showcasePlayer[data-slot="right-center"] {
+    transform: translateX(-18%) scale(.95);
+  }
+
+  .showcasePlayer[data-slot="far-right"] {
+    transform: translateX(20%) scale(.88);
+  }
+}

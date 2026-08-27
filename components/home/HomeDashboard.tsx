@@ -579,38 +579,19 @@ function TeamsSection({
   rows: LeagueRow[];
 }) {
   const miniRows = aroundOurTeam(rows, 6);
-  const [playerOffset, setPlayerOffset] = useState(0);
+  const [showcasePlayers, setShowcasePlayers] = useState<SquadPlayer[]>([]);
 
   useEffect(() => {
-    if (players.length <= 4) {
-      setPlayerOffset(0);
-      return;
+    const pool = [...players];
+
+    // Fisher-Yates: nový náhodný týmový náhled při načtení / přepnutí A-B.
+    for (let i = pool.length - 1; i > 0; i -= 1) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [pool[i], pool[j]] = [pool[j], pool[i]];
     }
 
-    setPlayerOffset(
-      Math.floor(Math.random() * players.length),
-    );
-  }, [team, players.length]);
-
-  const visiblePlayers = useMemo(
-    () => getPlayerWindow(players, playerOffset, 4),
-    [players, playerOffset],
-  );
-
-  const canScrollPlayers = players.length > 4;
-
-  const movePlayers = (direction: -1 | 1) => {
-    if (!canScrollPlayers) return;
-
-    setPlayerOffset((current) => {
-      const next = current + direction * 4;
-
-      return (
-        (next % players.length) +
-        players.length
-      ) % players.length;
-    });
-  };
+    setShowcasePlayers(pool.slice(0, Math.min(4, pool.length)));
+  }, [team, players]);
 
   return (
     <section className={styles.section}>
@@ -622,187 +603,133 @@ function TeamsSection({
       />
 
       <div className={styles.teamSectionBar}>
-        <TeamToggle
-          team={team}
-          setTeam={setTeam}
-        />
-
-        <div className={styles.playerCarouselControls}>
-          <button
-            type="button"
-            onClick={() => movePlayers(-1)}
-            disabled={!canScrollPlayers}
-            aria-label="Předchozí hráči"
-          >
-            ←
-          </button>
-
-          <button
-            type="button"
-            onClick={() => movePlayers(1)}
-            disabled={!canScrollPlayers}
-            aria-label="Další hráči"
-          >
-            →
-          </button>
-        </div>
+        <TeamToggle team={team} setTeam={setTeam} />
       </div>
 
-      <div className={styles.squadPreview}>
-        <img
-          className={styles.squadWatermark}
-          src="/images/fc-ppb-logo.png"
-          alt=""
-          aria-hidden="true"
-        />
+      <div className={styles.teamsSplit}>
+        <div className={styles.teamShowcase}>
+          <img
+            className={styles.teamShowcaseLogo}
+            src="/images/fc-ppb-logo.png"
+            alt=""
+            aria-hidden="true"
+          />
 
-        <div className={styles.squadCards}>
-          {visiblePlayers.length > 0 ? (
-            visiblePlayers.map((player) => (
-              <PlayerPreviewCard
-                key={player.id}
-                player={player}
-                team={team}
-              />
-            ))
-          ) : (
-            <div className={styles.empty}>
-              Náhled hráčů zatím není dostupný.
-            </div>
-          )}
-        </div>
-
-        <Link href="/tymy" className={styles.squadLink}>
-          CELÁ SOUPISKA <span>→</span>
-        </Link>
-      </div>
-
-      <div className={styles.teamTableWide}>
-        <div className={styles.teamTableTop}>
-          <div>
-            <span>SOUTĚŽ</span>
-            <h3>{competition}</h3>
+          <div className={styles.teamShowcasePlayers}>
+            {showcasePlayers.length > 0 ? (
+              showcasePlayers.map((player, index) => (
+                <ShowcasePlayer
+                  key={`${team}-${player.id}`}
+                  player={player}
+                  index={index}
+                  count={showcasePlayers.length}
+                />
+              ))
+            ) : (
+              <div className={styles.empty}>
+                Náhled hráčů zatím není dostupný.
+              </div>
+            )}
           </div>
 
-          <Link href="/zapasy#tabulka">
-            CELÁ TABULKA <b>→</b>
+          <div className={styles.teamShowcaseFade} />
+
+          <Link href="/tymy" className={styles.teamShowcaseLink}>
+            SOUPISKA <span>→</span>
           </Link>
         </div>
 
-        <div className={styles.tableHead}>
-          <span>#</span>
-          <span>TÝM</span>
-          <span>Z</span>
-          <span>SKÓRE</span>
-          <span>B</span>
-        </div>
+        <div className={styles.teamTable}>
+          <div className={styles.teamTableTop}>
+            <div>
+              <span>SOUTĚŽ</span>
+              <h3>{competition}</h3>
+            </div>
 
-        {miniRows.map((row) => (
-          <div
-            key={`${row.position}-${row.teamName}`}
-            className={`${styles.tableRow} ${
-              row.isOurTeam ? styles.ourTeamRow : ""
-            }`}
-          >
-            <span>{row.position}.</span>
-            <strong>{row.teamName}</strong>
-            <span>{row.matches}</span>
-            <span>{row.score}</span>
-            <b>{row.points}</b>
+            <Link href="/zapasy#tabulka">
+              CELÁ TABULKA <b>→</b>
+            </Link>
           </div>
-        ))}
+
+          <div className={styles.tableHead}>
+            <span>#</span>
+            <span>TÝM</span>
+            <span>Z</span>
+            <span>SKÓRE</span>
+            <span>B</span>
+          </div>
+
+          {miniRows.map((row) => (
+            <div
+              key={`${row.position}-${row.teamName}`}
+              className={`${styles.tableRow} ${
+                row.isOurTeam ? styles.ourTeamRow : ""
+              }`}
+            >
+              <span>{row.position}.</span>
+              <strong>{row.teamName}</strong>
+              <span>{row.matches}</span>
+              <span>{row.score}</span>
+              <b>{row.points}</b>
+            </div>
+          ))}
+        </div>
       </div>
     </section>
   );
 }
 
-function PlayerPreviewCard({
+function ShowcasePlayer({
   player,
-  team,
+  index,
+  count,
 }: {
   player: SquadPlayer;
-  team: Team;
+  index: number;
+  count: number;
 }) {
   const sources = [
-    ...(PNG_PLAYER_IDS.has(player.id)
-      ? [`/images/${player.id}.png`]
-      : []),
+    ...(PNG_PLAYER_IDS.has(player.id) ? [`/images/${player.id}.png`] : []),
     ...(player.imageUrl ? [player.imageUrl] : []),
   ];
 
   const [imageIndex, setImageIndex] = useState(0);
+  const image = sources[imageIndex];
 
   useEffect(() => {
     setImageIndex(0);
   }, [player.id]);
 
-  const image = sources[imageIndex];
-
   return (
-    <Link
-      href={`/hrac/${player.id}`}
-      className={styles.previewPlayer}
+    <div
+      className={styles.showcasePlayer}
+      data-slot={getShowcaseSlot(index, count)}
+      title={player.name}
     >
-      <div className={styles.previewPlayerVisual}>
+      {image ? (
         <img
-          className={styles.previewPlayerLogo}
-          src="/images/fc-ppb-logo.png"
-          alt=""
-          aria-hidden="true"
+          src={image}
+          alt={player.name}
+          onError={() =>
+            setImageIndex((current) =>
+              current + 1 < sources.length ? current + 1 : sources.length,
+            )
+          }
         />
-
-        {image ? (
-          <img
-            className={styles.previewPlayerImage}
-            src={image}
-            alt={player.name}
-            onError={() =>
-              setImageIndex((current) =>
-                current + 1 < sources.length
-                  ? current + 1
-                  : sources.length,
-              )
-            }
-          />
-        ) : (
-          <div className={styles.playerSilhouette}>
-            PPB
-          </div>
-        )}
-
-        <span className={styles.previewPlayerNumber}>
-          #{player.shirtNumber ?? "—"}
-        </span>
-
-        <div className={styles.previewPlayerShade} />
-      </div>
-
-      <div className={styles.previewPlayerCopy}>
-        <span>{team === "a" ? "A-TÝM" : "B-TÝM"}</span>
-        <strong>{player.name}</strong>
-        <small>
-          {player.position === "goalkeeper"
-            ? "BRANKÁŘ"
-            : "HRÁČ"}
-        </small>
-      </div>
-    </Link>
+      ) : (
+        <div className={styles.showcaseSilhouette}>PPB</div>
+      )}
+    </div>
   );
 }
 
-function getPlayerWindow(
-  players: SquadPlayer[],
-  offset: number,
-  count: number,
-): SquadPlayer[] {
-  if (players.length === 0) return [];
-  if (players.length <= count) return players;
+function getShowcaseSlot(index: number, count: number) {
+  if (count <= 1) return "center";
+  if (count === 2) return index === 0 ? "left" : "right";
+  if (count === 3) return ["left", "center", "right"][index];
 
-  return Array.from(
-    { length: Math.min(count, players.length) },
-    (_, index) =>
-      players[(offset + index) % players.length],
-  );
+  // 4 hráči: dva vzadu, dva vpředu. Vizuálně se překrývají jako týmová fotka.
+  return ["far-left", "left-center", "right-center", "far-right"][index];
 }
 
 function MatchesSection({
