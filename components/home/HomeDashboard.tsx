@@ -1,14 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import {
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import { useMemo, useState } from "react";
 
 import { AnimatedLogo } from "@/components/ui/AnimatedLogo/AnimatedLogo";
-
 import type { LeagueRow } from "@/types/league";
 import type { MatchResult } from "@/types/match";
 import type { NextMatch } from "@/types/nextMatch";
@@ -46,1155 +41,359 @@ type Props = {
 type Team = "a" | "b";
 
 const PNG_PLAYER_IDS = new Set([532, 997, 1562, 3937]);
-
 const TIKTOK_URL = "https://www.tiktok.com/@fcppbfutsal";
 const INSTAGRAM_URL = "https://www.instagram.com/fcppb_futsl/";
 
 export function HomeDashboard(props: Props) {
-  const [team, setTeam] = useState<Team>("a");
+  const [matchTeam, setMatchTeam] = useState<Team>("a");
+  const [tableTeam, setTableTeam] = useState<Team>("a");
 
-  const selectedRows =
-    team === "a"
-      ? props.aLeagueTable
-      : props.bLeagueTable;
-
-  const selectedPlayers =
-    team === "a"
-      ? props.aPlayers
-      : props.bPlayers;
-
-  const selectedLast =
-    team === "a"
-      ? props.aMatches[0] ?? null
-      : props.bMatches[0] ?? null;
-
-  const selectedPlayerOfMatch =
-    team === "a"
-      ? props.aPlayerOfMatch
-      : props.bPlayerOfMatch;
-
-  const selectedCompetition =
-    team === "a"
-      ? "1.B TŘÍDA"
-      : "2.B TŘÍDA";
-
-  const featuredPlayers = useMemo(
-    () =>
-      selectedPlayers.filter(
-        (player) =>
-          PNG_PLAYER_IDS.has(player.id) ||
-          Boolean(player.imageUrl),
-      ),
-    [selectedPlayers],
-  );
+  const lastMatch = matchTeam === "a" ? props.aMatches[0] ?? null : props.bMatches[0] ?? null;
+  const nextMatch = matchTeam === "a" ? props.aNextMatch : props.bNextMatch;
+  const tableRows = tableTeam === "a" ? props.aLeagueTable : props.bLeagueTable;
 
   return (
-    <div className={styles.page}>
-      <ClubIntro />
+    <main className={styles.page}>
+      <Hero />
 
-      <div className={styles.content}>
-        <section className={styles.editorialGrid}>
-          <HeroSlider transfers={props.transfers} />
+      <div className={styles.shell}>
+        <section className={styles.scoreboardSection}>
+          <div className={styles.scoreboardHeader}>
+            <div>
+              <span className={styles.kicker}>MATCH CENTER</span>
+              <h2>AKTUÁLNĚ.</h2>
+            </div>
+            <TeamToggle team={matchTeam} setTeam={setMatchTeam} />
+          </div>
 
-          <aside className={styles.editorialSide}>
-            <LastMatchCard
-              match={selectedLast}
-              team={team}
-              setTeam={setTeam}
-            />
-
-            <PlayerOfMatchCard
-              player={selectedPlayerOfMatch}
-            />
-          </aside>
+          <div className={styles.scoreGrid}>
+            <LastMatchPanel match={lastMatch} team={matchTeam} />
+            <NextMatchPanel match={nextMatch} team={matchTeam} rows={tableRowsFor(matchTeam, props)} />
+          </div>
         </section>
 
-        <NextMatchesSection
-          aMatch={props.aNextMatch}
-          bMatch={props.bNextMatch}
-          aRows={props.aLeagueTable}
-          bRows={props.bLeagueTable}
-        />
+        <section className={styles.section}>
+          <SectionTitle eyebrow="VÝKON KOLA" title="HRÁČI UTKÁNÍ." />
+          <div className={styles.playersOfMatchGrid}>
+            <PlayerOfMatchCard teamLabel="A-TÝM" player={props.aPlayerOfMatch} />
+            <PlayerOfMatchCard teamLabel="B-TÝM" player={props.bPlayerOfMatch} />
+          </div>
+        </section>
 
-        <TeamsSection
-          team={team}
-          setTeam={setTeam}
-          competition={selectedCompetition}
-          players={featuredPlayers}
-          rows={selectedRows}
-        />
+        <NewsSection props={props} />
 
-        <MatchesSection
-          aLast={props.aMatches[0] ?? null}
-          bLast={props.bMatches[0] ?? null}
-          aNext={props.aNextMatch}
-          bNext={props.bNextMatch}
-        />
+        <section className={styles.section}>
+          <div className={styles.sectionHeaderRow}>
+            <SectionTitle eyebrow="SOUTĚŽ" title="TABULKA." compact />
+            <TeamToggle team={tableTeam} setTeam={setTableTeam} />
+          </div>
+          <LeaguePreview rows={tableRows} />
+        </section>
 
-        <PartnersSection />
-
-        <SocialStrip />
+        <TeamsPreview aPlayers={props.aPlayers} bPlayers={props.bPlayers} />
+        <Partners />
+        <Social />
       </div>
-    </div>
+    </main>
   );
 }
 
-function ClubIntro() {
+function Hero() {
   return (
-    <section className={styles.clubIntro}>
-      <div className={styles.introNoise} aria-hidden="true" />
-      <div className={styles.introGlow} aria-hidden="true" />
-
-      <div className={styles.clubIntroInner}>
-        <div className={styles.introLogo}>
-          <AnimatedLogo size={176} priority />
-        </div>
-
-        <div className={styles.introCopy}>
-          <span>FC PPB · FUTSAL PLZEŇ</span>
-
-          <h1>FC PPB</h1>
-
-          <div className={styles.values}>
-            <b>PŘÁTELSTVÍ.</b>
-            <i />
-            <b>POKORA.</b>
-            <i />
-            <b>BOJOVNOST.</b>
+    <section className={styles.hero}>
+      <div className={styles.heroNoise} />
+      <div className={styles.heroLogoGhost} aria-hidden="true">
+        <AnimatedLogo size={470} priority />
+      </div>
+      <div className={styles.heroInner}>
+        <div className={styles.heroBrand}>
+          <div className={styles.heroLogo}>
+            <AnimatedLogo size={118} priority />
           </div>
-
-          <p>SPOJUJE NÁS VÍC NEŽ HRA.</p>
+          <div>
+            <span>FC PPB · FUTSAL PLZEŇ</span>
+            <h1>FC PPB</h1>
+          </div>
         </div>
+
+        <div className={styles.heroClaim}>
+          <strong>PŘÁTELSTVÍ.</strong>
+          <strong>POKORA.</strong>
+          <strong>BOJOVNOST.</strong>
+        </div>
+
+        <p>SPOJUJE NÁS VÍC NEŽ HRA.</p>
       </div>
     </section>
   );
 }
 
-function HeroSlider({ transfers }: { transfers: ClubTransfer[] }) {
-  const slides = transfers.slice(0, 3);
-  const [active, setActive] = useState(0);
-
-  useEffect(() => {
-    if (slides.length <= 1) return;
-
-    const timer = window.setInterval(() => {
-      setActive((current) => (current + 1) % slides.length);
-    }, 6500);
-
-    return () => window.clearInterval(timer);
-  }, [slides.length]);
-
-  if (slides.length === 0) {
-    return (
-      <article className={styles.hero}>
-        <div className={styles.heroFallback} />
-        <div className={styles.heroShade} />
-
-        <div className={styles.heroCopy}>
-          <span>KLUB</span>
-          <h2>SPOJUJE NÁS VÍC NEŽ HRA.</h2>
-          <p>Přátelství. Pokora. Bojovnost.</p>
-
-          <Link href="/klub" className={styles.primaryButton}>
-            POZNAT KLUB <b>→</b>
-          </Link>
-        </div>
-      </article>
-    );
-  }
-
-  const transfer = slides[active];
-
+function LastMatchPanel({ match, team }: { match: MatchResult | null; team: Team }) {
   return (
-    <article className={styles.hero}>
-      {slides.map((slide, index) => (
-        <img
-          key={slide.id}
-          className={`${styles.heroImage} ${
-            index === active ? styles.heroImageActive : ""
-          }`}
-          src={getTransferImage(slide)}
-          alt={slide.playerName}
-        />
-      ))}
-
-      <div className={styles.heroShade} />
-      <div className={styles.heroNoise} aria-hidden="true" />
-
-      <div className={styles.heroCopy}>
-        <span>AKTUALITY</span>
-
-        <h2>
-          {transfer.direction === "arrival"
-            ? "NOVÁ TVÁŘ V FC PPB"
-            : "ZMĚNA V KÁDRU"}
-        </h2>
-
-        <p>
-          {transfer.playerName} · {movementLabel(transfer)}
-          {transfer.otherClub ? ` · ${transfer.otherClub}` : ""}
-        </p>
-
-        <Link href="/prestupy" className={styles.primaryButton}>
-          ČÍST VÍCE <b>→</b>
-        </Link>
+    <article className={styles.matchPanel}>
+      <div className={styles.panelTopline}>
+        <span>POSLEDNÍ ZÁPAS · {team === "a" ? "A-TÝM" : "B-TÝM"}</span>
+        <b>KONEC</b>
       </div>
-
-      {slides.length > 1 && (
-        <>
-          <button
-            type="button"
-            className={`${styles.heroArrow} ${styles.heroArrowLeft}`}
-            onClick={() =>
-              setActive((active - 1 + slides.length) % slides.length)
-            }
-            aria-label="Předchozí aktualita"
-          >
-            ‹
-          </button>
-
-          <button
-            type="button"
-            className={`${styles.heroArrow} ${styles.heroArrowRight}`}
-            onClick={() => setActive((active + 1) % slides.length)}
-            aria-label="Další aktualita"
-          >
-            ›
-          </button>
-        </>
-      )}
-
-      <div className={styles.heroPager}>
-        <strong>{String(active + 1).padStart(2, "0")}</strong>
-        <span>/</span>
-        <b>{String(slides.length).padStart(2, "0")}</b>
-
-        <div className={styles.heroDots}>
-          {slides.map((slide, index) => (
-            <button
-              key={slide.id}
-              type="button"
-              className={index === active ? styles.heroDotActive : ""}
-              onClick={() => setActive(index)}
-              aria-label={`Aktualita ${index + 1}`}
-            />
-          ))}
-        </div>
-      </div>
-    </article>
-  );
-}
-
-function LastMatchCard({
-  match,
-  team,
-  setTeam,
-}: {
-  match: MatchResult | null;
-  team: Team;
-  setTeam: (team: Team) => void;
-}) {
-  return (
-    <section className={styles.sideBlock}>
-      <div className={styles.sideHead}>
-        <div>
-          <span>VÝSLEDEK</span>
-          <h2>POSLEDNÍ ZÁPAS</h2>
-        </div>
-
-        <TeamToggle team={team} setTeam={setTeam} compact />
-      </div>
-
       {match ? (
         <>
-          <div className={styles.lastMatch}>
+          <div className={styles.matchMain}>
             <MatchClub name={match.homeTeam} />
-
-            <strong>
-              {match.homeScore}
-              <i>:</i>
-              {match.awayScore}
-            </strong>
-
+            <div className={styles.score}>{match.homeScore}<i>:</i>{match.awayScore}</div>
             <MatchClub name={match.awayTeam} />
           </div>
-
-          <div className={styles.matchMetaLine}>
+          <div className={styles.matchFoot}>
             <span>{match.date}</span>
-
-            {match.detailUrl && (
-              <a
-                href={match.detailUrl}
-                target="_blank"
-                rel="noreferrer"
-              >
-                DETAIL ↗
-              </a>
-            )}
+            {match.detailUrl ? <a href={match.detailUrl} target="_blank" rel="noreferrer">DETAIL ↗</a> : null}
           </div>
         </>
-      ) : (
-        <div className={styles.empty}>Bez odehraného zápasu.</div>
-      )}
-    </section>
-  );
-}
-
-function PlayerOfMatchCard({
-  player,
-}: {
-  player: PlayerOfMatch | null;
-}) {
-  if (!player) {
-    return (
-      <section className={`${styles.sideBlock} ${styles.playerMatchBlock}`}>
-        <div className={styles.sideHead}>
-          <div>
-            <span>VÝKON</span>
-            <h2>HRÁČ ZÁPASU</h2>
-          </div>
-        </div>
-
-        <div className={styles.empty}>Hráč zápasu zatím není dostupný.</div>
-      </section>
-    );
-  }
-
-  const image = PNG_PLAYER_IDS.has(player.id)
-    ? `/images/${player.id}.png`
-    : `/images/${player.id}.jpg`;
-
-  return (
-    <section className={`${styles.sideBlock} ${styles.playerMatchBlock}`}>
-      <div className={styles.sideHead}>
-        <div>
-          <span>VÝKON</span>
-          <h2>HRÁČ ZÁPASU</h2>
-        </div>
-
-        {player.rating !== null && (
-          <div className={styles.rating}>
-            <span>ZNÁMKA</span>
-            <b>{player.rating.toFixed(1)}</b>
-          </div>
-        )}
-      </div>
-
-      <Link
-        href={`/hrac/${player.id}`}
-        className={styles.playerMatchContent}
-      >
-        <div className={styles.playerMatchVisual}>
-          <img
-            className={styles.playerWatermark}
-            src="/images/fc-ppb-logo.png"
-            alt=""
-            aria-hidden="true"
-          />
-
-          <img
-            className={styles.playerMatchImage}
-            src={image}
-            alt={player.name}
-          />
-        </div>
-
-        <div className={styles.playerMatchInfo}>
-          <h3>{player.name}</h3>
-
-          <div className={styles.performanceStats}>
-            <span>
-              <b>{player.goals}</b>
-              GÓLY
-            </span>
-
-            <span>
-              <b>{player.assists}</b>
-              ASISTENCE
-            </span>
-          </div>
-
-          <p>{player.matchTitle}</p>
-        </div>
-      </Link>
-    </section>
-  );
-}
-
-function NextMatchesSection({
-  aMatch,
-  bMatch,
-  aRows,
-  bRows,
-}: {
-  aMatch: NextMatch | null;
-  bMatch: NextMatch | null;
-  aRows: LeagueRow[];
-  bRows: LeagueRow[];
-}) {
-  return (
-    <section className={styles.section}>
-      <SectionHeading
-        eyebrow="NÁSLEDUJÍCÍ UTKÁNÍ"
-        title="DALŠÍ ZÁPASY."
-        href="/zapasy"
-        link="CELÝ PROGRAM"
-      />
-
-      <div className={styles.nextMatchCards}>
-        <NextMatchCompact
-          teamLabel="A-TÝM"
-          competition="1.B TŘÍDA"
-          match={aMatch}
-          rows={aRows}
-        />
-
-        <NextMatchCompact
-          teamLabel="B-TÝM"
-          competition="2.B TŘÍDA"
-          match={bMatch}
-          rows={bRows}
-        />
-      </div>
-    </section>
-  );
-}
-
-function NextMatchCompact({
-  teamLabel,
-  competition,
-  match,
-  rows,
-}: {
-  teamLabel: string;
-  competition: string;
-  match: NextMatch | null;
-  rows: LeagueRow[];
-}) {
-  if (!match) {
-    return (
-      <article className={`${styles.matchTile} ${styles.nextCompactTile}`}>
-        <div className={styles.matchTileTop}>
-          <span>{teamLabel}</span>
-          <b>DALŠÍ ZÁPAS</b>
-        </div>
-
-        <div className={styles.matchTileCompetition}>
-          {competition}
-        </div>
-
-        <div className={styles.empty}>
-          Další zápas zatím není v rozpisu APF.
-        </div>
-
-        <Link href="/zapasy" className={styles.tileButton}>
-          PROGRAM <span>→</span>
-        </Link>
-      </article>
-    );
-  }
-
-  const home = findTeamRow(rows, match.homeTeam);
-  const away = findTeamRow(rows, match.awayTeam);
-  const round = getRoundLabel(match);
-
-  return (
-    <article className={`${styles.matchTile} ${styles.nextCompactTile}`}>
-      <div className={styles.matchTileTop}>
-        <span>{teamLabel}</span>
-        <b>DALŠÍ ZÁPAS</b>
-      </div>
-
-      <div className={styles.matchTileCompetition}>
-        {competition}
-        {round ? ` · ${round}` : ""}
-      </div>
-
-      <div className={styles.matchTileTeams}>
-        <CompactMatchClub
-          name={match.homeTeam}
-          row={home}
-        />
-
-        <strong>VS</strong>
-
-        <CompactMatchClub
-          name={match.awayTeam}
-          row={away}
-        />
-      </div>
-
-      <div className={styles.compactMatchMeta}>
-        <strong>{match.date || "—"}</strong>
-        <span>{match.time || "—"}</span>
-        {match.venue && <small>{match.venue}</small>}
-      </div>
-
-      <Link href="/zapasy" className={styles.tileButton}>
-        DETAIL <span>→</span>
-      </Link>
+      ) : <Empty text="Bez odehraného zápasu." />}
     </article>
   );
 }
 
-function CompactMatchClub({
-  name,
-  row,
-}: {
-  name: string;
-  row: LeagueRow | null;
-}) {
+function NextMatchPanel({ match, team, rows }: { match: NextMatch | null; team: Team; rows: LeagueRow[] }) {
+  const home = match ? findTeamRow(rows, match.homeTeam) : null;
+  const away = match ? findTeamRow(rows, match.awayTeam) : null;
+
   return (
-    <div className={styles.compactClub}>
-      <TeamLogo name={name} />
-
-      <b>{name}</b>
-
-      <div className={styles.compactClubStats}>
-        <span>
-          <strong>{row ? `${row.position}.` : "—"}</strong>
-          MÍSTO
-        </span>
-
-        <span>
-          <strong>{row?.score ?? "—"}</strong>
-          SKÓRE
-        </span>
+    <article className={`${styles.matchPanel} ${styles.nextPanel}`}>
+      <div className={styles.panelTopline}>
+        <span>NADCHÁZEJÍCÍ ZÁPAS · {team === "a" ? "A-TÝM" : "B-TÝM"}</span>
+        <b>DALŠÍ</b>
       </div>
-    </div>
+      {match ? (
+        <>
+          <div className={styles.matchMain}>
+            <MatchClub name={match.homeTeam} position={home?.position} />
+            <div className={styles.versus}>VS</div>
+            <MatchClub name={match.awayTeam} position={away?.position} />
+          </div>
+          <div className={styles.matchFoot}>
+            <span>{[match.date, match.time].filter(Boolean).join(" · ")}</span>
+            <Link href="/zapasy">PROGRAM →</Link>
+          </div>
+          {match.venue ? <div className={styles.venue}>{match.venue}</div> : null}
+        </>
+      ) : <Empty text="Další zápas zatím není v rozpisu." />}
+    </article>
   );
 }
 
-function TeamsSection({
-  team,
-  setTeam,
-  competition,
-  players,
-  rows,
-}: {
-  team: Team;
-  setTeam: (team: Team) => void;
-  competition: string;
-  players: SquadPlayer[];
-  rows: LeagueRow[];
-}) {
-  const miniRows = aroundOurTeam(rows, 6);
-  const [showcasePlayers, setShowcasePlayers] = useState<SquadPlayer[]>([]);
+function PlayerOfMatchCard({ player, teamLabel }: { player: PlayerOfMatch | null; teamLabel: string }) {
+  if (!player) {
+    return <article className={styles.pomCard}><div className={styles.pomLabel}>{teamLabel}</div><Empty text="Hráč utkání zatím není dostupný." /></article>;
+  }
+  const image = PNG_PLAYER_IDS.has(player.id) ? `/images/${player.id}.png` : `/images/${player.id}.jpg`;
+  return (
+    <Link href={`/hrac/${player.id}`} className={styles.pomCard}>
+      <div className={styles.bigNumber}>{player.id}</div>
+      <img className={styles.pomWatermark} src="/images/fc-ppb-logo.png" alt="" aria-hidden="true" />
+      <img className={styles.pomPlayer} src={image} alt={player.name} />
+      <div className={styles.pomLabel}>{teamLabel}</div>
+      <div className={styles.pomCopy}>
+        <span>★ HRÁČ UTKÁNÍ</span>
+        <h3>{player.name}</h3>
+        <div className={styles.pomStats}>
+          <div><b>{player.goals}</b><small>GÓLY</small></div>
+          <div><b>{player.assists}</b><small>ASISTENCE</small></div>
+          {player.rating !== null ? <div><b>{player.rating.toFixed(1)}</b><small>ZNÁMKA</small></div> : null}
+        </div>
+      </div>
+    </Link>
+  );
+}
 
-  useEffect(() => {
-    const pool = [...players];
+function NewsSection({ props }: { props: Props }) {
+  const cards = useMemo(() => {
+    const transferCards = props.transfers.slice(0, 3).map((transfer) => ({
+      key: `transfer-${transfer.id}`,
+      tag: transfer.direction === "arrival" ? "PŘÍCHOD" : "ODCHOD",
+      title: `${transfer.playerName} · ${movementLabel(transfer)}`,
+      date: "AKTUALITA KLUBU",
+      image: getTransferImage(transfer),
+      href: "/prestupy",
+    }));
 
-    // Fisher-Yates: nový náhodný týmový náhled při načtení / přepnutí A-B.
-    for (let i = pool.length - 1; i > 0; i -= 1) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [pool[i], pool[j]] = [pool[j], pool[i]];
-    }
+    if (transferCards.length >= 3) return transferCards;
 
-    setShowcasePlayers(pool.slice(0, Math.min(4, pool.length)));
-  }, [team, players]);
+    const matchCards = [
+      props.aMatches[0] ? {
+        key: "a-result",
+        tag: "A-TÝM",
+        title: `${props.aMatches[0].homeTeam} ${props.aMatches[0].homeScore}:${props.aMatches[0].awayScore} ${props.aMatches[0].awayTeam}`,
+        date: props.aMatches[0].date,
+        image: "/images/fc-ppb-logo.png",
+        href: "/zapasy",
+      } : null,
+      props.bMatches[0] ? {
+        key: "b-result",
+        tag: "B-TÝM",
+        title: `${props.bMatches[0].homeTeam} ${props.bMatches[0].homeScore}:${props.bMatches[0].awayScore} ${props.bMatches[0].awayTeam}`,
+        date: props.bMatches[0].date,
+        image: "/images/fc-ppb-logo.png",
+        href: "/zapasy",
+      } : null,
+    ].filter(Boolean) as Array<{key:string;tag:string;title:string;date:string;image:string;href:string}>;
+
+    return [...transferCards, ...matchCards].slice(0, 3);
+  }, [props.transfers, props.aMatches, props.bMatches]);
+
+  if (cards.length === 0) return null;
 
   return (
     <section className={styles.section}>
-      <SectionHeading
-        eyebrow="KLUB"
-        title="TÝMY."
-        href="/tymy"
-        link="DETAIL TÝMU"
-      />
-
-      <div className={styles.teamSectionBar}>
-        <TeamToggle team={team} setTeam={setTeam} />
+      <div className={styles.sectionHeaderRow}>
+        <SectionTitle eyebrow="KRÁTCE Z KLUBU" title="Z KABINY." compact />
+        <Link className={styles.textLink} href="/novinky">VŠECHNY NOVINKY →</Link>
       </div>
-
-      <div className={styles.teamsSplit}>
-        <div className={styles.teamShowcase}>
-          <img
-            className={styles.teamShowcaseLogo}
-            src="/images/fc-ppb-logo.png"
-            alt=""
-            aria-hidden="true"
-          />
-
-          <div className={styles.teamShowcasePlayers}>
-            {showcasePlayers.length > 0 ? (
-              showcasePlayers.map((player, index) => (
-                <ShowcasePlayer
-                  key={`${team}-${player.id}`}
-                  player={player}
-                  index={index}
-                  count={showcasePlayers.length}
-                />
-              ))
-            ) : (
-              <div className={styles.empty}>
-                Náhled hráčů zatím není dostupný.
-              </div>
-            )}
-          </div>
-
-          <div className={styles.teamShowcaseFade} />
-
-          <Link href="/tymy" className={styles.teamShowcaseLink}>
-            SOUPISKA <span>→</span>
-          </Link>
-        </div>
-
-        <div className={styles.teamTable}>
-          <div className={styles.teamTableTop}>
-            <div>
-              <span>SOUTĚŽ</span>
-              <h3>{competition}</h3>
-            </div>
-
-            <Link href="/zapasy#tabulka">
-              CELÁ TABULKA <b>→</b>
-            </Link>
-          </div>
-
-          <div className={styles.tableHead}>
-            <span>#</span>
-            <span>TÝM</span>
-            <span>Z</span>
-            <span>SKÓRE</span>
-            <span>B</span>
-          </div>
-
-          {miniRows.map((row) => (
-            <div
-              key={`${row.position}-${row.teamName}`}
-              className={`${styles.tableRow} ${
-                row.isOurTeam ? styles.ourTeamRow : ""
-              }`}
-            >
-              <span>{row.position}.</span>
-              <strong>{row.teamName}</strong>
-              <span>{row.matches}</span>
-              <span>{row.score}</span>
-              <b>{row.points}</b>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function ShowcasePlayer({
-  player,
-  index,
-  count,
-}: {
-  player: SquadPlayer;
-  index: number;
-  count: number;
-}) {
-  const sources = [
-    ...(PNG_PLAYER_IDS.has(player.id) ? [`/images/${player.id}.png`] : []),
-    ...(player.imageUrl ? [player.imageUrl] : []),
-  ];
-
-  const [imageIndex, setImageIndex] = useState(0);
-  const image = sources[imageIndex];
-
-  useEffect(() => {
-    setImageIndex(0);
-  }, [player.id]);
-
-  return (
-    <div
-      className={styles.showcasePlayer}
-      data-slot={getShowcaseSlot(index, count)}
-      title={player.name}
-    >
-      {image ? (
-        <img
-          src={image}
-          alt={player.name}
-          onError={() =>
-            setImageIndex((current) =>
-              current + 1 < sources.length ? current + 1 : sources.length,
-            )
-          }
-        />
-      ) : (
-        <div className={styles.showcaseSilhouette}>PPB</div>
-      )}
-    </div>
-  );
-}
-
-function getShowcaseSlot(index: number, count: number) {
-  if (count <= 1) return "center";
-  if (count === 2) return index === 0 ? "left" : "right";
-  if (count === 3) return ["left", "center", "right"][index];
-
-  // 4 hráči: dva vzadu, dva vpředu. Vizuálně se překrývají jako týmová fotka.
-  return ["far-left", "left-center", "right-center", "far-right"][index];
-}
-
-function MatchesSection({
-  aLast,
-  bLast,
-  aNext,
-  bNext,
-}: {
-  aLast: MatchResult | null;
-  bLast: MatchResult | null;
-  aNext: NextMatch | null;
-  bNext: NextMatch | null;
-}) {
-  const cards: MatchCardData[] = [
-    ...(aLast
-      ? [
-          {
-            key: "a-last",
-            team: "A-TÝM",
-            competition: "1.B TŘÍDA",
-            kind: "POSLEDNÍ ZÁPAS",
-            home: aLast.homeTeam,
-            away: aLast.awayTeam,
-            date: aLast.date,
-            score: `${aLast.homeScore}:${aLast.awayScore}`,
-            detailUrl: aLast.detailUrl,
-          },
-        ]
-      : []),
-
-    ...(aNext
-      ? [
-          {
-            key: "a-next",
-            team: "A-TÝM",
-            competition: "1.B TŘÍDA",
-            kind: "DALŠÍ ZÁPAS",
-            home: aNext.homeTeam,
-            away: aNext.awayTeam,
-            date: [aNext.date, aNext.time].filter(Boolean).join(" · "),
-            score: "VS",
-            detailUrl: "/zapasy",
-          },
-        ]
-      : []),
-
-    ...(bLast
-      ? [
-          {
-            key: "b-last",
-            team: "B-TÝM",
-            competition: "2.B TŘÍDA",
-            kind: "POSLEDNÍ ZÁPAS",
-            home: bLast.homeTeam,
-            away: bLast.awayTeam,
-            date: bLast.date,
-            score: `${bLast.homeScore}:${bLast.awayScore}`,
-            detailUrl: bLast.detailUrl,
-          },
-        ]
-      : []),
-
-    ...(bNext
-      ? [
-          {
-            key: "b-next",
-            team: "B-TÝM",
-            competition: "2.B TŘÍDA",
-            kind: "DALŠÍ ZÁPAS",
-            home: bNext.homeTeam,
-            away: bNext.awayTeam,
-            date: [bNext.date, bNext.time].filter(Boolean).join(" · "),
-            score: "VS",
-            detailUrl: "/zapasy",
-          },
-        ]
-      : []),
-  ];
-
-  return (
-    <section className={styles.section}>
-      <SectionHeading
-        eyebrow="PROGRAM"
-        title="ZÁPASY."
-        href="/zapasy"
-        link="VŠECHNY ZÁPASY"
-      />
-
-      <div className={styles.matchScroller}>
+      <div className={styles.newsGrid}>
         {cards.map((card) => (
-          <MatchTile key={card.key} card={card} />
+          <Link href={card.href} className={styles.newsCard} key={card.key}>
+            <div className={styles.newsVisual}><img src={card.image} alt="" /></div>
+            <div className={styles.newsShade} />
+            <div className={styles.newsCopy}><span>{card.tag}</span><h3>{card.title}</h3><small>{card.date}</small></div>
+          </Link>
         ))}
       </div>
     </section>
   );
 }
 
-type MatchCardData = {
-  key: string;
-  team: string;
-  competition: string;
-  kind: string;
-  home: string;
-  away: string;
-  date: string;
-  score: string;
-  detailUrl?: string | null;
-};
-
-function MatchTile({ card }: { card: MatchCardData }) {
+function LeaguePreview({ rows }: { rows: LeagueRow[] }) {
+  const visible = aroundOurTeam(rows, 5);
   return (
-    <article className={styles.matchTile}>
-      <div className={styles.matchTileTop}>
-        <span>{card.team}</span>
-        <b>{card.kind}</b>
-      </div>
-
-      <div className={styles.matchTileCompetition}>
-        {card.competition}
-      </div>
-
-      <div className={styles.matchTileTeams}>
-        <MatchClub name={card.home} />
-
-        <strong>{card.score}</strong>
-
-        <MatchClub name={card.away} />
-      </div>
-
-      <p>{card.date}</p>
-
-      {card.detailUrl && (
-        card.detailUrl.startsWith("http") ? (
-          <a
-            href={card.detailUrl}
-            target="_blank"
-            rel="noreferrer"
-            className={styles.tileButton}
-          >
-            DETAIL <span>→</span>
-          </a>
-        ) : (
-          <Link href={card.detailUrl} className={styles.tileButton}>
-            DETAIL <span>→</span>
-          </Link>
-        )
-      )}
-    </article>
+    <div className={styles.tableCard}>
+      <div className={styles.tableHead}><span>#</span><span>TÝM</span><span>Z</span><span>SKÓRE</span><span>B</span></div>
+      {visible.map((row) => (
+        <div key={`${row.position}-${row.teamName}`} className={`${styles.tableRow} ${row.isOurTeam ? styles.ourRow : ""}`}>
+          <span>{row.position}.</span><strong>{row.teamName}</strong><span>{row.matches}</span><span>{row.score}</span><b>{row.points}</b>
+        </div>
+      ))}
+      <Link href="/zapasy#tabulka" className={styles.tableLink}>CELÁ TABULKA <span>→</span></Link>
+    </div>
   );
 }
 
-function PartnersSection() {
+function TeamsPreview({ aPlayers, bPlayers }: { aPlayers: SquadPlayer[]; bPlayers: SquadPlayer[] }) {
   return (
-    <section className={`${styles.section} ${styles.partnersSection}`}>
-      <SectionHeading
-        eyebrow="HRAJÍ S NÁMI"
-        title="PARTNEŘI."
-        href="/partneri"
-        link="PARTNEŘI KLUBU"
-      />
-
-      <div className={styles.partners}>
-        <PartnerLogo
-          name="PILSCO"
-          href="https://www.pilsco.cz/"
-          sources={[
-            "/partners/pilsco.png",
-          ]}
-        />
-
-        <PartnerLogo
-          name="FEMOTEC"
-          href="https://femotec.cz/"
-          sources={[
-            "/partners/femotec.png",
-          ]}
-        />
+    <section className={styles.section}>
+      <SectionTitle eyebrow="SOUPISKY" title="NAŠE TÝMY." />
+      <div className={styles.teamsGrid}>
+        <TeamPreviewCard label="A-TÝM" players={aPlayers} href="/tymy?team=a" />
+        <TeamPreviewCard label="B-TÝM" players={bPlayers} href="/tymy?team=b" />
       </div>
     </section>
   );
 }
 
-function PartnerLogo({
-  name,
-  href,
-  sources,
-}: {
-  name: string;
-  href: string;
-  sources: string[];
-}) {
-  const [index, setIndex] = useState(0);
-  const src = sources[index];
-
+function TeamPreviewCard({ label, players, href }: { label: string; players: SquadPlayer[]; href: string }) {
+  const featured = players.filter((p) => PNG_PLAYER_IDS.has(p.id) || Boolean(p.imageUrl)).slice(0, 3);
   return (
-    <a href={href} target="_blank" rel="noreferrer">
-      {src ? (
-        <img
-          src={src}
-          alt={name}
-          onError={() =>
-            setIndex((current) =>
-              current + 1 < sources.length
-                ? current + 1
-                : sources.length,
-            )
-          }
-        />
-      ) : (
-        <strong>{name}</strong>
-      )}
-    </a>
+    <Link href={href} className={styles.teamCard}>
+      <img className={styles.teamGhost} src="/images/fc-ppb-logo.png" alt="" />
+      <div className={styles.teamPlayers}>
+        {featured.map((player, index) => <RosterImage key={player.id} player={player} index={index} />)}
+      </div>
+      <div className={styles.teamCardShade} />
+      <div className={styles.teamCardCopy}><span>FC PPB</span><h3>{label}</h3><b>SOUPISKA →</b></div>
+    </Link>
   );
 }
 
-function SocialStrip() {
+function RosterImage({ player, index }: { player: SquadPlayer; index: number }) {
+  const src = PNG_PLAYER_IDS.has(player.id) ? `/images/${player.id}.png` : player.imageUrl;
+  if (!src) return null;
+  return <img src={src} alt={player.name} style={{ zIndex: index + 1 }} />;
+}
+
+function Partners() {
   return (
-    <section className={styles.socialStrip}>
-      <div>
-        <span>SLEDUJ FC PPB</span>
-        <strong>ZÁPASY. KABINA. TRÉNINKY. ZÁKULISÍ.</strong>
-      </div>
-
-      <div>
-        <a href={TIKTOK_URL} target="_blank" rel="noreferrer">
-          TIKTOK <span>@fcppbfutsal</span>
-        </a>
-
-        <a href={INSTAGRAM_URL} target="_blank" rel="noreferrer">
-          INSTAGRAM <span>fcppb_futsl</span>
-        </a>
-      </div>
+    <section className={styles.partners}>
+      <span>HRAJÍ S NÁMI</span>
+      <a href="https://www.pilsco.cz/" target="_blank" rel="noreferrer"><img src="/partners/pilsco.png" alt="PILSCO" /></a>
+      <a href="https://femotec.cz/" target="_blank" rel="noreferrer"><img src="/partners/femotec.png" alt="FEMOTEC" /></a>
     </section>
   );
 }
 
-function SectionHeading({
-  eyebrow,
-  title,
-  href,
-  link,
-}: {
-  eyebrow: string;
-  title: string;
-  href: string;
-  link: string;
-}) {
+function Social() {
   return (
-    <div className={styles.sectionHeading}>
-      <div>
-        <span>{eyebrow}</span>
-        <h2>{title}</h2>
-      </div>
+    <section className={styles.social}>
+      <div><span>SLEDUJ FC PPB</span><strong>ZÁPASY. KABINA. TRÉNINKY.</strong></div>
+      <div><a href={TIKTOK_URL} target="_blank" rel="noreferrer">TIKTOK ↗</a><a href={INSTAGRAM_URL} target="_blank" rel="noreferrer">INSTAGRAM ↗</a></div>
+    </section>
+  );
+}
 
-      <Link href={href}>
-        {link} <b>→</b>
-      </Link>
+function SectionTitle({ eyebrow, title, compact = false }: { eyebrow: string; title: string; compact?: boolean }) {
+  return <div className={`${styles.sectionTitle} ${compact ? styles.sectionTitleCompact : ""}`}><span>{eyebrow}</span><h2>{title}</h2></div>;
+}
+
+function TeamToggle({ team, setTeam }: { team: Team; setTeam: (team: Team) => void }) {
+  return (
+    <div className={styles.toggle}>
+      <button type="button" className={team === "a" ? styles.active : ""} onClick={() => setTeam("a")}>A-TÝM</button>
+      <button type="button" className={team === "b" ? styles.active : ""} onClick={() => setTeam("b")}>B-TÝM</button>
     </div>
   );
 }
 
-function TeamToggle({
-  team,
-  setTeam,
-  compact = false,
-}: {
-  team: Team;
-  setTeam: (team: Team) => void;
-  compact?: boolean;
-}) {
-  return (
-    <div className={`${styles.toggle} ${compact ? styles.toggleCompact : ""}`}>
-      <button
-        type="button"
-        className={team === "a" ? styles.active : ""}
-        onClick={() => setTeam("a")}
-      >
-        A-TÝM
-      </button>
-
-      <button
-        type="button"
-        className={team === "b" ? styles.active : ""}
-        onClick={() => setTeam("b")}
-      >
-        B-TÝM
-      </button>
-    </div>
-  );
+function MatchClub({ name, position }: { name: string; position?: number }) {
+  return <div className={styles.club}><TeamLogo name={name} /><strong>{name}</strong>{position ? <small>{position}. MÍSTO</small> : null}</div>;
 }
 
-function MatchClub({ name }: { name: string }) {
-  return (
-    <div className={styles.matchClub}>
-      <TeamLogo name={name} />
-      <b>{name}</b>
-    </div>
-  );
-}
-
-function TeamLogo({
-  name,
-  large = false,
-}: {
-  name: string;
-  large?: boolean;
-}) {
+function TeamLogo({ name }: { name: string }) {
   const ours = normalize(name).includes("fc ppb");
-
-  const sources = ours
-    ? ["/images/fc-ppb-logo.png"]
-    : teamLogoSources(name);
-
+  const sources = ours ? ["/images/fc-ppb-logo.png"] : teamLogoSources(name);
   const [index, setIndex] = useState(0);
   const src = sources[index];
-
-  return (
-    <div className={`${styles.teamLogo} ${large ? styles.teamLogoLarge : ""}`}>
-      {src ? (
-        <img
-          src={src}
-          alt={name}
-          onError={() =>
-            setIndex((current) =>
-              current + 1 < sources.length
-                ? current + 1
-                : sources.length,
-            )
-          }
-        />
-      ) : (
-        <span>{initials(name)}</span>
-      )}
-    </div>
-  );
+  return src ? <img className={styles.clubLogo} src={src} alt={name} onError={() => setIndex((i) => i + 1 < sources.length ? i + 1 : sources.length)} /> : <div className={styles.logoFallback}>{initials(name)}</div>;
 }
+
+function Empty({ text }: { text: string }) { return <div className={styles.empty}>{text}</div>; }
+
+function tableRowsFor(team: Team, props: Props) { return team === "a" ? props.aLeagueTable : props.bLeagueTable; }
 
 function teamLogoSources(teamName: string): string[] {
   const slug = slugify(teamName);
-
-  return [
-    `/images/teams/${slug}.png`,
-    `/images/teams/${slug}.webp`,
-    `/images/teams/${slug}.jpg`,
-    `/images/${slug}.png`,
-  ];
+  return [`/images/teams/${slug}.png`, `/images/teams/${slug}.webp`, `/images/teams/${slug}.jpg`, `/images/${slug}.png`];
 }
 
-function slugify(value: string): string {
-  return value
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
-}
-
-function findTeamRow(
-  rows: LeagueRow[],
-  teamName: string,
-): LeagueRow | null {
+function findTeamRow(rows: LeagueRow[], teamName: string): LeagueRow | null {
   const wanted = normalize(teamName);
-
-  return (
-    rows.find((row) => normalize(row.teamName) === wanted) ??
-    rows.find((row) => {
-      const current = normalize(row.teamName);
-
-      return current.includes(wanted) || wanted.includes(current);
-    }) ??
-    null
-  );
+  return rows.find((row) => normalize(row.teamName) === wanted) ?? rows.find((row) => {
+    const current = normalize(row.teamName);
+    return current.includes(wanted) || wanted.includes(current);
+  }) ?? null;
 }
 
 function aroundOurTeam(rows: LeagueRow[], count: number): LeagueRow[] {
   if (rows.length === 0) return [];
-
   const index = rows.findIndex((row) => row.isOurTeam);
-
   if (index < 0) return rows.slice(0, count);
-
-  const half = Math.floor(count / 2);
-  let start = Math.max(0, index - half);
+  let start = Math.max(0, index - Math.floor(count / 2));
   let end = Math.min(rows.length, start + count);
-
   start = Math.max(0, end - count);
-
   return rows.slice(start, end);
-}
-
-function getRoundLabel(match: NextMatch | null): string | null {
-  if (!match) return null;
-
-  const extended =
-    match as NextMatch & {
-      round?: string | number | null;
-      roundName?: string | null;
-      matchday?: string | number | null;
-    };
-
-  const raw =
-    extended.roundName ??
-    extended.round ??
-    extended.matchday;
-
-  if (
-    raw === null ||
-    raw === undefined ||
-    String(raw).trim() === ""
-  ) {
-    return null;
-  }
-
-  const value = String(raw).trim();
-
-  return /kolo/i.test(value)
-    ? value.toUpperCase()
-    : `${value}. KOLO`;
 }
 
 function movementLabel(transfer: ClubTransfer): string {
   switch (transfer.movementDetail) {
-    case "transfer_from":
-    case "transfer_to":
-      return "PŘESTUP";
-
-    case "loan_in":
-      return "NA HOSTOVÁNÍ";
-
-    case "loan_out":
-      return "HOSTOVÁNÍ";
-
-    case "loan_end":
-      return "KONEC HOSTOVÁNÍ";
-
-    case "released":
-      return "UKONČENÍ PŮSOBENÍ";
+    case "transfer_from": case "transfer_to": return "PŘESTUP";
+    case "loan_in": return "NA HOSTOVÁNÍ";
+    case "loan_out": return "HOSTOVÁNÍ";
+    case "loan_end": return "KONEC HOSTOVÁNÍ";
+    case "released": return "UKONČENÍ PŮSOBENÍ";
+    default: return "ZMĚNA V KÁDRU";
   }
 }
 
 function getTransferImage(transfer: ClubTransfer): string {
-  if (
-    transfer.playerId &&
-    PNG_PLAYER_IDS.has(transfer.playerId)
-  ) {
-    return `/images/${transfer.playerId}.png`;
-  }
-
+  if (transfer.playerId && PNG_PLAYER_IDS.has(transfer.playerId)) return `/images/${transfer.playerId}.png`;
   return transfer.imageUrl || "/images/fc-ppb-logo.png";
 }
 
-function initials(value: string): string {
-  return value
-    .split(/\s+/)
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((word) => word[0]?.toUpperCase() ?? "")
-    .join("");
-}
-
-function normalize(value: string): string {
-  return value
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, " ")
-    .trim();
-}
+function slugify(value: string): string { return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, ""); }
+function normalize(value: string): string { return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim(); }
+function initials(value: string): string { return value.split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]?.toUpperCase() ?? "").join(""); }
