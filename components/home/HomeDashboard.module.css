@@ -155,3 +155,42 @@
   .partners > span { grid-column:1 / -1; }
   .social { align-items:flex-start; flex-direction:column; padding:28px 0; }
 }
+
+/* =========================================================
+   FC PPB — REFERENCE DESIGN / FINAL OVERRIDES
+   ========================================================= */
+
+.matchPanel{min-height:292px;padding:22px 28px 20px;border-color:rgba(255,255,255,.19);border-radius:2px;background:linear-gradient(180deg,rgba(5,8,6,.84),rgba(3,5,4,.97)),radial-gradient(circle at 75% 20%,rgba(83,242,10,.055),transparent 42%)}
+.panelTopline{justify-content:center}.panelTopline span{font-size:12px;letter-spacing:-.01em}.panelTopline b{position:absolute;top:18px;right:20px}
+.matchMain{margin-top:30px;grid-template-columns:1fr 145px 1fr}.clubLogo{width:88px;height:88px}.club strong{margin-top:2px;font-size:12px}
+.score{font-size:clamp(54px,6vw,82px);letter-spacing:-.055em}.score i{color:#fff;padding:0 4px}.versus{font-size:clamp(48px,5vw,70px);font-style:italic}
+.matchFoot{right:28px;bottom:18px;left:28px;justify-content:center;border-top:0;font-size:9px}.matchFoot a{position:absolute;right:0}.venue{bottom:42px;font-size:8px}
+
+.playersOfMatchGrid{min-height:0;gap:12px}
+.pomCard{display:grid;grid-template-columns:58px minmax(0,1.1fr) minmax(155px,.8fr);min-height:270px;border-color:rgba(255,255,255,.2);border-radius:2px;background:linear-gradient(110deg,#070907 0%,#0b0e0c 58%,#070907 100%)}
+.pomCard::after{display:none}
+.pomLabel{position:relative;z-index:8;left:auto;top:auto;display:flex;align-items:center;justify-content:center;border-right:1px solid rgba(255,255,255,.05);color:var(--green);background:rgba(0,0,0,.15);font-size:22px;letter-spacing:.01em;writing-mode:vertical-rl;transform:rotate(180deg)}
+.pomStage{position:relative;min-width:0;min-height:270px;overflow:hidden}
+.bigNumber{z-index:0;left:6px;top:22px;color:rgba(255,255,255,.075);font-size:clamp(120px,13vw,190px);line-height:.78}
+.pomWatermark{z-index:0;right:-4%;top:52%;width:72%;height:72%;opacity:.045}
+.pomPlayer{z-index:3;right:-2%;bottom:0;width:88%;height:100%;object-fit:contain;object-position:center bottom}
+.pomCopy{position:relative;z-index:5;left:auto;bottom:auto;width:auto;display:flex;flex-direction:column;justify-content:center;padding:26px 22px 22px 0}
+.pomCopy h3{margin:0 0 16px;color:#fff;font-size:clamp(20px,2.15vw,31px);line-height:.92;letter-spacing:-.035em}.pomCopy h3 strong{display:block;color:var(--green);font:inherit}
+.pomCopy>span{order:2;margin-bottom:18px;color:#f3f5f3;font-size:10px;letter-spacing:0}.pomStats{order:3;gap:28px}.pomStats b{font-size:25px}.pomStats small{margin-top:4px;color:#8a918b;font-size:8px}
+
+.teamsGrid{min-height:0;gap:12px}
+.teamCard{display:grid;grid-template-columns:62px minmax(0,1.1fr) minmax(190px,.9fr);min-height:260px;border-color:rgba(255,255,255,.2);border-radius:2px;background:radial-gradient(circle at 62% 45%,rgba(83,242,10,.08),transparent 38%),#080b09}
+.teamVertical{position:relative;z-index:8;display:flex;align-items:center;justify-content:center;border-right:1px solid rgba(255,255,255,.05);color:var(--green);font-size:clamp(28px,3vw,42px);font-weight:1000;font-style:italic;line-height:1;writing-mode:vertical-rl;transform:rotate(180deg)}
+.teamGhost{left:62%;top:50%;width:48%;height:74%;opacity:.045}
+.teamPlayers{position:relative;z-index:3;inset:auto;grid-column:2;grid-row:1;height:260px;padding:8px 0 0;justify-content:center;overflow:hidden}.teamPlayers img{width:52%;height:100%;margin-left:-20%}.teamPlayers img:first-child{margin-left:0}
+.teamCardShade{z-index:4;background:linear-gradient(90deg,transparent 35%,rgba(5,7,5,.4) 65%,rgba(5,7,5,.86))}
+.teamCardCopy{position:relative;z-index:6;left:auto;right:auto;bottom:auto;grid-column:3;grid-row:1;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;padding:25px 22px 25px 8px}
+.teamMenu{display:grid;gap:9px;margin-bottom:24px}.teamMenu span{color:#f0f3f1;font-size:11px;font-weight:900}.teamMenu span::after{content:" •";color:var(--green)}
+.teamCardCopy b{min-width:160px;padding:13px 16px;border:1px solid rgba(83,242,10,.48);color:var(--green);font-size:8px;text-align:center}
+
+@media(max-width:980px){.pomCard{grid-template-columns:52px minmax(0,1.1fr) minmax(145px,.75fr);min-height:250px}.pomStage{min-height:250px}.teamCard{grid-template-columns:52px minmax(0,1fr) minmax(175px,.9fr)}}
+@media(max-width:650px){
+.matchPanel{min-height:255px;padding:17px 12px}.panelTopline span{padding-right:45px;font-size:9px;text-align:center}.matchMain{grid-template-columns:1fr 76px 1fr;gap:5px}.clubLogo{width:58px;height:58px}.score,.versus{font-size:40px}
+.pomCard{grid-template-columns:42px minmax(0,1fr) minmax(110px,.82fr);min-height:220px}.pomLabel{font-size:16px}.pomStage{min-height:220px}.bigNumber{top:28px;font-size:92px}.pomPlayer{width:105%;right:-10%}.pomCopy{padding:18px 8px 16px 0}.pomCopy h3{margin-bottom:11px;font-size:16px}.pomCopy>span{margin-bottom:12px;font-size:7px}.pomStats{gap:13px}.pomStats b{font-size:19px}.pomStats small{font-size:6px}
+.teamCard{grid-template-columns:42px minmax(0,.9fr) minmax(120px,1fr);min-height:210px}.teamVertical{font-size:22px}.teamPlayers{height:210px}.teamCardCopy{padding:15px 8px 15px 2px}.teamMenu{gap:6px;margin-bottom:15px}.teamMenu span{font-size:8px}.teamCardCopy b{min-width:112px;padding:10px 7px;font-size:7px}
+}

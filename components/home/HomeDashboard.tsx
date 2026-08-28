@@ -182,25 +182,51 @@ function NextMatchPanel({ match, team, rows }: { match: NextMatch | null; team: 
 
 function PlayerOfMatchCard({ player, teamLabel }: { player: PlayerOfMatch | null; teamLabel: string }) {
   if (!player) {
-    return <article className={styles.pomCard}><div className={styles.pomLabel}>{teamLabel}</div><Empty text="Hráč utkání zatím není dostupný." /></article>;
+    return (
+      <article className={styles.pomCard}>
+        <div className={styles.pomLabel}>{teamLabel}</div>
+        <Empty text="Hráč utkání zatím není dostupný." />
+      </article>
+    );
   }
-  const image = PNG_PLAYER_IDS.has(player.id) ? `/images/${player.id}.png` : `/images/${player.id}.jpg`;
+
+  const image = PNG_PLAYER_IDS.has(player.id)
+    ? `/images/${player.id}.png`
+    : `/images/${player.id}.jpg`;
+
   return (
     <Link href={`/hrac/${player.id}`} className={styles.pomCard}>
-      <div className={styles.bigNumber}>{player.id}</div>
-      <img className={styles.pomWatermark} src="/images/fc-ppb-logo.png" alt="" aria-hidden="true" />
-      <img className={styles.pomPlayer} src={image} alt={player.name} />
       <div className={styles.pomLabel}>{teamLabel}</div>
+
+      <div className={styles.pomStage}>
+        <div className={styles.bigNumber}>{player.id}</div>
+        <img className={styles.pomWatermark} src="/images/fc-ppb-logo.png" alt="" aria-hidden="true" />
+        <img className={styles.pomPlayer} src={image} alt={player.name} />
+      </div>
+
       <div className={styles.pomCopy}>
+        <h3>{formatPlayerName(player.name)}</h3>
         <span>★ HRÁČ UTKÁNÍ</span>
-        <h3>{player.name}</h3>
+
         <div className={styles.pomStats}>
           <div><b>{player.goals}</b><small>GÓLY</small></div>
           <div><b>{player.assists}</b><small>ASISTENCE</small></div>
-          {player.rating !== null ? <div><b>{player.rating.toFixed(1)}</b><small>ZNÁMKA</small></div> : null}
         </div>
       </div>
     </Link>
+  );
+}
+
+function formatPlayerName(name: string) {
+  const parts = name.trim().split(/\s+/);
+  if (parts.length < 2) return name;
+  const last = parts.pop();
+
+  return (
+    <>
+      {parts.join(" ")}
+      <strong>{last}</strong>
+    </>
   );
 }
 
@@ -289,14 +315,26 @@ function TeamsPreview({ aPlayers, bPlayers }: { aPlayers: SquadPlayer[]; bPlayer
 
 function TeamPreviewCard({ label, players, href }: { label: string; players: SquadPlayer[]; href: string }) {
   const featured = players.filter((p) => PNG_PLAYER_IDS.has(p.id) || Boolean(p.imageUrl)).slice(0, 3);
+
   return (
     <Link href={href} className={styles.teamCard}>
-      <img className={styles.teamGhost} src="/images/fc-ppb-logo.png" alt="" />
+      <div className={styles.teamVertical}>{label}</div>
+      <img className={styles.teamGhost} src="/images/fc-ppb-logo.png" alt="" aria-hidden="true" />
+
       <div className={styles.teamPlayers}>
         {featured.map((player, index) => <RosterImage key={player.id} player={player} index={index} />)}
       </div>
+
       <div className={styles.teamCardShade} />
-      <div className={styles.teamCardCopy}><span>FC PPB</span><h3>{label}</h3><b>SOUPISKA →</b></div>
+
+      <div className={styles.teamCardCopy}>
+        <div className={styles.teamMenu}>
+          <span>SOUPISKA</span>
+          <span>STATISTIKY</span>
+          <span>REALIZAČNÍ TÝM</span>
+        </div>
+        <b>ZOBRAZIT TÝM →</b>
+      </div>
     </Link>
   );
 }
