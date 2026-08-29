@@ -692,3 +692,36 @@
     font-size: 6px !important;
   }
 }
+
+
+/* =========================================================
+   FC PPB — NAŠE TÝMY / LABEL STEJNÝ JAKO HRÁČ UTKÁNÍ
+   ========================================================= */
+
+.teamVertical {
+  font-family: "Arial Narrow", "Roboto Condensed", "Helvetica Neue", Arial, sans-serif !important;
+  font-size: 22px !important;
+  font-weight: 1000 !important;
+  font-style: normal !important;
+  line-height: 1 !important;
+  letter-spacing: .01em !important;
+  color: var(--green) !important;
+  writing-mode: vertical-rl !important;
+  transform: rotate(180deg) !important;
+}
+
+/* Všechny portréty v NAŠE TÝMY mají stejné chování a žádné vlastní pozadí */
+.teamPlayers img {
+  display: block;
+  align-self: flex-end;
+  height: 100% !important;
+  object-fit: contain !important;
+  object-position: center bottom !important;
+  background: transparent !important;
+}
+
+@media (max-width: 650px) {
+  .teamVertical {
+    font-size: 16px !important;
+  }
+}

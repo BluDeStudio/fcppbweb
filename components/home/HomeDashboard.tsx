@@ -358,16 +358,17 @@ function RosterImage({ player, index }: { player: SquadPlayer; index: number }) 
       style={{ zIndex: index + 1 }}
       onError={(event) => {
         const img = event.currentTarget;
+        const fallback = img.dataset.fallback || "";
 
-        if (img.dataset.fallback !== "remote" && player.imageUrl) {
-          img.dataset.fallback = "remote";
-          img.src = player.imageUrl;
+        if (fallback === "") {
+          img.dataset.fallback = "jpg";
+          img.src = `/images/${player.id}.jpg`;
           return;
         }
 
-        if (img.dataset.fallback !== "jpg") {
-          img.dataset.fallback = "jpg";
-          img.src = `/images/${player.id}.jpg`;
+        if (fallback === "jpg" && player.imageUrl) {
+          img.dataset.fallback = "remote";
+          img.src = player.imageUrl;
           return;
         }
 
