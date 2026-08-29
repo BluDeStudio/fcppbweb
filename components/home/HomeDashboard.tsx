@@ -213,6 +213,13 @@ function PlayerOfMatchCard({ player, teamLabel }: { player: PlayerOfMatch | null
         <h3>{formatPlayerName(player.name)}</h3>
         <span>★ HRÁČ UTKÁNÍ</span>
 
+        {player.rating !== null && (
+          <div className={styles.pomRating}>
+            <small>ZNÁMKA</small>
+            <strong>{player.rating.toFixed(1)}</strong>
+          </div>
+        )}
+
         <div className={styles.pomStats}>
           <div><b>{player.goals}</b><small>GÓLY</small></div>
           <div><b>{player.assists}</b><small>ASISTENCE</small></div>
@@ -345,9 +352,30 @@ function TeamPreviewCard({ label, players, href }: { label: string; players: Squ
 }
 
 function RosterImage({ player, index }: { player: SquadPlayer; index: number }) {
-  const src = PNG_PLAYER_IDS.has(player.id) ? `/images/${player.id}.png` : player.imageUrl;
-  if (!src) return null;
-  return <img src={src} alt={player.name} style={{ zIndex: index + 1 }} />;
+  return (
+    <img
+      src={`/images/${player.id}.png`}
+      alt={player.name}
+      style={{ zIndex: index + 1 }}
+      onError={(event) => {
+        const img = event.currentTarget;
+
+        if (img.dataset.fallback !== "remote" && player.imageUrl) {
+          img.dataset.fallback = "remote";
+          img.src = player.imageUrl;
+          return;
+        }
+
+        if (img.dataset.fallback !== "jpg") {
+          img.dataset.fallback = "jpg";
+          img.src = `/images/${player.id}.jpg`;
+          return;
+        }
+
+        img.style.display = "none";
+      }}
+    />
+  );
 }
 
 function Partners() {
