@@ -114,9 +114,10 @@ function Hero() {
         </div>
 
         <div className={styles.heroClaim}>
-          <strong>PŘÁTELSTVÍ.</strong>
-          <strong>POKORA.</strong>
-          <strong>BOJOVNOST.</strong>
+          <div className={styles.heroClaimLaser} aria-hidden="true" />
+          <strong data-text="PŘÁTELSTVÍ.">PŘÁTELSTVÍ.</strong>
+          <strong data-text="POKORA.">POKORA.</strong>
+          <strong data-text="BOJOVNOST.">BOJOVNOST.</strong>
         </div>
 
         <p>SPOJUJE NÁS VÍC NEŽ HRA.</p>
