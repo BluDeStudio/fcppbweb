@@ -631,3 +631,64 @@
     font-size: 14px;
   }
 }
+
+
+/* =========================================================
+   FC PPB — PLAYER OF MATCH / CLEAN RATING CORNER
+   ========================================================= */
+
+.pomMatchBadge {
+  display: none !important;
+}
+
+.pomRatingCorner {
+  position: absolute;
+  z-index: 14;
+  top: 14px;
+  right: 14px;
+  min-width: 54px;
+  padding: 9px 11px;
+  border-radius: 7px;
+  background: #176fc8;
+  color: #fff;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 21px;
+  font-weight: 950;
+  line-height: 1;
+  text-align: center;
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,.08),
+    0 8px 18px rgba(0,0,0,.2);
+}
+
+.pomMatchTitle {
+  display: block;
+  max-width: 185px;
+  margin: 0 0 17px;
+  overflow: hidden;
+  color: #d7ddd8 !important;
+  font-family: Arial, Helvetica, sans-serif !important;
+  font-size: 8px !important;
+  font-weight: 900 !important;
+  line-height: 1.25;
+  letter-spacing: .015em !important;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-transform: uppercase;
+}
+
+@media (max-width: 650px) {
+  .pomRatingCorner {
+    top: 8px;
+    right: 8px;
+    min-width: 44px;
+    padding: 7px 8px;
+    font-size: 16px;
+  }
+
+  .pomMatchTitle {
+    max-width: 125px;
+    margin-bottom: 11px;
+    font-size: 6px !important;
+  }
+}

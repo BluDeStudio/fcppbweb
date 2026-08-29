@@ -210,18 +210,14 @@ function PlayerOfMatchCard({ player, teamLabel }: { player: PlayerOfMatch | null
       </div>
 
       {player.rating !== null && (
-        <div className={styles.pomMatchBadge}>
-          <div className={styles.pomMatchBadgeTitle}>{player.matchTitle}</div>
-          <div className={styles.pomMatchBadgeMeta}>
-            <span>{player.matchDate}</span>
-            <strong>{player.rating.toFixed(1)}</strong>
-          </div>
+        <div className={styles.pomRatingCorner}>
+          {player.rating.toFixed(1)}
         </div>
       )}
 
       <div className={styles.pomCopy}>
         <h3>{formatPlayerName(player.name)}</h3>
-        <span>★ HRÁČ UTKÁNÍ</span>
+        <span className={styles.pomMatchTitle}>{player.matchTitle}</span>
 
         <div className={styles.pomStats}>
           <div><b>{player.goals}</b><small>GÓLY</small></div>
