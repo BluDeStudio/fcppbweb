@@ -545,3 +545,89 @@
     font-size: 18px;
   }
 }
+
+
+/* FC PPB — známka + zápas v pravém horním rohu karty */
+.pomMatchBadge {
+  position: absolute;
+  z-index: 12;
+  top: 14px;
+  right: 14px;
+  width: min(190px, 34%);
+  padding: 9px 10px 8px;
+  border: 1px solid rgba(36, 128, 221, .55);
+  border-radius: 7px;
+  background: rgba(13, 55, 96, .88);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 8px 20px rgba(0,0,0,.22);
+}
+
+.pomMatchBadgeTitle {
+  overflow: hidden;
+  color: #fff;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 8px;
+  font-weight: 900;
+  line-height: 1.15;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-transform: uppercase;
+}
+
+.pomMatchBadgeMeta {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 5px;
+}
+
+.pomMatchBadgeMeta span {
+  overflow: hidden;
+  color: rgba(255,255,255,.62);
+  font-size: 6px;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pomMatchBadgeMeta strong {
+  min-width: 42px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  background: #176fc8;
+  color: #fff;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 18px;
+  font-weight: 950;
+  line-height: 1;
+  text-align: center;
+}
+
+/* starý rating box už nepoužíváme */
+.pomRating {
+  display: none !important;
+}
+
+@media (max-width: 650px) {
+  .pomMatchBadge {
+    top: 8px;
+    right: 8px;
+    width: min(135px, 42%);
+    padding: 6px 7px;
+  }
+
+  .pomMatchBadgeTitle {
+    font-size: 6px;
+  }
+
+  .pomMatchBadgeMeta span {
+    font-size: 5px;
+  }
+
+  .pomMatchBadgeMeta strong {
+    min-width: 34px;
+    padding: 5px 6px;
+    font-size: 14px;
+  }
+}
