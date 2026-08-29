@@ -59,10 +59,7 @@ export function HomeDashboard(props: Props) {
       <div className={styles.shell}>
         <section className={styles.scoreboardSection}>
           <div className={styles.scoreboardHeader}>
-            <div>
-              <span className={styles.kicker}>MATCH CENTER</span>
-              <h2>AKTUÁLNĚ.</h2>
-            </div>
+            <SectionTitle title="ZÁPASY." />
             <TeamToggle team={matchTeam} setTeam={setMatchTeam} />
           </div>
 
@@ -73,7 +70,7 @@ export function HomeDashboard(props: Props) {
         </section>
 
         <section className={styles.section}>
-          <SectionTitle eyebrow="VÝKON KOLA" title="HRÁČI UTKÁNÍ." />
+          <SectionTitle title="HRÁČI UTKÁNÍ." />
           <div className={styles.playersOfMatchGrid}>
             <PlayerOfMatchCard teamLabel="A-TÝM" player={props.aPlayerOfMatch} />
             <PlayerOfMatchCard teamLabel="B-TÝM" player={props.bPlayerOfMatch} />
@@ -84,7 +81,7 @@ export function HomeDashboard(props: Props) {
 
         <section className={styles.section}>
           <div className={styles.sectionHeaderRow}>
-            <SectionTitle eyebrow="SOUTĚŽ" title="TABULKA." compact />
+            <SectionTitle title="TABULKA." compact />
             <TeamToggle team={tableTeam} setTeam={setTableTeam} />
           </div>
           <LeaguePreview rows={tableRows} />
@@ -190,18 +187,26 @@ function PlayerOfMatchCard({ player, teamLabel }: { player: PlayerOfMatch | null
     );
   }
 
-  const image = PNG_PLAYER_IDS.has(player.id)
-    ? `/images/${player.id}.png`
-    : `/images/${player.id}.jpg`;
-
   return (
     <Link href={`/hrac/${player.id}`} className={styles.pomCard}>
       <div className={styles.pomLabel}>{teamLabel}</div>
 
       <div className={styles.pomStage}>
-        <div className={styles.bigNumber}>{player.id}</div>
         <img className={styles.pomWatermark} src="/images/fc-ppb-logo.png" alt="" aria-hidden="true" />
-        <img className={styles.pomPlayer} src={image} alt={player.name} />
+        <img
+          className={styles.pomPlayer}
+          src={`/images/${player.id}.png`}
+          alt={player.name}
+          onError={(event) => {
+            const image = event.currentTarget;
+            if (image.dataset.fallback !== "jpg") {
+              image.dataset.fallback = "jpg";
+              image.src = `/images/${player.id}.jpg`;
+              return;
+            }
+            image.style.display = "none";
+          }}
+        />
       </div>
 
       <div className={styles.pomCopy}>
@@ -270,7 +275,7 @@ function NewsSection({ props }: { props: Props }) {
   return (
     <section className={styles.section}>
       <div className={styles.sectionHeaderRow}>
-        <SectionTitle eyebrow="KRÁTCE Z KLUBU" title="Z KABINY." compact />
+        <SectionTitle title="ZPRÁVY Z KABINY." compact />
         <Link className={styles.textLink} href="/novinky">VŠECHNY NOVINKY →</Link>
       </div>
       <div className={styles.newsGrid}>
@@ -304,7 +309,7 @@ function LeaguePreview({ rows }: { rows: LeagueRow[] }) {
 function TeamsPreview({ aPlayers, bPlayers }: { aPlayers: SquadPlayer[]; bPlayers: SquadPlayer[] }) {
   return (
     <section className={styles.section}>
-      <SectionTitle eyebrow="SOUPISKY" title="NAŠE TÝMY." />
+      <SectionTitle title="NAŠE TÝMY." />
       <div className={styles.teamsGrid}>
         <TeamPreviewCard label="A-TÝM" players={aPlayers} href="/tymy?team=a" />
         <TeamPreviewCard label="B-TÝM" players={bPlayers} href="/tymy?team=b" />
@@ -364,8 +369,12 @@ function Social() {
   );
 }
 
-function SectionTitle({ eyebrow, title, compact = false }: { eyebrow: string; title: string; compact?: boolean }) {
-  return <div className={`${styles.sectionTitle} ${compact ? styles.sectionTitleCompact : ""}`}><span>{eyebrow}</span><h2>{title}</h2></div>;
+function SectionTitle({ title, compact = false }: { title: string; compact?: boolean }) {
+  return (
+    <div className={`${styles.sectionTitle} ${compact ? styles.sectionTitleCompact : ""}`}>
+      <h2>{title}</h2>
+    </div>
+  );
 }
 
 function TeamToggle({ team, setTeam }: { team: Team; setTeam: (team: Team) => void }) {

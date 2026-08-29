@@ -326,3 +326,126 @@
     font-size: 6px;
   }
 }
+
+
+/* =========================================================
+   FC PPB — FINÁLNÍ NADPISY SEKCI
+   ========================================================= */
+
+.sectionTitle {
+  position: relative !important;
+  min-height: 42px !important;
+  margin: 0 0 14px !important;
+  padding: 4px 0 10px 28px !important;
+  display: flex !important;
+  align-items: flex-end !important;
+  border-bottom: 1px solid rgba(255,255,255,.16) !important;
+}
+
+.sectionTitle::before {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 18px;
+  height: 25px;
+  content: "";
+  border-top: 2px solid var(--green);
+  border-left: 2px solid var(--green);
+}
+
+.sectionTitle::after {
+  position: absolute;
+  left: 17px;
+  bottom: -1px;
+  width: 105px;
+  height: 1px;
+  content: "";
+  background: linear-gradient(90deg, var(--green), rgba(83,242,10,0));
+}
+
+.sectionTitle > span {
+  display: none !important;
+}
+
+.sectionTitle h2 {
+  margin: 0 !important;
+  color: #fff !important;
+  font-family: Impact, Haettenschweiler, "Arial Narrow Bold", "Arial Narrow", sans-serif !important;
+  font-size: clamp(28px, 3vw, 42px) !important;
+  font-weight: 900 !important;
+  line-height: .86 !important;
+  letter-spacing: -.025em !important;
+  text-transform: uppercase !important;
+}
+
+.sectionTitleCompact h2 {
+  font-size: clamp(26px, 2.7vw, 38px) !important;
+}
+
+/* ZÁPASY používají stejný nadpisový systém */
+.scoreboardHeader {
+  align-items: flex-end !important;
+  margin-bottom: 14px !important;
+}
+
+.scoreboardHeader > .sectionTitle {
+  flex: 1 1 auto;
+  margin-bottom: 0 !important;
+}
+
+/* Hráč utkání: bez náhodného ID/čísla za hráčem */
+.bigNumber {
+  display: none !important;
+}
+
+.pomStage {
+  background:
+    radial-gradient(circle at 52% 58%, rgba(83,242,10,.045), transparent 38%);
+}
+
+.pomPlayer {
+  max-width: 100%;
+  filter: drop-shadow(0 20px 24px rgba(0,0,0,.5));
+}
+
+/* O něco čistší sportovní typografie uvnitř karet */
+.panelTopline span,
+.pomLabel,
+.pomCopy h3,
+.pomCopy > span,
+.pomStats b,
+.newsCopy h3,
+.teamVertical,
+.teamMenu span,
+.teamCardCopy b {
+  font-family: "Arial Narrow", "Roboto Condensed", "Helvetica Neue", Arial, sans-serif;
+}
+
+.pomCopy h3,
+.newsCopy h3,
+.teamVertical {
+  font-weight: 1000;
+}
+
+@media (max-width: 650px) {
+  .sectionTitle {
+    min-height: 35px !important;
+    margin-bottom: 9px !important;
+    padding: 3px 0 7px 22px !important;
+  }
+
+  .sectionTitle::before {
+    width: 14px;
+    height: 20px;
+  }
+
+  .sectionTitle::after {
+    left: 13px;
+    width: 68px;
+  }
+
+  .sectionTitle h2,
+  .sectionTitleCompact h2 {
+    font-size: 25px !important;
+  }
+}
