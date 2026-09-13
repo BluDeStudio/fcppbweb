@@ -36,13 +36,11 @@ type FinishedMatchRow = {
   date: string;
   time: string | null;
   finishedAt: string | null;
-  playerOfTheMatchNumber: number | null;
 };
 
 type PlayerMatchStatRow = {
   finishedMatchId: string;
-  playerNumber: number;
-  playerId: string | null;
+  playerId: string;
   goals: number;
   assists: number;
   isPlayerOfTheMatch: boolean;
@@ -156,9 +154,9 @@ export default async function HomePage() {
    * SOUPISKY
    * ============================================================
    *
-   * Soupisky používáme dál pro ostatní části homepage.
+   * Soupisky používáme pro ostatní části homepage.
    *
-   * HRÁČ UTKÁNÍ už ale na soupisce NEZÁVISÍ.
+   * HRÁČ UTKÁNÍ NA SOUPISCE NEZÁVISÍ.
    * ============================================================
    */
 
@@ -244,13 +242,11 @@ export default async function HomePage() {
    * HRÁČI UTKÁNÍ
    * ============================================================
    *
-   * DŮLEŽITÉ:
-   *
-   * HZ už NEHLEDÁME přes APF soupisku.
-   *
-   * Data jdou přímo:
+   * DATA JDOU:
    *
    * finished_matches
+   *        ↓
+   * skutečně nejnovější zápas podle data
    *        ↓
    * finished_match_player_stats
    *        ↓
@@ -258,15 +254,9 @@ export default async function HomePage() {
    *        ↓
    * player_id
    *        ↓
-   * players
+   * players.id
    *
-   * Takže hráč může:
-   *
-   * - být členem A-týmu
-   * - nastoupit za B-tým
-   * - nebýt ve staré soupisce webu
-   *
-   * a homepage ho přesto správně najde.
+   * ŽÁDNÉ hledání podle čísla dresu.
    * ============================================================
    */
 
@@ -316,7 +306,16 @@ async function getLatestPlayerOfMatchFromApp(
 ): Promise<PlayerOfMatch | null> {
   /*
    * ------------------------------------------------------------
-   * 1. POSLEDNÍ DOKONČENÝ ZÁPAS
+   * 1. NAČTEME DOKONČENÉ ZÁPASY DANÉHO TÝMU
+   * ------------------------------------------------------------
+   *
+   * NEDĚLÁME:
+   *
+   * .order("date")
+   *
+   * protože date může být v databázi uložené jako text.
+   *
+   * Zápasy načteme a správné datum vyhodnotíme až v JS.
    * ------------------------------------------------------------
    */
 
@@ -334,53 +333,35 @@ async function getLatestPlayerOfMatchFromApp(
         "date",
         "time",
         "finished_at",
-        "player_of_the_match_number",
       ].join(", "),
     )
     .eq("team", team)
-    .order(
-      "date",
-      {
-        ascending: false,
-      },
-    )
-    .order(
-      "finished_at",
-      {
-        ascending: false,
-        nullsFirst: false,
-      },
-    )
-    .limit(1);
+    .limit(100);
 
   if (matchesError) {
     console.error(
-      `HZ ${team} – chyba při načítání posledního zápasu:`,
+      `HZ ${team} – chyba při načítání zápasů:`,
       matchesError,
     );
 
     return null;
   }
 
-  const firstMatchRaw =
-    matchesData?.[0];
+  const matches =
+    (matchesData ?? [])
+      .map((raw) =>
+        parseFinishedMatch(raw),
+      )
+      .filter(
+        (
+          match,
+        ): match is FinishedMatchRow =>
+          match !== null,
+      );
 
-  if (!firstMatchRaw) {
+  if (matches.length === 0) {
     console.warn(
-      `HZ ${team} – žádný dokončený zápas.`,
-    );
-
-    return null;
-  }
-
-  const match =
-    parseFinishedMatch(
-      firstMatchRaw,
-    );
-
-  if (!match) {
-    console.warn(
-      `HZ ${team} – nepodařilo se zpracovat poslední zápas.`,
+      `HZ ${team} – nebyl nalezen žádný dokončený zápas.`,
     );
 
     return null;
@@ -388,7 +369,73 @@ async function getLatestPlayerOfMatchFromApp(
 
   /*
    * ------------------------------------------------------------
-   * 2. ŘÁDEK HRÁČE UTKÁNÍ
+   * 2. VYBEREME SKUTEČNĚ NEJNOVĚJŠÍ ZÁPAS
+   * ------------------------------------------------------------
+   */
+
+  const matchesWithTimestamp =
+    matches
+      .map((match) => ({
+        match,
+        timestamp:
+          getFinishedMatchTimestamp(
+            match,
+          ),
+      }))
+      .filter(
+        (
+          item,
+        ): item is {
+          match: FinishedMatchRow;
+          timestamp: number;
+        } =>
+          item.timestamp !== null,
+      )
+      .sort(
+        (a, b) =>
+          b.timestamp -
+          a.timestamp,
+      );
+
+  const latest =
+    matchesWithTimestamp[0];
+
+  if (!latest) {
+    console.warn(
+      `HZ ${team} – žádný zápas nemá platné datum.`,
+    );
+
+    return null;
+  }
+
+  const match =
+    latest.match;
+
+  console.log(
+    `HZ ${team} – vybraný poslední zápas:`,
+    {
+      id: match.id,
+      title:
+        match.matchTitle,
+      date:
+        match.date,
+      time:
+        match.time,
+    },
+  );
+
+  /*
+   * ------------------------------------------------------------
+   * 3. NAJDEME HRÁČE UTKÁNÍ
+   * ------------------------------------------------------------
+   *
+   * Pouze:
+   *
+   * is_player_of_the_match = true
+   *
+   * a následně player_id.
+   *
+   * ŽÁDNÝ fallback přes player_number.
    * ------------------------------------------------------------
    */
 
@@ -402,7 +449,6 @@ async function getLatestPlayerOfMatchFromApp(
     .select(
       [
         "finished_match_id",
-        "player_number",
         "player_id",
         "goals",
         "assists",
@@ -421,90 +467,32 @@ async function getLatestPlayerOfMatchFromApp(
 
   if (winnerStatsError) {
     console.error(
-      `HZ ${team} – chyba při načítání vítěze:`,
+      `HZ ${team} – chyba při načítání hráče utkání:`,
       winnerStatsError,
     );
 
     return null;
   }
 
-  let winnerStat:
-    PlayerMatchStatRow | null =
-      null;
-
   const winnerRaw =
     winnerStatsData?.[0];
 
-  if (winnerRaw) {
-    winnerStat =
-      parsePlayerMatchStat(
-        winnerRaw,
-      );
+  if (!winnerRaw) {
+    console.warn(
+      `HZ ${team} – zápas "${match.matchTitle}" nemá označeného hráče utkání.`,
+    );
+
+    return null;
   }
 
-  /*
-   * ------------------------------------------------------------
-   * FALLBACK:
-   *
-   * Pokud starší zápas nemá
-   * is_player_of_the_match,
-   * použijeme player_of_the_match_number
-   * z finished_matches.
-   * ------------------------------------------------------------
-   */
-
-  if (
-    !winnerStat &&
-    match.playerOfTheMatchNumber !== null
-  ) {
-    const {
-      data: fallbackStatsData,
-      error: fallbackStatsError,
-    } = await supabase
-      .from(
-        "finished_match_player_stats",
-      )
-      .select(
-        [
-          "finished_match_id",
-          "player_number",
-          "player_id",
-          "goals",
-          "assists",
-          "is_player_of_the_match",
-        ].join(", "),
-      )
-      .eq(
-        "finished_match_id",
-        match.id,
-      )
-      .eq(
-        "player_number",
-        match.playerOfTheMatchNumber,
-      )
-      .limit(1);
-
-    if (fallbackStatsError) {
-      console.error(
-        `HZ ${team} – fallback podle čísla hráče selhal:`,
-        fallbackStatsError,
-      );
-    }
-
-    const fallbackRaw =
-      fallbackStatsData?.[0];
-
-    if (fallbackRaw) {
-      winnerStat =
-        parsePlayerMatchStat(
-          fallbackRaw,
-        );
-    }
-  }
+  const winnerStat =
+    parsePlayerMatchStat(
+      winnerRaw,
+    );
 
   if (!winnerStat) {
     console.warn(
-      `HZ ${team} – zápas "${match.matchTitle}" nemá hráče utkání.`,
+      `HZ ${team} – hráč utkání nemá platné player_id.`,
     );
 
     return null;
@@ -512,106 +500,62 @@ async function getLatestPlayerOfMatchFromApp(
 
   /*
    * ------------------------------------------------------------
-   * 3. NAČTENÍ HRÁČE PODLE PLAYER_ID
-   * ------------------------------------------------------------
-   */
-
-  let player:
-    AppPlayerRow | null =
-      null;
-
-  if (winnerStat.playerId) {
-    const {
-      data: playerData,
-      error: playerError,
-    } = await supabase
-      .from("players")
-      .select(
-        [
-          "id",
-          "club_id",
-          "name",
-          "number",
-          "apf_player_id",
-        ].join(", "),
-      )
-      .eq(
-        "id",
-        winnerStat.playerId,
-      )
-      .maybeSingle();
-
-    if (playerError) {
-      console.error(
-        `HZ ${team} – chyba při načítání hráče podle player_id:`,
-        playerError,
-      );
-    }
-
-    if (playerData) {
-      player =
-        parseAppPlayer(
-          playerData,
-        );
-    }
-  }
-
-  /*
-   * ------------------------------------------------------------
-   * FALLBACK PODLE ČÍSLA HRÁČE
+   * 4. NAČTENÍ HRÁČE VÝHRADNĚ PODLE PLAYER_ID
    * ------------------------------------------------------------
    *
-   * Hodí se pro starší zápasy,
-   * kde player_id nemuselo být uložené.
+   * finished_match_player_stats.player_id
+   *                 ↓
+   * players.id
+   *
+   * ČÍSLO DRESU SE PRO IDENTIFIKACI NEPOUŽÍVÁ.
    * ------------------------------------------------------------
    */
 
-  if (!player) {
-    const {
-      data: playerByNumberData,
-      error: playerByNumberError,
-    } = await supabase
-      .from("players")
-      .select(
-        [
-          "id",
-          "club_id",
-          "name",
-          "number",
-          "apf_player_id",
-        ].join(", "),
-      )
-      .eq(
+  const {
+    data: playerData,
+    error: playerError,
+  } = await supabase
+    .from("players")
+    .select(
+      [
+        "id",
         "club_id",
-        match.clubId,
-      )
-      .eq(
+        "name",
         "number",
-        winnerStat.playerNumber,
-      )
-      .limit(1);
+        "apf_player_id",
+      ].join(", "),
+    )
+    .eq(
+      "id",
+      winnerStat.playerId,
+    )
+    .maybeSingle();
 
-    if (playerByNumberError) {
-      console.error(
-        `HZ ${team} – chyba při načítání hráče podle čísla:`,
-        playerByNumberError,
-      );
-    }
+  if (playerError) {
+    console.error(
+      `HZ ${team} – chyba při načítání hráče podle player_id:`,
+      playerError,
+    );
 
-    const playerRaw =
-      playerByNumberData?.[0];
-
-    if (playerRaw) {
-      player =
-        parseAppPlayer(
-          playerRaw,
-        );
-    }
+    return null;
   }
+
+  if (!playerData) {
+    console.warn(
+      `HZ ${team} – pro player_id "${winnerStat.playerId}" nebyl nalezen hráč v tabulce players.`,
+    );
+
+    return null;
+  }
+
+  const player =
+    parseAppPlayer(
+      playerData,
+    );
 
   if (!player) {
     console.warn(
-      `HZ ${team} – hráč utkání byl nalezen ve statistikách, ale nepodařilo se najít jeho profil.`,
+      `HZ ${team} – profil hráče se nepodařilo zpracovat.`,
     );
 
     return null;
@@ -619,71 +563,22 @@ async function getLatestPlayerOfMatchFromApp(
 
   /*
    * ------------------------------------------------------------
-   * 4. HODNOCENÍ
+   * 5. HODNOCENÍ – TAKÉ VÝHRADNĚ PODLE PLAYER_ID
    * ------------------------------------------------------------
    */
 
-  let rating:
-    number | null =
-      null;
+  const ratingResult =
+    await loadPlayerRating({
+      matchId:
+        match.id,
 
-  let ratingVotes = 0;
-
-  /*
-   * Primárně hledáme rating podle player_id.
-   */
-
-  if (winnerStat.playerId) {
-    const ratingResult =
-      await loadPlayerRating({
-        matchId:
-          match.id,
-
-        playerId:
-          winnerStat.playerId,
-
-        playerNumber:
-          null,
-      });
-
-    rating =
-      ratingResult.rating;
-
-    ratingVotes =
-      ratingResult.votes;
-  }
-
-  /*
-   * Fallback podle čísla hráče.
-   */
-
-  if (ratingVotes === 0) {
-    const ratingResult =
-      await loadPlayerRating({
-        matchId:
-          match.id,
-
-        playerId:
-          null,
-
-        playerNumber:
-          winnerStat.playerNumber,
-      });
-
-    rating =
-      ratingResult.rating;
-
-    ratingVotes =
-      ratingResult.votes;
-  }
+      playerId:
+        winnerStat.playerId,
+    });
 
   /*
    * ------------------------------------------------------------
-   * 5. APF ID
-   * ------------------------------------------------------------
-   *
-   * Homepage používá APF ID jako číselné ID
-   * hráče – mimo jiné pro jeho fotku.
+   * 6. APF ID
    * ------------------------------------------------------------
    */
 
@@ -692,7 +587,7 @@ async function getLatestPlayerOfMatchFromApp(
     null
   ) {
     console.warn(
-      `HZ ${team} – ${player.name} nemá v databázi nastavené apf_player_id.`,
+      `HZ ${team} – ${player.name} nemá nastavené apf_player_id.`,
     );
 
     return null;
@@ -700,9 +595,23 @@ async function getLatestPlayerOfMatchFromApp(
 
   /*
    * ------------------------------------------------------------
-   * 6. HOTOVÝ HRÁČ UTKÁNÍ
+   * 7. HOTOVÝ HRÁČ UTKÁNÍ
    * ------------------------------------------------------------
    */
+
+  console.log(
+    `HZ ${team} – nalezen hráč utkání:`,
+    {
+      playerId:
+        player.id,
+      name:
+        player.name,
+      apfPlayerId:
+        player.apfPlayerId,
+      match:
+        match.matchTitle,
+    },
+  );
 
   return {
     id:
@@ -717,9 +626,11 @@ async function getLatestPlayerOfMatchFromApp(
     assists:
       winnerStat.assists,
 
-    rating,
+    rating:
+      ratingResult.rating,
 
-    ratingVotes,
+    ratingVotes:
+      ratingResult.votes,
 
     matchId:
       match.id,
@@ -736,21 +647,31 @@ async function getLatestPlayerOfMatchFromApp(
  * ============================================================
  * NAČTENÍ PRŮMĚRNÉHO HODNOCENÍ
  * ============================================================
+ *
+ * Pouze přes:
+ *
+ * finished_match_id
+ * +
+ * player_id
+ *
+ * ŽÁDNÉ player_number.
+ * ============================================================
  */
 
 async function loadPlayerRating({
   matchId,
   playerId,
-  playerNumber,
 }: {
   matchId: string;
-  playerId: string | null;
-  playerNumber: number | null;
+  playerId: string;
 }): Promise<{
   rating: number | null;
   votes: number;
 }> {
-  let query = supabase
+  const {
+    data,
+    error,
+  } = await supabase
     .from(
       "match_player_ratings",
     )
@@ -758,34 +679,11 @@ async function loadPlayerRating({
     .eq(
       "finished_match_id",
       matchId,
+    )
+    .eq(
+      "player_id",
+      playerId,
     );
-
-  if (playerId) {
-    query =
-      query.eq(
-        "player_id",
-        playerId,
-      );
-  } else if (
-    playerNumber !== null
-  ) {
-    query =
-      query.eq(
-        "player_number",
-        playerNumber,
-      );
-  } else {
-    return {
-      rating: null,
-      votes: 0,
-    };
-  }
-
-  const {
-    data,
-    error,
-  } =
-    await query;
 
   if (error) {
     console.error(
@@ -847,6 +745,358 @@ async function loadPlayerRating({
     votes:
       values.length,
   };
+}
+
+/*
+ * ============================================================
+ * URČENÍ ČASU ZÁPASU PRO ŘAZENÍ
+ * ============================================================
+ */
+
+function getFinishedMatchTimestamp(
+  match: FinishedMatchRow,
+): number | null {
+  const matchTimestamp =
+    parseMatchDateTimestamp(
+      match.date,
+      match.time,
+    );
+
+  if (
+    matchTimestamp !== null
+  ) {
+    return matchTimestamp;
+  }
+
+  /*
+   * Pokud by byl historický záznam s nečitelným date,
+   * můžeme jako poslední možnost použít finished_at.
+   */
+
+  if (match.finishedAt) {
+    const finishedTimestamp =
+      Date.parse(
+        match.finishedAt,
+      );
+
+    if (
+      Number.isFinite(
+        finishedTimestamp,
+      )
+    ) {
+      return finishedTimestamp;
+    }
+  }
+
+  return null;
+}
+
+/*
+ * ============================================================
+ * PARSOVÁNÍ DATA ZÁPASU
+ * ============================================================
+ *
+ * Podporujeme například:
+ *
+ * 2026-09-06
+ * 2026-09-06 12:00
+ * 2026-09-06T12:00
+ * 06.09.2026
+ * 6.9.2026
+ * 06.09.2026 12:00
+ *
+ * Pokud čas není součástí date,
+ * použije se sloupec time.
+ * ============================================================
+ */
+
+function parseMatchDateTimestamp(
+  dateValue: string,
+  timeValue: string | null,
+): number | null {
+  const date =
+    dateValue.trim();
+
+  /*
+   * ------------------------------------------------------------
+   * YYYY-MM-DD
+   * ------------------------------------------------------------
+   */
+
+  const isoMatch =
+    date.match(
+      /^(\d{4})-(\d{1,2})-(\d{1,2})(?:[T\s](\d{1,2}):(\d{2}))?/,
+    );
+
+  if (isoMatch) {
+    const year =
+      Number(
+        isoMatch[1],
+      );
+
+    const month =
+      Number(
+        isoMatch[2],
+      );
+
+    const day =
+      Number(
+        isoMatch[3],
+      );
+
+    const dateHour =
+      isoMatch[4]
+        ? Number(
+            isoMatch[4],
+          )
+        : null;
+
+    const dateMinute =
+      isoMatch[5]
+        ? Number(
+            isoMatch[5],
+          )
+        : null;
+
+    const parsedTime =
+      getHoursAndMinutes(
+        timeValue,
+      );
+
+    const hour =
+      dateHour ??
+      parsedTime.hour;
+
+    const minute =
+      dateMinute ??
+      parsedTime.minute;
+
+    return createTimestamp({
+      year,
+      month,
+      day,
+      hour,
+      minute,
+    });
+  }
+
+  /*
+   * ------------------------------------------------------------
+   * DD.MM.YYYY
+   * ------------------------------------------------------------
+   */
+
+  const czechMatch =
+    date.match(
+      /^(\d{1,2})\.(\d{1,2})\.(\d{4})(?:\s+(\d{1,2}):(\d{2}))?/,
+    );
+
+  if (czechMatch) {
+    const day =
+      Number(
+        czechMatch[1],
+      );
+
+    const month =
+      Number(
+        czechMatch[2],
+      );
+
+    const year =
+      Number(
+        czechMatch[3],
+      );
+
+    const dateHour =
+      czechMatch[4]
+        ? Number(
+            czechMatch[4],
+          )
+        : null;
+
+    const dateMinute =
+      czechMatch[5]
+        ? Number(
+            czechMatch[5],
+          )
+        : null;
+
+    const parsedTime =
+      getHoursAndMinutes(
+        timeValue,
+      );
+
+    const hour =
+      dateHour ??
+      parsedTime.hour;
+
+    const minute =
+      dateMinute ??
+      parsedTime.minute;
+
+    return createTimestamp({
+      year,
+      month,
+      day,
+      hour,
+      minute,
+    });
+  }
+
+  return null;
+}
+
+/*
+ * ============================================================
+ * PARSOVÁNÍ ČASU
+ * ============================================================
+ */
+
+function getHoursAndMinutes(
+  value: string | null,
+): {
+  hour: number;
+  minute: number;
+} {
+  if (!value) {
+    return {
+      hour: 0,
+      minute: 0,
+    };
+  }
+
+  const match =
+    value
+      .trim()
+      .match(
+        /^(\d{1,2}):(\d{2})/,
+      );
+
+  if (!match) {
+    return {
+      hour: 0,
+      minute: 0,
+    };
+  }
+
+  const hour =
+    Number(
+      match[1],
+    );
+
+  const minute =
+    Number(
+      match[2],
+    );
+
+  if (
+    !Number.isInteger(
+      hour,
+    ) ||
+    !Number.isInteger(
+      minute,
+    ) ||
+    hour < 0 ||
+    hour > 23 ||
+    minute < 0 ||
+    minute > 59
+  ) {
+    return {
+      hour: 0,
+      minute: 0,
+    };
+  }
+
+  return {
+    hour,
+    minute,
+  };
+}
+
+/*
+ * ============================================================
+ * VYTVOŘENÍ TIMESTAMP
+ * ============================================================
+ */
+
+function createTimestamp({
+  year,
+  month,
+  day,
+  hour,
+  minute,
+}: {
+  year: number;
+  month: number;
+  day: number;
+  hour: number;
+  minute: number;
+}): number | null {
+  if (
+    !Number.isInteger(
+      year,
+    ) ||
+    !Number.isInteger(
+      month,
+    ) ||
+    !Number.isInteger(
+      day,
+    ) ||
+    !Number.isInteger(
+      hour,
+    ) ||
+    !Number.isInteger(
+      minute,
+    )
+  ) {
+    return null;
+  }
+
+  if (
+    month < 1 ||
+    month > 12 ||
+    day < 1 ||
+    day > 31 ||
+    hour < 0 ||
+    hour > 23 ||
+    minute < 0 ||
+    minute > 59
+  ) {
+    return null;
+  }
+
+  const timestamp =
+    Date.UTC(
+      year,
+      month - 1,
+      day,
+      hour,
+      minute,
+      0,
+      0,
+    );
+
+  const check =
+    new Date(
+      timestamp,
+    );
+
+  if (
+    check.getUTCFullYear() !==
+      year ||
+    check.getUTCMonth() !==
+      month - 1 ||
+    check.getUTCDate() !==
+      day ||
+    check.getUTCHours() !==
+      hour ||
+    check.getUTCMinutes() !==
+      minute
+  ) {
+    return null;
+  }
+
+  return timestamp;
 }
 
 /*
@@ -934,20 +1184,12 @@ function parseFinishedMatch(
           "finished_at",
         ),
       ),
-
-    playerOfTheMatchNumber:
-      toNumber(
-        getObjectValue(
-          raw,
-          "player_of_the_match_number",
-        ),
-      ),
   };
 }
 
 /*
  * ============================================================
- * PARSER – MATCH PLAYER STAT
+ * PARSER – HRÁČ UTKÁNÍ
  * ============================================================
  */
 
@@ -962,17 +1204,30 @@ function parsePlayerMatchStat(
       ),
     );
 
-  const playerNumber =
-    toNumber(
+  const playerId =
+    toStringValue(
       getObjectValue(
         raw,
-        "player_number",
+        "player_id",
       ),
     );
 
+  const isPlayerOfTheMatch =
+    getObjectValue(
+      raw,
+      "is_player_of_the_match",
+    ) === true;
+
+  /*
+   * Bez player_id tento záznam NEPOUŽIJEME.
+   *
+   * Žádné dohledávání podle čísla dresu.
+   */
+
   if (
     !finishedMatchId ||
-    playerNumber === null
+    !playerId ||
+    !isPlayerOfTheMatch
   ) {
     return null;
   }
@@ -980,15 +1235,7 @@ function parsePlayerMatchStat(
   return {
     finishedMatchId,
 
-    playerNumber,
-
-    playerId:
-      toNullableString(
-        getObjectValue(
-          raw,
-          "player_id",
-        ),
-      ),
+    playerId,
 
     goals:
       toNumber(
@@ -1006,11 +1253,7 @@ function parsePlayerMatchStat(
         ),
       ) ?? 0,
 
-    isPlayerOfTheMatch:
-      getObjectValue(
-        raw,
-        "is_player_of_the_match",
-      ) === true,
+    isPlayerOfTheMatch,
   };
 }
 
@@ -1138,7 +1381,9 @@ function toStringValue(
       value,
     )
   ) {
-    return String(value);
+    return String(
+      value,
+    );
   }
 
   return null;
@@ -1199,7 +1444,9 @@ function toNumber(
     }
 
     const number =
-      Number(trimmed);
+      Number(
+        trimmed,
+      );
 
     return Number.isFinite(
       number,
