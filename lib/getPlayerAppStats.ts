@@ -29,6 +29,7 @@ type PlayerMatchStatRow = {
   assists: number | null;
   yellow_cards: number | null;
   red_cards: number | null;
+  is_player_of_the_match: boolean | null;
 };
 
 type FinishedMatchRow = {
@@ -770,6 +771,7 @@ export async function getPlayerAppStats(
           "assists",
           "yellow_cards",
           "red_cards",
+          "is_player_of_the_match",
         ].join(", "),
       )
       .in(
@@ -1092,7 +1094,7 @@ export async function getPlayerAppStats(
               rating.votes,
 
             isPlayerOfTheMatch:
-              false,
+              stat.is_player_of_the_match === true,
           };
         },
       )

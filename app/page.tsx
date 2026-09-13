@@ -269,17 +269,23 @@ export default async function HomePage() {
   }
 
   /*
+   * ========================================
    * HRÁČ ZÁPASU
+   * ========================================
    *
-   * Data bere pouze z existující aplikace:
-   * - poslední dokončený zápas A/B týmu
-   * - góly
-   * - asistence
-   * - průměrná známka
+   * Vítěze už NEPOČÍTÁ web podle známky.
    *
-   * Jako hráče zápasu zobrazíme hráče
-   * s nejvyšší známkou v posledním zápase.
+   * Web respektuje přímo výsledek,
+   * který uložila aplikace:
+   *
+   * is_player_of_the_match = true
+   *
+   * getPlayerAppStats tuto hodnotu převede na:
+   *
+   * isPlayerOfTheMatch = true
+   * ========================================
    */
+
   try {
     [
       aPlayerOfMatch,
@@ -412,6 +418,12 @@ async function getLatestPlayerOfMatch(
     return null;
   }
 
+  /*
+   * ========================================
+   * POSLEDNÍ DOKONČENÝ ZÁPAS TÝMU
+   * ========================================
+   */
+
   const latest =
     all.reduce(
       (
@@ -432,70 +444,36 @@ async function getLatestPlayerOfMatch(
   const latestMatchId =
     latest.match.matchId;
 
-  const candidates =
-    all.filter(
+  /*
+   * ========================================
+   * VÍTĚZ PODLE APLIKACE
+   * ========================================
+   *
+   * ŽÁDNÉ:
+   * - řazení podle známky
+   * - rozhodování podle gólů
+   * - rozhodování podle asistencí
+   *
+   * Pouze hráč označený aplikací jako HZ.
+   * ========================================
+   */
+
+  const winner =
+    all.find(
       (
         row,
       ) =>
         row.match.matchId ===
-        latestMatchId,
-    );
-
-  const rated =
-    candidates.filter(
-      (
-        row,
-      ) =>
-        row.match.averageRating !==
-        null,
+          latestMatchId &&
+        row.match.isPlayerOfTheMatch ===
+          true,
     );
 
   if (
-    rated.length ===
-    0
+    !winner
   ) {
     return null;
   }
-
-  rated.sort(
-    (
-      left,
-      right,
-    ) => {
-      const ratingDiff =
-        Number(
-          right.match.averageRating ??
-            0,
-        ) -
-        Number(
-          left.match.averageRating ??
-            0,
-        );
-
-      if (
-        ratingDiff !==
-        0
-      ) {
-        return ratingDiff;
-      }
-
-      const rightContribution =
-        right.match.goals +
-        right.match.assists;
-
-      const leftContribution =
-        left.match.goals +
-        left.match.assists;
-
-      return (
-        rightContribution -
-        leftContribution
-      );
-    },
-  );
-
-  const winner =
-    rated[0];
 
   return {
     id:
