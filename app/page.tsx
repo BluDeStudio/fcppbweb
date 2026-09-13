@@ -25,11 +25,8 @@ import type { ClubTransfer } from "@/types/transfer";
 export default async function HomePage() {
   await testSupabaseConnection();
 
-  const a =
-    clubConfig.teams.aTeam;
-
-  const b =
-    clubConfig.teams.bTeam;
+  const a = clubConfig.teams.aTeam;
+  const b = clubConfig.teams.bTeam;
 
   let aLeagueTable: LeagueRow[] = [];
   let bLeagueTable: LeagueRow[] = [];
@@ -37,44 +34,35 @@ export default async function HomePage() {
   let aMatches: MatchResult[] = [];
   let bMatches: MatchResult[] = [];
 
-  let aNextMatch: NextMatch | null =
-    null;
-
-  let bNextMatch: NextMatch | null =
-    null;
+  let aNextMatch: NextMatch | null = null;
+  let bNextMatch: NextMatch | null = null;
 
   let aPlayers: SquadPlayer[] = [];
   let bPlayers: SquadPlayer[] = [];
 
   let transfers: ClubTransfer[] = [];
 
-  let aPlayerOfMatch:
-    PlayerOfMatch | null = null;
+  let aPlayerOfMatch: PlayerOfMatch | null = null;
+  let bPlayerOfMatch: PlayerOfMatch | null = null;
 
-  let bPlayerOfMatch:
-    PlayerOfMatch | null = null;
+  /*
+   * ========================================
+   * TABULKY
+   * ========================================
+   */
 
   try {
-    [
-      aLeagueTable,
-      bLeagueTable,
-    ] = await Promise.all([
+    [aLeagueTable, bLeagueTable] = await Promise.all([
       getLeagueTable({
-        competitionId:
-          a.competition.id,
-        competitionSlug:
-          a.competition.slug,
-        teamName:
-          a.teamName,
+        competitionId: a.competition.id,
+        competitionSlug: a.competition.slug,
+        teamName: a.teamName,
       }),
 
       getLeagueTable({
-        competitionId:
-          b.competition.id,
-        competitionSlug:
-          b.competition.slug,
-        teamName:
-          b.teamName,
+        competitionId: b.competition.id,
+        competitionSlug: b.competition.slug,
+        teamName: b.teamName,
       }),
     ]);
   } catch (error) {
@@ -84,27 +72,24 @@ export default async function HomePage() {
     );
   }
 
+  /*
+   * ========================================
+   * ODEHRANÉ ZÁPASY
+   * ========================================
+   */
+
   try {
-    [
-      aMatches,
-      bMatches,
-    ] = await Promise.all([
+    [aMatches, bMatches] = await Promise.all([
       getMatchResults({
-        competitionId:
-          a.competition.id,
-        competitionSlug:
-          a.competition.slug,
-        teamName:
-          a.teamName,
+        competitionId: a.competition.id,
+        competitionSlug: a.competition.slug,
+        teamName: a.teamName,
       }),
 
       getMatchResults({
-        competitionId:
-          b.competition.id,
-        competitionSlug:
-          b.competition.slug,
-        teamName:
-          b.teamName,
+        competitionId: b.competition.id,
+        competitionSlug: b.competition.slug,
+        teamName: b.teamName,
       }),
     ]);
   } catch (error) {
@@ -114,27 +99,24 @@ export default async function HomePage() {
     );
   }
 
+  /*
+   * ========================================
+   * NÁSLEDUJÍCÍ ZÁPASY
+   * ========================================
+   */
+
   try {
-    [
-      aNextMatch,
-      bNextMatch,
-    ] = await Promise.all([
+    [aNextMatch, bNextMatch] = await Promise.all([
       getNextMatch({
-        competitionId:
-          a.competition.id,
-        competitionSlug:
-          a.competition.slug,
-        teamName:
-          a.teamName,
+        competitionId: a.competition.id,
+        competitionSlug: a.competition.slug,
+        teamName: a.teamName,
       }),
 
       getNextMatch({
-        competitionId:
-          b.competition.id,
-        competitionSlug:
-          b.competition.slug,
-        teamName:
-          b.teamName,
+        competitionId: b.competition.id,
+        competitionSlug: b.competition.slug,
+        teamName: b.teamName,
       }),
     ]);
   } catch (error) {
@@ -144,47 +126,34 @@ export default async function HomePage() {
     );
   }
 
+  /*
+   * ========================================
+   * SOUPISKY
+   * ========================================
+   */
+
   try {
-    const [
-      aSquad,
-      bSquad,
-    ] = await Promise.all([
+    const [aSquad, bSquad] = await Promise.all([
       getSquad({
-        teamId:
-          a.teamId,
-        teamSlug:
-          a.teamSlug,
-        team:
-          "a",
+        teamId: a.teamId,
+        teamSlug: a.teamSlug,
+        team: "a",
       }),
 
       getSquad({
-        teamId:
-          b.teamId,
-        teamSlug:
-          b.teamSlug,
-        team:
-          "b",
+        teamId: b.teamId,
+        teamSlug: b.teamSlug,
+        team: "b",
       }),
     ]);
 
     const map =
-      new Map<
-        number,
-        SquadPlayer
-      >();
+      new Map<number, SquadPlayer>();
 
-    [
-      ...aSquad,
-      ...bSquad,
-    ].forEach(
-      (
-        player,
-      ) => {
+    [...aSquad, ...bSquad].forEach(
+      (player) => {
         const old =
-          map.get(
-            player.id,
-          );
+          map.get(player.id);
 
         map.set(
           player.id,
@@ -192,6 +161,7 @@ export default async function HomePage() {
             ? {
                 ...old,
                 ...player,
+
                 shirtNumber:
                   player.shirtNumber ??
                   old.shirtNumber,
@@ -202,26 +172,18 @@ export default async function HomePage() {
     );
 
     const all =
-      [
-        ...map.values(),
-      ];
+      [...map.values()];
 
     aPlayers =
       all.filter(
-        (
-          player,
-        ) =>
-          player.team ===
-          "a",
+        (player) =>
+          player.team === "a",
       );
 
     bPlayers =
       all.filter(
-        (
-          player,
-        ) =>
-          player.team ===
-          "b",
+        (player) =>
+          player.team === "b",
       );
   } catch (error) {
     console.error(
@@ -229,6 +191,12 @@ export default async function HomePage() {
       error,
     );
   }
+
+  /*
+   * ========================================
+   * PŘESTUPY
+   * ========================================
+   */
 
   try {
     const [
@@ -244,9 +212,7 @@ export default async function HomePage() {
 
     aPlayers =
       aPlayers.filter(
-        (
-          player,
-        ) =>
+        (player) =>
           !departed.has(
             player.id,
           ),
@@ -254,9 +220,7 @@ export default async function HomePage() {
 
     bPlayers =
       bPlayers.filter(
-        (
-          player,
-        ) =>
+        (player) =>
           !departed.has(
             player.id,
           ),
@@ -273,18 +237,39 @@ export default async function HomePage() {
    * HRÁČ ZÁPASU
    * ========================================
    *
-   * Vítěze už NEPOČÍTÁ web podle známky.
+   * DŮLEŽITÉ:
    *
-   * Web respektuje přímo výsledek,
-   * který uložila aplikace:
+   * HZ nehledáme pouze mezi hráči aktuální
+   * soupisky A nebo B.
    *
-   * is_player_of_the_match = true
+   * Hráč vedený v A-týmu může nastoupit
+   * za B-tým a naopak.
    *
-   * getPlayerAppStats tuto hodnotu převede na:
-   *
-   * isPlayerOfTheMatch = true
+   * Proto sestavíme jeden seznam všech
+   * současných hráčů klubu a pak pouze
+   * filtrujeme zápasy podle A / B.
    * ========================================
    */
+
+  const allClubPlayersMap =
+    new Map<number, SquadPlayer>();
+
+  [
+    ...aPlayers,
+    ...bPlayers,
+  ].forEach(
+    (player) => {
+      allClubPlayersMap.set(
+        player.id,
+        player,
+      );
+    },
+  );
+
+  const allClubPlayers =
+    Array.from(
+      allClubPlayersMap.values(),
+    );
 
   try {
     [
@@ -292,12 +277,12 @@ export default async function HomePage() {
       bPlayerOfMatch,
     ] = await Promise.all([
       getLatestPlayerOfMatch(
-        aPlayers,
+        allClubPlayers,
         "A",
       ),
 
       getLatestPlayerOfMatch(
-        bPlayers,
+        allClubPlayers,
         "B",
       ),
     ]);
@@ -307,6 +292,12 @@ export default async function HomePage() {
       error,
     );
   }
+
+  /*
+   * ========================================
+   * HOMEPAGE
+   * ========================================
+   */
 
   return (
     <>
@@ -349,16 +340,26 @@ export default async function HomePage() {
   );
 }
 
+/*
+ * ========================================
+ * POSLEDNÍ HRÁČ ZÁPASU
+ * ========================================
+ */
+
 async function getLatestPlayerOfMatch(
   players: SquadPlayer[],
   team: "A" | "B",
 ): Promise<PlayerOfMatch | null> {
   if (
-    players.length ===
-    0
+    players.length === 0
   ) {
     return null;
   }
+
+  /*
+   * Načteme aplikační statistiky
+   * všech hráčů klubu.
+   */
 
   const rows =
     await Promise.all(
@@ -412,15 +413,14 @@ async function getLatestPlayerOfMatch(
     rows.flat();
 
   if (
-    all.length ===
-    0
+    all.length === 0
   ) {
     return null;
   }
 
   /*
    * ========================================
-   * POSLEDNÍ DOKONČENÝ ZÁPAS TÝMU
+   * POSLEDNÍ DOKONČENÝ ZÁPAS
    * ========================================
    */
 
@@ -430,14 +430,16 @@ async function getLatestPlayerOfMatch(
         best,
         current,
       ) => {
-        return getMatchTime(
-          current.match,
-        ) >
-        getMatchTime(
-          best.match,
-        )
-          ? current
-          : best;
+        return (
+          getMatchTime(
+            current.match,
+          ) >
+          getMatchTime(
+            best.match,
+          )
+            ? current
+            : best
+        );
       },
     );
 
@@ -449,12 +451,12 @@ async function getLatestPlayerOfMatch(
    * VÍTĚZ PODLE APLIKACE
    * ========================================
    *
-   * ŽÁDNÉ:
-   * - řazení podle známky
-   * - rozhodování podle gólů
-   * - rozhodování podle asistencí
+   * Web už nic nepočítá.
    *
-   * Pouze hráč označený aplikací jako HZ.
+   * Pouze hledá hráče, který má
+   * u daného zápasu:
+   *
+   * isPlayerOfTheMatch === true
    * ========================================
    */
 
@@ -474,6 +476,12 @@ async function getLatestPlayerOfMatch(
   ) {
     return null;
   }
+
+  /*
+   * ========================================
+   * DATA PRO HOMEPAGE KARTU
+   * ========================================
+   */
 
   return {
     id:
@@ -505,6 +513,12 @@ async function getLatestPlayerOfMatch(
   };
 }
 
+/*
+ * ========================================
+ * ČAS ZÁPASU
+ * ========================================
+ */
+
 function getMatchTime(
   match: PlayerAppMatch,
 ): number {
@@ -523,6 +537,12 @@ function getMatchTime(
     ? time
     : 0;
 }
+
+/*
+ * ========================================
+ * NORMALIZACE A / B
+ * ========================================
+ */
 
 function normalizeTeam(
   value: string,
