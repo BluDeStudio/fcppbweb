@@ -21,10 +21,13 @@ import styles from "./HomeDashboard.module.css";
 export type PlayerOfMatch = {
   id: number;
   name: string;
+
   goals: number;
   assists: number;
+
   rating: number | null;
   ratingVotes: number;
+
   matchId: string;
   matchTitle: string;
   matchDate: string;
@@ -49,7 +52,9 @@ type Props = {
   transfers: ClubTransfer[];
 };
 
-type Team = "a" | "b";
+type Team =
+  | "a"
+  | "b";
 
 type CountdownValue = {
   days: number;
@@ -58,12 +63,13 @@ type CountdownValue = {
   finished: boolean;
 };
 
-const PNG_PLAYER_IDS = new Set([
-  532,
-  997,
-  1562,
-  3937,
-]);
+const PNG_PLAYER_IDS =
+  new Set([
+    532,
+    997,
+    1562,
+    3937,
+  ]);
 
 const TIKTOK_URL =
   "https://www.tiktok.com/@fcppbfutsal";
@@ -77,7 +83,8 @@ export function HomeDashboard(
   const [
     tableTeam,
     setTableTeam,
-  ] = useState<Team>("a");
+  ] =
+    useState<Team>("a");
 
   const tableRows =
     tableTeam === "a"
@@ -85,60 +92,142 @@ export function HomeDashboard(
       : props.bLeagueTable;
 
   return (
-    <main className={styles.page}>
+    <main
+      className={styles.page}
+    >
       <Hero />
 
-      <div className={styles.shell}>
-        <section className={styles.scoreboardSection}>
-          <SectionTitle title="ZÁPASY." />
+      <div
+        className={styles.shell}
+      >
+        {/* ===================================================
+            ZÁPASY
+        =================================================== */}
 
-          <MatchTeamBlock label="A-TÝM">
-            <NextMatchPanel
-              match={props.aNextMatch}
-              team="a"
-              rows={props.aLeagueTable}
-            />
+        <section
+          className={
+            styles.scoreboardSection
+          }
+        >
+          <SectionTitle
+            title="ZÁPASY."
+          />
 
-            <LastMatchPanel
-              match={props.aMatches[0] ?? null}
-              team="a"
-            />
-          </MatchTeamBlock>
+          <TeamFrame
+            label="A-TÝM"
+          >
+            <div
+              className={
+                styles.scoreGrid
+              }
+            >
+              <NextMatchPanel
+                match={
+                  props.aNextMatch
+                }
+                rows={
+                  props.aLeagueTable
+                }
+              />
 
-          <MatchTeamBlock label="B-TÝM">
-            <NextMatchPanel
-              match={props.bNextMatch}
-              team="b"
-              rows={props.bLeagueTable}
-            />
+              <LastMatchPanel
+                match={
+                  props.aMatches[0] ??
+                  null
+                }
+              />
+            </div>
+          </TeamFrame>
 
-            <LastMatchPanel
-              match={props.bMatches[0] ?? null}
-              team="b"
-            />
-          </MatchTeamBlock>
+          <TeamFrame
+            label="B-TÝM"
+          >
+            <div
+              className={
+                styles.scoreGrid
+              }
+            >
+              <NextMatchPanel
+                match={
+                  props.bNextMatch
+                }
+                rows={
+                  props.bLeagueTable
+                }
+              />
+
+              <LastMatchPanel
+                match={
+                  props.bMatches[0] ??
+                  null
+                }
+              />
+            </div>
+          </TeamFrame>
         </section>
 
-        <section className={styles.section}>
-          <SectionTitle title="HRÁČI UTKÁNÍ." />
+        {/* ===================================================
+            HRÁČI UTKÁNÍ
+        =================================================== */}
 
-          <div className={styles.playersOfMatchGrid}>
-            <PlayerOfMatchCard
-              teamLabel="A-TÝM"
-              player={props.aPlayerOfMatch}
-            />
+        <section
+          className={
+            styles.section
+          }
+        >
+          <SectionTitle
+            title="HRÁČI UTKÁNÍ."
+          />
 
-            <PlayerOfMatchCard
-              teamLabel="B-TÝM"
-              player={props.bPlayerOfMatch}
-            />
+          <div
+            className={
+              styles.playersOfMatchGrid
+            }
+          >
+            <TeamCardFrame
+              label="A-TÝM"
+            >
+              <PlayerOfMatchCard
+                player={
+                  props.aPlayerOfMatch
+                }
+              />
+            </TeamCardFrame>
+
+            <TeamCardFrame
+              label="B-TÝM"
+            >
+              <PlayerOfMatchCard
+                player={
+                  props.bPlayerOfMatch
+                }
+              />
+            </TeamCardFrame>
           </div>
         </section>
 
-        <NewsSection props={props} />
+        {/* ===================================================
+            NOVINKY
+        =================================================== */}
 
-        <section className={styles.section}>
-          <div className={styles.sectionHeaderRow}>
+        <NewsSection
+          props={props}
+        />
+
+        {/* ===================================================
+            TABULKA
+        =================================================== */}
+
+        <section
+          className={
+            styles.section
+          }
+        >
+          <div
+            className={
+              styles.sectionHeaderRow
+            }
+          >
             <SectionTitle
               title="TABULKA."
               compact
@@ -146,16 +235,28 @@ export function HomeDashboard(
 
             <TeamToggle
               team={tableTeam}
-              setTeam={setTableTeam}
+              setTeam={
+                setTableTeam
+              }
             />
           </div>
 
-          <LeaguePreview rows={tableRows} />
+          <LeaguePreview
+            rows={tableRows}
+          />
         </section>
 
+        {/* ===================================================
+            NAŠE TÝMY
+        =================================================== */}
+
         <TeamsPreview
-          aPlayers={props.aPlayers}
-          bPlayers={props.bPlayers}
+          aPlayers={
+            props.aPlayers
+          }
+          bPlayers={
+            props.bPlayers
+          }
         />
 
         <Partners />
@@ -166,17 +267,32 @@ export function HomeDashboard(
   );
 }
 
+/* =========================================================
+   HERO
+   ========================================================= */
+
 function Hero() {
   return (
-    <section className={styles.hero}>
-      <div className={styles.heroNoise} />
+    <section
+      className={styles.hero}
+    >
       <div
-        className={styles.heroLight}
+        className={
+          styles.heroNoise
+        }
+      />
+
+      <div
+        className={
+          styles.heroLight
+        }
         aria-hidden="true"
       />
 
       <div
-        className={styles.heroLogoGhost}
+        className={
+          styles.heroLogoGhost
+        }
         aria-hidden="true"
       >
         <AnimatedLogo
@@ -185,33 +301,71 @@ function Hero() {
         />
       </div>
 
-      <div className={styles.heroInner}>
-        <div className={styles.heroBrand}>
-          <div className={styles.heroLogo}>
+      <div
+        className={
+          styles.heroInner
+        }
+      >
+        <div
+          className={
+            styles.heroBrand
+          }
+        >
+          <div
+            className={
+              styles.heroLogo
+            }
+          >
             <div
-              className={styles.heroLogoShine}
+              className={
+                styles.heroLogoShine
+              }
               aria-hidden="true"
             />
 
-            <AnimatedLogo
-              size={118}
-              priority
-            />
+            <div
+              className={
+                styles.heroLogoGraphic
+              }
+            >
+              <AnimatedLogo
+                size={118}
+                priority
+              />
+            </div>
           </div>
 
-          <div>
+          <div
+            className={
+              styles.heroBrandCopy
+            }
+          >
             <span>
               FC PPB · FUTSAL PLZEŇ
             </span>
 
-            <h1>FC PPB</h1>
+            <h1>
+              FC PPB
+            </h1>
           </div>
         </div>
 
-        <div className={styles.heroClaim}>
-          <strong>PŘÁTELSTVÍ.</strong>
-          <strong>POKORA.</strong>
-          <strong>BOJOVNOST.</strong>
+        <div
+          className={
+            styles.heroClaim
+          }
+        >
+          <strong>
+            PŘÁTELSTVÍ.
+          </strong>
+
+          <strong>
+            POKORA.
+          </strong>
+
+          <strong>
+            BOJOVNOST.
+          </strong>
         </div>
 
         <p>
@@ -222,7 +376,12 @@ function Hero() {
   );
 }
 
-function MatchTeamBlock({
+/* =========================================================
+   RÁMEČEK TÝMU
+   ┌── A-TÝM ─────────────┐
+   ========================================================= */
+
+function TeamFrame({
   label,
   children,
 }: {
@@ -230,67 +389,142 @@ function MatchTeamBlock({
   children: ReactNode;
 }) {
   return (
-    <div className={styles.matchTeamBlock}>
-      <div className={styles.matchTeamHeading}>
-        <strong>{label}</strong>
-        <span />
-      </div>
+    <div
+      className={
+        styles.teamFrame
+      }
+    >
+      <span
+        className={
+          styles.teamFrameLegend
+        }
+      >
+        {label}
+      </span>
 
-      <div className={styles.scoreGrid}>
+      {children}
+    </div>
+  );
+}
+
+/* =========================================================
+   RÁMEČEK JEDNÉ KARTY
+   ========================================================= */
+
+function TeamCardFrame({
+  label,
+  children,
+}: {
+  label: string;
+  children: ReactNode;
+}) {
+  return (
+    <div
+      className={
+        styles.teamCardFrame
+      }
+    >
+      <span
+        className={
+          styles.teamCardFrameLegend
+        }
+      >
+        {label}
+      </span>
+
+      <div
+        className={
+          styles.teamCardFrameInner
+        }
+      >
         {children}
       </div>
     </div>
   );
 }
 
+/* =========================================================
+   POSLEDNÍ ZÁPAS
+   ========================================================= */
+
 function LastMatchPanel({
   match,
-  team,
 }: {
-  match: MatchResult | null;
-  team: Team;
+  match:
+    MatchResult | null;
 }) {
   return (
-    <article className={styles.matchPanel}>
+    <article
+      className={
+        styles.matchPanel
+      }
+    >
       <CardSweep />
 
-      <div className={styles.panelTopline}>
+      <div
+        className={
+          styles.panelTopline
+        }
+      >
         <span>
-          POSLEDNÍ ZÁPAS ·{" "}
-          {team === "a"
-            ? "A-TÝM"
-            : "B-TÝM"}
+          POSLEDNÍ ZÁPAS
         </span>
-
-        <b>KONEC</b>
       </div>
 
       {match ? (
         <>
-          <div className={styles.matchMain}>
+          <div
+            className={
+              styles.matchMain
+            }
+          >
             <MatchClub
-              name={match.homeTeam}
-              teamId={match.homeTeamId}
+              name={
+                match.homeTeam
+              }
+              teamId={
+                match.homeTeamId
+              }
             />
 
-            <div className={styles.score}>
+            <div
+              className={
+                styles.score
+              }
+            >
               {match.homeScore}
-              <i>:</i>
+
+              <i>
+                :
+              </i>
+
               {match.awayScore}
             </div>
 
             <MatchClub
-              name={match.awayTeam}
-              teamId={match.awayTeamId}
+              name={
+                match.awayTeam
+              }
+              teamId={
+                match.awayTeamId
+              }
             />
           </div>
 
-          <div className={styles.matchFoot}>
-            <span>{match.date}</span>
+          <div
+            className={
+              styles.matchFoot
+            }
+          >
+            <span>
+              {match.date}
+            </span>
 
             {match.detailUrl ? (
               <a
-                href={match.detailUrl}
+                href={
+                  match.detailUrl
+                }
                 target="_blank"
                 rel="noreferrer"
               >
@@ -300,20 +534,27 @@ function LastMatchPanel({
           </div>
         </>
       ) : (
-        <Empty text="Bez odehraného zápasu." />
+        <Empty
+          text="Bez odehraného zápasu."
+        />
       )}
     </article>
   );
 }
 
+/* =========================================================
+   NÁSLEDUJÍCÍ ZÁPAS
+   ========================================================= */
+
 function NextMatchPanel({
   match,
-  team,
   rows,
 }: {
-  match: NextMatch | null;
-  team: Team;
-  rows: LeagueRow[];
+  match:
+    NextMatch | null;
+
+  rows:
+    LeagueRow[];
 }) {
   const home =
     match
@@ -337,42 +578,67 @@ function NextMatchPanel({
     >
       <CardSweep />
 
-      <div className={styles.panelTopline}>
+      <div
+        className={
+          styles.panelTopline
+        }
+      >
         <span>
-          NÁSLEDUJÍCÍ ZÁPAS ·{" "}
-          {team === "a"
-            ? "A-TÝM"
-            : "B-TÝM"}
+          NÁSLEDUJÍCÍ ZÁPAS
         </span>
-
-        <b>DALŠÍ</b>
       </div>
 
       {match ? (
         <>
-          <div className={styles.matchMain}>
+          <div
+            className={
+              styles.matchMain
+            }
+          >
             <MatchClub
-              name={match.homeTeam}
-              teamId={match.homeTeamId}
-              position={home?.position}
+              name={
+                match.homeTeam
+              }
+              teamId={
+                match.homeTeamId
+              }
+              position={
+                home?.position
+              }
             />
 
-            <div className={styles.versus}>
+            <div
+              className={
+                styles.versus
+              }
+            >
               VS
             </div>
 
             <MatchClub
-              name={match.awayTeam}
-              teamId={match.awayTeamId}
-              position={away?.position}
+              name={
+                match.awayTeam
+              }
+              teamId={
+                match.awayTeamId
+              }
+              position={
+                away?.position
+              }
             />
           </div>
 
           <MatchCountdown
-            dateTimeIso={match.dateTimeIso}
+            dateTimeIso={
+              match.dateTimeIso
+            }
           />
 
-          <div className={styles.matchFoot}>
+          <div
+            className={
+              styles.matchFoot
+            }
+          >
             <span>
               {[
                 match.date,
@@ -382,28 +648,41 @@ function NextMatchPanel({
                 .join(" · ")}
             </span>
 
-            <Link href="/zapasy">
+            <Link
+              href="/zapasy"
+            >
               PROGRAM →
             </Link>
           </div>
 
           {match.venue ? (
-            <div className={styles.venue}>
+            <div
+              className={
+                styles.venue
+              }
+            >
               {match.venue}
             </div>
           ) : null}
         </>
       ) : (
-        <Empty text="Další zápas zatím není v rozpisu." />
+        <Empty
+          text="Další zápas zatím není v rozpisu."
+        />
       )}
     </article>
   );
 }
 
+/* =========================================================
+   ODPOČET
+   ========================================================= */
+
 function MatchCountdown({
   dateTimeIso,
 }: {
-  dateTimeIso: string | null;
+  dateTimeIso:
+    string | null;
 }) {
   const [
     countdown,
@@ -425,15 +704,22 @@ function MatchCountdown({
           dateTimeIso,
         ).getTime();
 
-      if (!Number.isFinite(target)) {
+      if (
+        !Number.isFinite(
+          target,
+        )
+      ) {
         setCountdown(null);
         return;
       }
 
       const difference =
-        target - Date.now();
+        target -
+        Date.now();
 
-      if (difference <= 0) {
+      if (
+        difference <= 0
+      ) {
         setCountdown({
           days: 0,
           hours: 0,
@@ -446,22 +732,26 @@ function MatchCountdown({
 
       const totalMinutes =
         Math.ceil(
-          difference / 60_000,
+          difference /
+            60_000,
         );
 
       const days =
         Math.floor(
-          totalMinutes / 1440,
+          totalMinutes /
+            1440,
         );
 
       const hours =
         Math.floor(
-          (totalMinutes % 1440) /
+          (totalMinutes %
+            1440) /
             60,
         );
 
       const minutes =
-        totalMinutes % 60;
+        totalMinutes %
+        60;
 
       setCountdown({
         days,
@@ -479,10 +769,11 @@ function MatchCountdown({
         30_000,
       );
 
-    return () =>
+    return () => {
       window.clearInterval(
         timer,
       );
+    };
   }, [dateTimeIso]);
 
   if (!dateTimeIso) {
@@ -490,12 +781,17 @@ function MatchCountdown({
   }
 
   return (
-    <div className={styles.matchCountdown}>
+    <div
+      className={
+        styles.matchCountdown
+      }
+    >
       <span>
         HRAJEME ZA:
       </span>
 
-      {countdown === null ? (
+      {countdown ===
+      null ? (
         <strong>
           -- d / -- h / -- m
         </strong>
@@ -508,44 +804,62 @@ function MatchCountdown({
           {padCountdown(
             countdown.days,
           )}
-          <small>d</small>
 
-          <i>/</i>
+          <small>
+            d
+          </small>
+
+          <i>
+            /
+          </i>
 
           {padCountdown(
             countdown.hours,
           )}
-          <small>h</small>
 
-          <i>/</i>
+          <small>
+            h
+          </small>
+
+          <i>
+            /
+          </i>
 
           {padCountdown(
             countdown.minutes,
           )}
-          <small>m</small>
+
+          <small>
+            m
+          </small>
         </strong>
       )}
     </div>
   );
 }
 
+/* =========================================================
+   HRÁČ UTKÁNÍ
+   ========================================================= */
+
 function PlayerOfMatchCard({
   player,
-  teamLabel,
 }: {
-  player: PlayerOfMatch | null;
-  teamLabel: string;
+  player:
+    PlayerOfMatch | null;
 }) {
   if (!player) {
     return (
-      <article className={styles.pomCard}>
+      <article
+        className={
+          styles.pomCard
+        }
+      >
         <CardSweep />
 
-        <div className={styles.pomLabel}>
-          {teamLabel}
-        </div>
-
-        <Empty text="Hráč utkání zatím není dostupný." />
+        <Empty
+          text="Hráč utkání zatím není dostupný."
+        />
       </article>
     );
   }
@@ -553,35 +867,45 @@ function PlayerOfMatchCard({
   return (
     <Link
       href={`/hrac/${player.id}`}
-      className={styles.pomCard}
+      className={
+        styles.pomCard
+      }
     >
       <CardSweep />
 
-      <div className={styles.pomLabel}>
-        {teamLabel}
-      </div>
-
-      <div className={styles.pomStage}>
+      <div
+        className={
+          styles.pomStage
+        }
+      >
         <img
-          className={styles.pomWatermark}
+          className={
+            styles.pomWatermark
+          }
           src="/images/fc-ppb-logo.png"
           alt=""
           aria-hidden="true"
         />
 
         <img
-          className={styles.pomPlayer}
+          className={
+            styles.pomPlayer
+          }
           src={`/images/${player.id}.png`}
           alt={player.name}
-          onError={(event) => {
+          onError={(
+            event,
+          ) => {
             const image =
               event.currentTarget;
 
             if (
-              image.dataset.fallback !==
+              image.dataset
+                .fallback !==
               "jpg"
             ) {
-              image.dataset.fallback =
+              image.dataset
+                .fallback =
                 "jpg";
 
               image.src =
@@ -596,32 +920,61 @@ function PlayerOfMatchCard({
         />
       </div>
 
-      {player.rating !== null ? (
-        <div className={styles.pomRatingCorner}>
-          {player.rating.toFixed(1)}
+      {player.rating !==
+        null ? (
+        <div
+          className={
+            styles.pomRatingCorner
+          }
+        >
+          {player.rating.toFixed(
+            1,
+          )}
         </div>
       ) : null}
 
-      <div className={styles.pomCopy}>
+      <div
+        className={
+          styles.pomCopy
+        }
+      >
         <h3>
           {formatPlayerName(
             player.name,
           )}
         </h3>
 
-        <span className={styles.pomMatchTitle}>
+        <span
+          className={
+            styles.pomMatchTitle
+          }
+        >
           {player.matchTitle}
         </span>
 
-        <div className={styles.pomStats}>
+        <div
+          className={
+            styles.pomStats
+          }
+        >
           <div>
-            <b>{player.goals}</b>
-            <small>GÓLY</small>
+            <b>
+              {player.goals}
+            </b>
+
+            <small>
+              GÓLY
+            </small>
           </div>
 
           <div>
-            <b>{player.assists}</b>
-            <small>ASISTENCE</small>
+            <b>
+              {player.assists}
+            </b>
+
+            <small>
+              ASISTENCE
+            </small>
           </div>
         </div>
       </div>
@@ -637,7 +990,9 @@ function formatPlayerName(
       .trim()
       .split(/\s+/);
 
-  if (parts.length < 2) {
+  if (
+    parts.length < 2
+  ) {
     return name;
   }
 
@@ -654,6 +1009,10 @@ function formatPlayerName(
     </>
   );
 }
+
+/* =========================================================
+   NOVINKY
+   ========================================================= */
 
 function NewsSection({
   props,
@@ -767,46 +1126,82 @@ function NewsSection({
       props.bMatches,
     ]);
 
-  if (cards.length === 0) {
+  if (
+    cards.length === 0
+  ) {
     return null;
   }
 
   return (
-    <section className={styles.section}>
-      <div className={styles.sectionHeaderRow}>
+    <section
+      className={
+        styles.section
+      }
+    >
+      <div
+        className={
+          styles.sectionHeaderRow
+        }
+      >
         <SectionTitle
           title="ZPRÁVY Z KABINY."
           compact
         />
 
         <Link
-          className={styles.textLink}
+          className={
+            styles.textLink
+          }
           href="/novinky"
         >
           VŠECHNY NOVINKY →
         </Link>
       </div>
 
-      <div className={styles.newsGrid}>
+      <div
+        className={
+          styles.newsGrid
+        }
+      >
         {cards.map(
           (card) => (
             <Link
-              href={card.href}
-              className={styles.newsCard}
-              key={card.key}
+              href={
+                card.href
+              }
+              className={
+                styles.newsCard
+              }
+              key={
+                card.key
+              }
             >
               <CardSweep />
 
-              <div className={styles.newsVisual}>
+              <div
+                className={
+                  styles.newsVisual
+                }
+              >
                 <img
-                  src={card.image}
+                  src={
+                    card.image
+                  }
                   alt=""
                 />
               </div>
 
-              <div className={styles.newsShade} />
+              <div
+                className={
+                  styles.newsShade
+                }
+              />
 
-              <div className={styles.newsCopy}>
+              <div
+                className={
+                  styles.newsCopy
+                }
+              >
                 <span>
                   {card.tag}
                 </span>
@@ -827,10 +1222,15 @@ function NewsSection({
   );
 }
 
+/* =========================================================
+   TABULKA
+   ========================================================= */
+
 function LeaguePreview({
   rows,
 }: {
-  rows: LeagueRow[];
+  rows:
+    LeagueRow[];
 }) {
   const visible =
     aroundOurTeam(
@@ -839,26 +1239,59 @@ function LeaguePreview({
     );
 
   return (
-    <div className={styles.tableCard}>
-      <div className={styles.tableHead}>
-        <span>#</span>
-        <span>TÝM</span>
-        <span>ZÁPASY</span>
+    <div
+      className={
+        styles.tableCard
+      }
+    >
+      <div
+        className={
+          styles.tableHead
+        }
+      >
+        <span>
+          #
+        </span>
 
-        <span className={styles.tableDesktopOnly}>
+        <span>
+          TÝM
+        </span>
+
+        <span>
+          ZÁPASY
+        </span>
+
+        <span
+          className={
+            styles.tableDesktopOnly
+          }
+        >
           VÝHRY
         </span>
 
-        <span className={styles.tableDesktopOnly}>
+        <span
+          className={
+            styles.tableDesktopOnly
+          }
+        >
           REMÍZY
         </span>
 
-        <span className={styles.tableDesktopOnly}>
+        <span
+          className={
+            styles.tableDesktopOnly
+          }
+        >
           PROHRY
         </span>
 
-        <span>SKÓRE</span>
-        <span>BODY</span>
+        <span>
+          SKÓRE
+        </span>
+
+        <span>
+          BODY
+        </span>
       </div>
 
       {visible.map(
@@ -883,15 +1316,27 @@ function LeaguePreview({
               {row.matches}
             </span>
 
-            <span className={styles.tableDesktopOnly}>
+            <span
+              className={
+                styles.tableDesktopOnly
+              }
+            >
               {row.wins}
             </span>
 
-            <span className={styles.tableDesktopOnly}>
+            <span
+              className={
+                styles.tableDesktopOnly
+              }
+            >
               {row.draws}
             </span>
 
-            <span className={styles.tableDesktopOnly}>
+            <span
+              className={
+                styles.tableDesktopOnly
+              }
+            >
               {row.losses}
             </span>
 
@@ -908,51 +1353,84 @@ function LeaguePreview({
 
       <Link
         href="/zapasy#tabulka"
-        className={styles.tableLink}
+        className={
+          styles.tableLink
+        }
       >
         CELÁ TABULKA
-        <span>→</span>
+
+        <span>
+          →
+        </span>
       </Link>
     </div>
   );
 }
 
+/* =========================================================
+   NAŠE TÝMY
+   ========================================================= */
+
 function TeamsPreview({
   aPlayers,
   bPlayers,
 }: {
-  aPlayers: SquadPlayer[];
-  bPlayers: SquadPlayer[];
+  aPlayers:
+    SquadPlayer[];
+
+  bPlayers:
+    SquadPlayer[];
 }) {
   return (
-    <section className={styles.section}>
-      <SectionTitle title="NAŠE TÝMY." />
+    <section
+      className={
+        styles.section
+      }
+    >
+      <SectionTitle
+        title="NAŠE TÝMY."
+      />
 
-      <div className={styles.teamsGrid}>
-        <TeamPreviewCard
+      <div
+        className={
+          styles.teamsGrid
+        }
+      >
+        <TeamCardFrame
           label="A-TÝM"
-          players={aPlayers}
-          href="/tymy?team=a"
-        />
+        >
+          <TeamPreviewCard
+            players={
+              aPlayers
+            }
+            href="/tymy?team=a"
+          />
+        </TeamCardFrame>
 
-        <TeamPreviewCard
+        <TeamCardFrame
           label="B-TÝM"
-          players={bPlayers}
-          href="/tymy?team=b"
-        />
+        >
+          <TeamPreviewCard
+            players={
+              bPlayers
+            }
+            href="/tymy?team=b"
+          />
+        </TeamCardFrame>
       </div>
     </section>
   );
 }
 
 function TeamPreviewCard({
-  label,
   players,
   href,
 }: {
-  label: string;
-  players: SquadPlayer[];
-  href: string;
+  players:
+    SquadPlayer[];
+
+  href:
+    string;
 }) {
   const featured =
     players
@@ -970,42 +1448,69 @@ function TeamPreviewCard({
   return (
     <Link
       href={href}
-      className={styles.teamCard}
+      className={
+        styles.teamCard
+      }
     >
       <CardSweep />
 
-      <div className={styles.teamTitle}>
-        {label}
-      </div>
-
       <img
-        className={styles.teamGhost}
+        className={
+          styles.teamGhost
+        }
         src="/images/fc-ppb-logo.png"
         alt=""
         aria-hidden="true"
       />
 
-      <div className={styles.teamPlayers}>
+      <div
+        className={
+          styles.teamPlayers
+        }
+      >
         {featured.map(
           (
             player,
             index,
           ) => (
             <RosterImage
-              key={player.id}
-              player={player}
-              index={index}
+              key={
+                player.id
+              }
+              player={
+                player
+              }
+              index={
+                index
+              }
             />
           ),
         )}
       </div>
 
-      <div className={styles.teamCardShade} />
+      <div
+        className={
+          styles.teamCardShade
+        }
+      />
 
-      <div className={styles.teamCardCopy}>
-        <div className={styles.teamMenu}>
-          <span>SOUPISKA</span>
-          <span>STATISTIKY</span>
+      <div
+        className={
+          styles.teamCardCopy
+        }
+      >
+        <div
+          className={
+            styles.teamMenu
+          }
+        >
+          <span>
+            SOUPISKA
+          </span>
+
+          <span>
+            STATISTIKY
+          </span>
         </div>
 
         <b>
@@ -1020,8 +1525,11 @@ function RosterImage({
   player,
   index,
 }: {
-  player: SquadPlayer;
-  index: number;
+  player:
+    SquadPlayer;
+
+  index:
+    number;
 }) {
   return (
     <img
@@ -1031,16 +1539,22 @@ function RosterImage({
         zIndex:
           index + 1,
       }}
-      onError={(event) => {
+      onError={(
+        event,
+      ) => {
         const img =
           event.currentTarget;
 
         const fallback =
-          img.dataset.fallback ||
+          img.dataset
+            .fallback ||
           "";
 
-        if (fallback === "") {
-          img.dataset.fallback =
+        if (
+          fallback === ""
+        ) {
+          img.dataset
+            .fallback =
             "jpg";
 
           img.src =
@@ -1050,10 +1564,12 @@ function RosterImage({
         }
 
         if (
-          fallback === "jpg" &&
+          fallback ===
+            "jpg" &&
           player.imageUrl
         ) {
-          img.dataset.fallback =
+          img.dataset
+            .fallback =
             "remote";
 
           img.src =
@@ -1069,9 +1585,17 @@ function RosterImage({
   );
 }
 
+/* =========================================================
+   PARTNEŘI
+   ========================================================= */
+
 function Partners() {
   return (
-    <section className={styles.partners}>
+    <section
+      className={
+        styles.partners
+      }
+    >
       <span>
         HRAJÍ S NÁMI
       </span>
@@ -1101,9 +1625,17 @@ function Partners() {
   );
 }
 
+/* =========================================================
+   SOCIAL
+   ========================================================= */
+
 function Social() {
   return (
-    <section className={styles.social}>
+    <section
+      className={
+        styles.social
+      }
+    >
       <div>
         <span>
           SLEDUJ FC PPB
@@ -1116,7 +1648,9 @@ function Social() {
 
       <div>
         <a
-          href={TIKTOK_URL}
+          href={
+            TIKTOK_URL
+          }
           target="_blank"
           rel="noreferrer"
         >
@@ -1124,7 +1658,9 @@ function Social() {
         </a>
 
         <a
-          href={INSTAGRAM_URL}
+          href={
+            INSTAGRAM_URL
+          }
           target="_blank"
           rel="noreferrer"
         >
@@ -1135,12 +1671,19 @@ function Social() {
   );
 }
 
+/* =========================================================
+   TITULEK SEKCE
+   ========================================================= */
+
 function SectionTitle({
   title,
   compact = false,
 }: {
-  title: string;
-  compact?: boolean;
+  title:
+    string;
+
+  compact?:
+    boolean;
 }) {
   return (
     <div
@@ -1150,23 +1693,35 @@ function SectionTitle({
           : ""
       }`}
     >
-      <h2>{title}</h2>
+      <h2>
+        {title}
+      </h2>
     </div>
   );
 }
+
+/* =========================================================
+   PŘEPÍNAČ TABULKY
+   ========================================================= */
 
 function TeamToggle({
   team,
   setTeam,
 }: {
-  team: Team;
+  team:
+    Team;
+
   setTeam:
     (
       team: Team,
     ) => void;
 }) {
   return (
-    <div className={styles.toggle}>
+    <div
+      className={
+        styles.toggle
+      }
+    >
       <button
         type="button"
         className={
@@ -1198,17 +1753,30 @@ function TeamToggle({
   );
 }
 
+/* =========================================================
+   KLUB
+   ========================================================= */
+
 function MatchClub({
   name,
   teamId,
   position,
 }: {
-  name: string;
-  teamId: number | null;
-  position?: number;
+  name:
+    string;
+
+  teamId:
+    number | null;
+
+  position?:
+    number;
 }) {
   return (
-    <div className={styles.club}>
+    <div
+      className={
+        styles.club
+      }
+    >
       <TeamLogo
         name={name}
         teamId={teamId}
@@ -1231,8 +1799,11 @@ function TeamLogo({
   name,
   teamId,
 }: {
-  name: string;
-  teamId: number | null;
+  name:
+    string;
+
+  teamId:
+    number | null;
 }) {
   const ours =
     normalize(name).includes(
@@ -1252,9 +1823,16 @@ function TeamLogo({
   ] =
     useState(false);
 
-  if (!src || failed) {
+  if (
+    !src ||
+    failed
+  ) {
     return (
-      <div className={styles.logoFallback}>
+      <div
+        className={
+          styles.logoFallback
+        }
+      >
         {initials(name)}
       </div>
     );
@@ -1262,7 +1840,9 @@ function TeamLogo({
 
   return (
     <img
-      className={styles.clubLogo}
+      className={
+        styles.clubLogo
+      }
       src={src}
       alt={name}
       onError={() =>
@@ -1272,40 +1852,65 @@ function TeamLogo({
   );
 }
 
+/* =========================================================
+   EFFECT
+   ========================================================= */
+
 function CardSweep() {
   return (
     <span
-      className={styles.cardSweep}
+      className={
+        styles.cardSweep
+      }
       aria-hidden="true"
     />
   );
 }
 
+/* =========================================================
+   EMPTY
+   ========================================================= */
+
 function Empty({
   text,
 }: {
-  text: string;
+  text:
+    string;
 }) {
   return (
-    <div className={styles.empty}>
+    <div
+      className={
+        styles.empty
+      }
+    >
       {text}
     </div>
   );
 }
 
+/* =========================================================
+   HELPERS
+   ========================================================= */
+
 function findTeamRow(
-  rows: LeagueRow[],
-  teamName: string,
+  rows:
+    LeagueRow[],
+
+  teamName:
+    string,
 ): LeagueRow | null {
   const wanted =
-    normalize(teamName);
+    normalize(
+      teamName,
+    );
 
   return (
     rows.find(
       (row) =>
         normalize(
           row.teamName,
-        ) === wanted,
+        ) ===
+        wanted,
     ) ??
     rows.find(
       (row) => {
@@ -1329,10 +1934,15 @@ function findTeamRow(
 }
 
 function aroundOurTeam(
-  rows: LeagueRow[],
-  count: number,
+  rows:
+    LeagueRow[],
+
+  count:
+    number,
 ): LeagueRow[] {
-  if (rows.length === 0) {
+  if (
+    rows.length === 0
+  ) {
     return [];
   }
 
@@ -1342,7 +1952,9 @@ function aroundOurTeam(
         row.isOurTeam,
     );
 
-  if (index < 0) {
+  if (
+    index < 0
+  ) {
     return rows.slice(
       0,
       count,
@@ -1377,7 +1989,8 @@ function aroundOurTeam(
 }
 
 function movementLabel(
-  transfer: ClubTransfer,
+  transfer:
+    ClubTransfer,
 ): string {
   switch (
     transfer.movementDetail
@@ -1404,7 +2017,8 @@ function movementLabel(
 }
 
 function getTransferImage(
-  transfer: ClubTransfer,
+  transfer:
+    ClubTransfer,
 ): string {
   if (
     transfer.playerId &&
@@ -1422,7 +2036,8 @@ function getTransferImage(
 }
 
 function padCountdown(
-  value: number,
+  value:
+    number,
 ): string {
   return String(value)
     .padStart(
@@ -1432,7 +2047,8 @@ function padCountdown(
 }
 
 function normalize(
-  value: string,
+  value:
+    string,
 ): string {
   return value
     .normalize("NFD")
@@ -1449,7 +2065,8 @@ function normalize(
 }
 
 function initials(
-  value: string,
+  value:
+    string,
 ): string {
   return value
     .split(/\s+/)
