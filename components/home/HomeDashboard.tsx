@@ -920,18 +920,20 @@ function PlayerOfMatchCard({
         />
       </div>
 
-      {player.rating !==
-        null ? (
-        <div
-          className={
-            styles.pomRatingCorner
-          }
-        >
-          {player.rating.toFixed(
-            1,
-          )}
-        </div>
-      ) : null}
+      <div
+        className={
+          styles.pomRatingCorner
+        }
+        title={
+          player.ratingVotes > 0
+            ? `Hodnocení z ${player.ratingVotes} hlasů`
+            : "Hodnocení zatím není dostupné"
+        }
+      >
+        {player.rating !== null
+          ? player.rating.toFixed(1)
+          : "—"}
+      </div>
 
       <div
         className={
