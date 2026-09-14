@@ -425,13 +425,12 @@ export default async function TeamsPage() {
     ];
 
 
-  const squad:
-    TeamsPlayer[] =
-      rosterIds
-        .map(
-          (
-            apfPlayerId,
-          ) => {
+  const squad =
+    rosterIds
+      .map<TeamsPlayer | null>(
+        (
+          apfPlayerId,
+        ) => {
             const appPlayer =
               appPlayerByApfId.get(
                 apfPlayerId,
@@ -545,15 +544,15 @@ export default async function TeamsPage() {
 
               imageUrl,
             } satisfies TeamsPlayer;
-          },
-        )
-        .filter(
-          (
-            player,
-          ): player is TeamsPlayer =>
-            player !== null,
-        )
-        .sort(
+        },
+      )
+      .filter(
+        (
+          player,
+        ): player is TeamsPlayer =>
+          player !== null,
+      )
+      .sort(
           (
             a,
             b,
