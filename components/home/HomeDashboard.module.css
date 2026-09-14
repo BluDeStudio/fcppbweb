@@ -1,1513 +1,2165 @@
 .page {
   --bg: #050605;
-  --panel: #0d100e;
-  --panel-2: #131614;
-  --line: rgba(255,255,255,.1);
+  --panel: #0c0f0d;
+  --panel-2: #111512;
+  --line: rgba(255, 255, 255, .1);
+  --line-strong: rgba(255, 255, 255, .18);
   --text: #f5f7f5;
-  --muted: #7c847e;
+  --muted: #798079;
   --green: #53f20a;
+
+  --heading:
+    "Arial Narrow",
+    "Roboto Condensed",
+    "Helvetica Neue",
+    Arial,
+    sans-serif;
+
   min-height: 100vh;
   color: var(--text);
   background: var(--bg);
 }
 
-.shell { width: min(1440px, calc(100% - 48px)); margin: 0 auto; }
-.hero { position: relative; min-height: 390px; overflow: hidden; border-bottom: 1px solid var(--line); background: radial-gradient(circle at 72% 40%, rgba(83,242,10,.12), transparent 31%), linear-gradient(135deg,#050605 0%,#0a0d0b 58%,#050605 100%); }
-.heroNoise { position:absolute; inset:0; opacity:.1; pointer-events:none; background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.25'/%3E%3C/svg%3E"); }
-.heroLogoGhost { position:absolute; right:4%; top:50%; transform:translateY(-50%); opacity:.055; filter:grayscale(1); }
-.heroInner { position:relative; z-index:2; width:min(1440px,calc(100% - 48px)); min-height:390px; margin:auto; display:flex; flex-direction:column; justify-content:center; }
-.heroBrand { display:flex; align-items:center; gap:26px; }
-.heroBrand span,.kicker,.sectionTitle span { color:var(--green); font-size:9px; font-weight:1000; letter-spacing:.17em; }
-.heroBrand h1 { margin:3px 0 0; font-size:clamp(66px,8vw,120px); line-height:.82; letter-spacing:-.075em; font-weight:1000; }
-.heroClaim { margin-top:34px; display:flex; flex-wrap:wrap; gap:0; }
-.heroClaim strong { padding:0 26px; border-left:1px solid rgba(83,242,10,.45); font-size:clamp(18px,2vw,30px); letter-spacing:-.035em; }
-.heroClaim strong:first-child { padding-left:0; border-left:0; }
-.heroInner > p { margin:22px 0 0; color:var(--green); font-size:11px; font-weight:1000; letter-spacing:.24em; }
-
-.scoreboardSection,.section { padding-top:52px; }
-.scoreboardHeader,.sectionHeaderRow { margin-bottom:16px; display:flex; align-items:flex-end; justify-content:space-between; gap:24px; }
-.scoreboardHeader h2,.sectionTitle h2 { margin:5px 0 0; color:#fff; font-size:clamp(34px,3.4vw,54px); line-height:.88; letter-spacing:-.06em; font-weight:1000; }
-.sectionTitleCompact h2 { font-size:clamp(31px,3vw,46px); }
-.toggle { display:flex; padding:3px; border:1px solid var(--line); background:#0a0d0b; }
-.toggle button { min-width:84px; height:38px; border:0; color:#89918b; background:transparent; font-size:8px; font-weight:1000; cursor:pointer; }
-.toggle .active { color:#061006; background:var(--green); }
-.scoreGrid,.playersOfMatchGrid,.teamsGrid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
-.matchPanel { position:relative; min-height:300px; padding:20px 24px; overflow:hidden; border:1px solid var(--line); background:radial-gradient(circle at 50% 100%,rgba(83,242,10,.055),transparent 45%),#0a0d0b; }
-.nextPanel { background:radial-gradient(circle at 50% 38%,rgba(83,242,10,.065),transparent 40%),#0b0e0c; }
-.panelTopline { display:flex; align-items:center; justify-content:space-between; gap:15px; }
-.panelTopline span { color:#f0f3f1; font-size:9px; font-weight:1000; }
-.panelTopline b { padding:6px 9px; border:1px solid rgba(83,242,10,.3); color:var(--green); font-size:7px; letter-spacing:.06em; }
-.matchMain { margin-top:34px; display:grid; grid-template-columns:1fr 120px 1fr; align-items:center; gap:18px; }
-.club { min-width:0; display:grid; justify-items:center; gap:7px; text-align:center; }
-.club strong { max-width:100%; overflow:hidden; text-overflow:ellipsis; color:#f2f4f2; font-size:11px; font-weight:1000; white-space:nowrap; }
-.club small { color:var(--green); font-size:7px; font-weight:1000; }
-.clubLogo { width:72px; height:72px; object-fit:contain; }
-.logoFallback { width:64px; height:64px; display:grid; place-items:center; border:1px solid var(--line); color:#7f8781; font-weight:1000; }
-.score,.versus { text-align:center; font-size:clamp(42px,5vw,72px); line-height:1; letter-spacing:-.08em; font-weight:1000; }
-.score i { color:var(--green); font-style:normal; }
-.versus { color:var(--green); }
-.matchFoot { position:absolute; right:24px; bottom:18px; left:24px; padding-top:13px; display:flex; justify-content:space-between; gap:14px; border-top:1px solid var(--line); color:#7f8781; font-size:8px; font-weight:900; }
-.matchFoot a,.textLink,.tableLink { color:var(--green); text-decoration:none; font-weight:1000; }
-.venue { position:absolute; left:50%; bottom:51px; transform:translateX(-50%); color:#697169; font-size:7px; font-weight:900; text-transform:uppercase; white-space:nowrap; }
-
-.playersOfMatchGrid { min-height:420px; }
-.pomCard { position:relative; min-height:420px; overflow:hidden; border:1px solid var(--line); color:inherit; text-decoration:none; background:linear-gradient(135deg,#0a0d0b,#111512); }
-.pomCard::after { position:absolute; inset:0; content:""; background:linear-gradient(90deg,rgba(5,6,5,.84) 0%,rgba(5,6,5,.36) 53%,transparent 72%),linear-gradient(0deg,rgba(5,6,5,.88),transparent 58%); pointer-events:none; }
-.pomWatermark { position:absolute; right:-4%; top:50%; width:52%; height:78%; transform:translateY(-50%); object-fit:contain; opacity:.065; filter:grayscale(1); }
-.pomPlayer { position:absolute; z-index:1; right:2%; bottom:0; width:54%; height:98%; object-fit:contain; object-position:center bottom; filter:drop-shadow(0 22px 28px rgba(0,0,0,.5)); }
-.bigNumber { position:absolute; left:5%; top:7%; color:rgba(255,255,255,.055); font-size:150px; line-height:.8; font-weight:1000; letter-spacing:-.1em; }
-.pomLabel { position:absolute; z-index:3; left:22px; top:20px; color:var(--green); font-size:9px; font-weight:1000; letter-spacing:.1em; }
-.pomCopy { position:absolute; z-index:3; left:28px; bottom:30px; width:48%; }
-.pomCopy > span { color:var(--green); font-size:8px; font-weight:1000; }
-.pomCopy h3 { margin:8px 0 22px; color:#fff; font-size:clamp(28px,3vw,48px); line-height:.88; letter-spacing:-.055em; text-transform:uppercase; }
-.pomStats { display:flex; gap:26px; }
-.pomStats div { display:grid; gap:3px; }
-.pomStats b { color:#fff; font-size:26px; line-height:1; }
-.pomStats small { color:#7e867f; font-size:6px; font-weight:1000; }
-
-.newsGrid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
-.newsCard { position:relative; min-height:270px; overflow:hidden; border:1px solid var(--line); color:inherit; text-decoration:none; background:#0c0f0d; }
-.newsVisual { position:absolute; inset:0; }
-.newsVisual img { width:100%; height:100%; object-fit:cover; filter:grayscale(.25); transition:transform .35s ease; }
-.newsCard:hover .newsVisual img { transform:scale(1.035); }
-.newsShade { position:absolute; inset:0; background:linear-gradient(0deg,rgba(4,5,4,.96),rgba(4,5,4,.07) 75%); }
-.newsCopy { position:absolute; z-index:2; right:20px; bottom:18px; left:20px; }
-.newsCopy span { display:inline-flex; padding:6px 8px; color:#071006; background:var(--green); font-size:7px; font-weight:1000; }
-.newsCopy h3 { margin:11px 0 7px; color:#fff; font-size:22px; line-height:1; letter-spacing:-.035em; }
-.newsCopy small { color:#8a928c; font-size:7px; font-weight:900; }
-.textLink { padding-bottom:5px; font-size:8px; letter-spacing:.05em; }
-
-.tableCard { border:1px solid var(--line); background:#101311; }
-.tableHead,.tableRow { display:grid; grid-template-columns:54px minmax(0,1fr) 70px 110px 70px; align-items:center; gap:8px; }
-.tableHead { min-height:40px; padding:0 18px; color:#6f7771; font-size:7px; font-weight:1000; }
-.tableRow { position:relative; min-height:54px; padding:0 18px; border-top:1px solid rgba(255,255,255,.07); color:#adb4ae; font-size:9px; }
-.tableRow strong { color:#f0f2f0; font-size:10px; }
-.tableRow b { color:#fff; }
-.ourRow { background:linear-gradient(90deg,rgba(83,242,10,.24),rgba(83,242,10,.05)); }
-.ourRow::before { position:absolute; top:0; bottom:0; left:0; width:3px; content:""; background:var(--green); }
-.tableLink { min-height:48px; padding:0 18px; display:flex; align-items:center; justify-content:flex-end; gap:12px; border-top:1px solid var(--line); font-size:8px; }
-.tableLink span { font-size:15px; }
-
-.teamsGrid { min-height:390px; }
-.teamCard { position:relative; min-height:390px; overflow:hidden; border:1px solid var(--line); color:inherit; text-decoration:none; background:radial-gradient(circle at 52% 42%,rgba(83,242,10,.09),transparent 34%),#0a0d0b; }
-.teamGhost { position:absolute; left:50%; top:48%; width:54%; height:70%; transform:translate(-50%,-50%); object-fit:contain; opacity:.06; filter:grayscale(1); }
-.teamPlayers { position:absolute; inset:24px 7% 0; display:flex; align-items:flex-end; justify-content:center; }
-.teamPlayers img { width:40%; height:100%; margin-left:-12%; object-fit:contain; object-position:center bottom; filter:drop-shadow(0 16px 22px rgba(0,0,0,.55)); }
-.teamPlayers img:first-child { margin-left:0; }
-.teamCardShade { position:absolute; inset:0; background:linear-gradient(0deg,rgba(4,5,4,.98),transparent 60%); }
-.teamCardCopy { position:absolute; z-index:3; left:24px; right:24px; bottom:22px; display:grid; grid-template-columns:1fr auto; align-items:end; }
-.teamCardCopy span { grid-column:1 / -1; color:var(--green); font-size:8px; font-weight:1000; }
-.teamCardCopy h3 { margin:4px 0 0; color:#fff; font-size:42px; letter-spacing:-.055em; line-height:.9; }
-.teamCardCopy b { color:var(--green); font-size:8px; }
-
-.partners { margin-top:60px; min-height:130px; display:grid; grid-template-columns:1fr 1fr 1fr; align-items:center; gap:38px; border-top:1px solid var(--line); border-bottom:1px solid var(--line); }
-.partners > span { color:#6f7771; font-size:8px; font-weight:1000; letter-spacing:.15em; }
-.partners a { min-height:100px; display:grid; place-items:center; }
-.partners img { max-width:220px; max-height:65px; object-fit:contain; }
-.social { min-height:118px; display:flex; align-items:center; justify-content:space-between; gap:30px; }
-.social > div:first-child { display:grid; gap:4px; }
-.social span { color:var(--green); font-size:8px; font-weight:1000; letter-spacing:.12em; }
-.social strong { font-size:16px; }
-.social > div:last-child { display:flex; gap:28px; }
-.social a { color:#fff; font-size:8px; font-weight:1000; text-decoration:none; }
-.empty { min-height:150px; display:grid; place-items:center; color:#747c76; font-size:9px; font-weight:900; text-align:center; }
-
-@media (max-width: 980px) {
-  .shell,.heroInner { width:calc(100% - 28px); }
-  .hero { min-height:340px; }
-  .heroInner { min-height:340px; }
-  .scoreGrid,.playersOfMatchGrid,.teamsGrid { grid-template-columns:1fr; }
-  .newsGrid { grid-template-columns:1fr 1fr; }
-  .newsCard:last-child { grid-column:1 / -1; }
-  .playersOfMatchGrid { min-height:0; }
-  .pomCard { min-height:390px; }
+.shell {
+  width: min(1440px, calc(100% - 48px));
+  margin: 0 auto;
 }
 
-@media (max-width: 650px) {
-  .shell,.heroInner { width:calc(100% - 20px); }
-  .hero { min-height:370px; }
-  .heroInner { min-height:370px; }
-  .heroBrand { align-items:flex-start; gap:10px; }
-  .heroLogo { transform:scale(.72); transform-origin:left top; width:82px; }
-  .heroBrand h1 { font-size:68px; }
-  .heroClaim { display:grid; gap:7px; }
-  .heroClaim strong { padding:0; border:0; font-size:21px; }
-  .scoreboardHeader,.sectionHeaderRow { align-items:stretch; flex-direction:column; }
-  .toggle { width:100%; }
-  .toggle button { flex:1; }
-  .matchPanel { min-height:280px; padding:16px; }
-  .matchMain { grid-template-columns:1fr 72px 1fr; gap:8px; }
-  .clubLogo { width:54px; height:54px; }
-  .score,.versus { font-size:40px; }
-  .club strong { white-space:normal; font-size:9px; }
-  .matchFoot { right:16px; bottom:14px; left:16px; }
-  .pomCard { min-height:360px; }
-  .pomPlayer { width:70%; right:-10%; opacity:.9; }
-  .pomCopy { width:58%; left:18px; bottom:22px; }
-  .pomCopy h3 { font-size:28px; }
-  .newsGrid { grid-template-columns:1fr; }
-  .newsCard:last-child { grid-column:auto; }
-  .tableCard { overflow-x:auto; }
-  .tableHead,.tableRow { min-width:520px; }
-  .teamCard { min-height:340px; }
-  .teamCardCopy h3 { font-size:34px; }
-  .partners { grid-template-columns:1fr 1fr; gap:15px; padding:20px 0; }
-  .partners > span { grid-column:1 / -1; }
-  .social { align-items:flex-start; flex-direction:column; padding:28px 0; }
-}
 
 /* =========================================================
-   FC PPB — REFERENCE DESIGN / FINAL OVERRIDES
+   HERO
    ========================================================= */
 
-.matchPanel{min-height:292px;padding:22px 28px 20px;border-color:rgba(255,255,255,.19);border-radius:2px;background:linear-gradient(180deg,rgba(5,8,6,.84),rgba(3,5,4,.97)),radial-gradient(circle at 75% 20%,rgba(83,242,10,.055),transparent 42%)}
-.panelTopline{justify-content:center}.panelTopline span{font-size:12px;letter-spacing:-.01em}.panelTopline b{position:absolute;top:18px;right:20px}
-.matchMain{margin-top:30px;grid-template-columns:1fr 145px 1fr}.clubLogo{width:88px;height:88px}.club strong{margin-top:2px;font-size:12px}
-.score{font-size:clamp(54px,6vw,82px);letter-spacing:-.055em}.score i{color:#fff;padding:0 4px}.versus{font-size:clamp(48px,5vw,70px);font-style:italic}
-.matchFoot{right:28px;bottom:18px;left:28px;justify-content:center;border-top:0;font-size:9px}.matchFoot a{position:absolute;right:0}.venue{bottom:42px;font-size:8px}
-
-.playersOfMatchGrid{min-height:0;gap:12px}
-.pomCard{display:grid;grid-template-columns:58px minmax(0,1.1fr) minmax(155px,.8fr);min-height:270px;border-color:rgba(255,255,255,.2);border-radius:2px;background:linear-gradient(110deg,#070907 0%,#0b0e0c 58%,#070907 100%)}
-.pomCard::after{display:none}
-.pomLabel{position:relative;z-index:8;left:auto;top:auto;display:flex;align-items:center;justify-content:center;border-right:1px solid rgba(255,255,255,.05);color:var(--green);background:rgba(0,0,0,.15);font-size:22px;letter-spacing:.01em;writing-mode:vertical-rl;transform:rotate(180deg)}
-.pomStage{position:relative;min-width:0;min-height:270px;overflow:hidden}
-.bigNumber{z-index:0;left:6px;top:22px;color:rgba(255,255,255,.075);font-size:clamp(120px,13vw,190px);line-height:.78}
-.pomWatermark{z-index:0;right:-4%;top:52%;width:72%;height:72%;opacity:.045}
-.pomPlayer{z-index:3;right:-2%;bottom:0;width:88%;height:100%;object-fit:contain;object-position:center bottom}
-.pomCopy{position:relative;z-index:5;left:auto;bottom:auto;width:auto;display:flex;flex-direction:column;justify-content:center;padding:26px 22px 22px 0}
-.pomCopy h3{margin:0 0 16px;color:#fff;font-size:clamp(20px,2.15vw,31px);line-height:.92;letter-spacing:-.035em}.pomCopy h3 strong{display:block;color:var(--green);font:inherit}
-.pomCopy>span{order:2;margin-bottom:18px;color:#f3f5f3;font-size:10px;letter-spacing:0}.pomStats{order:3;gap:28px}.pomStats b{font-size:25px}.pomStats small{margin-top:4px;color:#8a918b;font-size:8px}
-
-.teamsGrid{min-height:0;gap:12px}
-.teamCard{display:grid;grid-template-columns:62px minmax(0,1.1fr) minmax(190px,.9fr);min-height:260px;border-color:rgba(255,255,255,.2);border-radius:2px;background:radial-gradient(circle at 62% 45%,rgba(83,242,10,.08),transparent 38%),#080b09}
-.teamVertical{position:relative;z-index:8;display:flex;align-items:center;justify-content:center;border-right:1px solid rgba(255,255,255,.05);color:var(--green);font-size:clamp(28px,3vw,42px);font-weight:1000;font-style:italic;line-height:1;writing-mode:vertical-rl;transform:rotate(180deg)}
-.teamGhost{left:62%;top:50%;width:48%;height:74%;opacity:.045}
-.teamPlayers{position:relative;z-index:3;inset:auto;grid-column:2;grid-row:1;height:260px;padding:8px 0 0;justify-content:center;overflow:hidden}.teamPlayers img{width:52%;height:100%;margin-left:-20%}.teamPlayers img:first-child{margin-left:0}
-.teamCardShade{z-index:4;background:linear-gradient(90deg,transparent 35%,rgba(5,7,5,.4) 65%,rgba(5,7,5,.86))}
-.teamCardCopy{position:relative;z-index:6;left:auto;right:auto;bottom:auto;grid-column:3;grid-row:1;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;padding:25px 22px 25px 8px}
-.teamMenu{display:grid;gap:9px;margin-bottom:24px}.teamMenu span{color:#f0f3f1;font-size:11px;font-weight:900}.teamMenu span::after{content:" •";color:var(--green)}
-.teamCardCopy b{min-width:160px;padding:13px 16px;border:1px solid rgba(83,242,10,.48);color:var(--green);font-size:8px;text-align:center}
-
-@media(max-width:980px){.pomCard{grid-template-columns:52px minmax(0,1.1fr) minmax(145px,.75fr);min-height:250px}.pomStage{min-height:250px}.teamCard{grid-template-columns:52px minmax(0,1fr) minmax(175px,.9fr)}}
-@media(max-width:650px){
-.matchPanel{min-height:255px;padding:17px 12px}.panelTopline span{padding-right:45px;font-size:9px;text-align:center}.matchMain{grid-template-columns:1fr 76px 1fr;gap:5px}.clubLogo{width:58px;height:58px}.score,.versus{font-size:40px}
-.pomCard{grid-template-columns:42px minmax(0,1fr) minmax(110px,.82fr);min-height:220px}.pomLabel{font-size:16px}.pomStage{min-height:220px}.bigNumber{top:28px;font-size:92px}.pomPlayer{width:105%;right:-10%}.pomCopy{padding:18px 8px 16px 0}.pomCopy h3{margin-bottom:11px;font-size:16px}.pomCopy>span{margin-bottom:12px;font-size:7px}.pomStats{gap:13px}.pomStats b{font-size:19px}.pomStats small{font-size:6px}
-.teamCard{grid-template-columns:42px minmax(0,.9fr) minmax(120px,1fr);min-height:210px}.teamVertical{font-size:22px}.teamPlayers{height:210px}.teamCardCopy{padding:15px 8px 15px 2px}.teamMenu{gap:6px;margin-bottom:15px}.teamMenu span{font-size:8px}.teamCardCopy b{min-width:112px;padding:10px 7px;font-size:7px}
-}
-
-
-/* FC PPB — ZAHNUTÉ NADPISY + LEPŠÍ SPORTOVNÍ FONT */
-.home {
-  --heading-font: "Arial Narrow", "Roboto Condensed", "Helvetica Neue", Arial, sans-serif;
-}
-
-.sectionHeadingAccent {
+.hero {
   position: relative;
+  min-height: 390px;
+  overflow: hidden;
+  border-bottom: 1px solid var(--line);
+
+  background:
+    radial-gradient(
+      circle at 75% 40%,
+      rgba(83, 242, 10, .1),
+      transparent 34%
+    ),
+    linear-gradient(
+      135deg,
+      #050605,
+      #090c0a 60%,
+      #050605
+    );
+}
+
+.heroNoise {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: .05;
+
+  background-image:
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.3'/%3E%3C/svg%3E");
+}
+
+.heroLight {
+  position: absolute;
+  z-index: 1;
+  top: -50%;
+  left: -35%;
+  width: 30%;
+  height: 200%;
+  pointer-events: none;
+
+  background:
+    linear-gradient(
+      105deg,
+      transparent,
+      rgba(255, 255, 255, .08),
+      rgba(83, 242, 10, .07),
+      transparent
+    );
+
+  transform: skewX(-18deg);
+  animation: heroSweep 8s ease-in-out infinite;
+}
+
+.heroLogoGhost {
+  position: absolute;
+  right: 3%;
+  top: 50%;
+
+  transform:
+    translateY(-50%);
+
+  opacity: .05;
+  filter: grayscale(1);
+
+  animation:
+    logoFloat 7s ease-in-out infinite;
+}
+
+.heroInner {
+  position: relative;
+  z-index: 3;
+
+  width: min(1440px, calc(100% - 48px));
+  min-height: 390px;
+  margin: auto;
+
   display: flex;
-  align-items: flex-end;
-  min-height: 34px;
-  margin-bottom: 13px;
-  padding: 0 0 7px 28px;
-  border-bottom: 1px solid rgba(255,255,255,.16);
+  flex-direction: column;
+  justify-content: center;
 }
 
-.sectionHeadingAccent::before {
+.heroBrand {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.heroLogo {
+  position: relative;
+  overflow: hidden;
+}
+
+.heroLogoShine {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 18px;
-  height: 24px;
-  content: "";
-  border-top: 2px solid var(--green);
-  border-left: 2px solid var(--green);
-  background: transparent;
+  z-index: 20;
+
+  top: -20%;
+  left: -80%;
+
+  width: 32%;
+  height: 150%;
+
+  pointer-events: none;
+
+  background:
+    linear-gradient(
+      100deg,
+      transparent,
+      rgba(255,255,255,.42),
+      rgba(83,242,10,.16),
+      transparent
+    );
+
+  transform: skewX(-17deg);
+  animation: logoShine 6s ease-in-out infinite;
 }
 
-.sectionHeadingAccent::after {
-  position: absolute;
-  left: 17px;
-  bottom: -1px;
-  width: 90px;
-  height: 1px;
-  content: "";
-  background: linear-gradient(90deg, rgba(83,242,10,.7), transparent);
-}
-
-.sectionHeadingAccent small {
-  margin-bottom: 3px;
+.heroBrand span {
   color: var(--green);
-  font-family: var(--heading-font);
-  font-size: 7px;
-  font-weight: 900;
-  letter-spacing: .12em;
+  font-size: 9px;
+  font-weight: 1000;
+  letter-spacing: .17em;
 }
 
-.sectionHeadingAccent h2 {
-  margin: 0;
-  color: #fff;
-  font-family: var(--heading-font);
-  font-size: clamp(24px,2.5vw,36px);
+.heroBrand h1 {
+  margin: 3px 0 0;
+
+  font-family: var(--heading);
+  font-size: clamp(68px, 8vw, 118px);
   font-weight: 1000;
   line-height: .82;
-  letter-spacing: -.055em;
-  text-transform: uppercase;
+  letter-spacing: -.07em;
 }
 
-.sectionHeadingAccent > a {
-  align-self: center;
-  margin-left: auto;
-  color: var(--green);
-  font-family: var(--heading-font);
-  font-size: 8px;
-  font-weight: 950;
-  letter-spacing: .055em;
+.heroClaim {
+  margin-top: 35px;
+
+  display: flex;
+  flex-wrap: wrap;
 }
 
-.panelTopline span,
-.club strong,
-.score,
-.versus,
-.pomLabel,
-.pomCopy h3,
-.pomCopy > span,
-.pomStats,
-.newsCard h3,
-.table,
-.teamVertical,
-.teamMenu,
-.teamCardCopy b {
-  font-family: var(--heading-font);
-}
+.heroClaim strong {
+  padding: 0 25px;
 
-.panelTopline span,
-.club strong,
-.pomLabel,
-.pomCopy h3,
-.newsCard h3,
-.teamVertical,
-.score,
-.versus {
+  border-left:
+    1px solid
+    rgba(83, 242, 10, .42);
+
+  font-family: var(--heading);
+  font-size: clamp(18px, 2vw, 30px);
   font-weight: 1000;
+  letter-spacing: -.03em;
+
+  background:
+    linear-gradient(
+      105deg,
+      #fff 0%,
+      #fff 42%,
+      #8eff61 49%,
+      #fff 57%,
+      #fff 100%
+    );
+
+  background-size: 250% 100%;
+
+  -webkit-background-clip: text;
+  background-clip: text;
+
+  color: transparent;
+
+  animation:
+    claimShine 7s ease-in-out infinite;
 }
 
-.pomCopy h3,
-.newsCard h3 {
-  letter-spacing: -.04em;
+.heroClaim strong:first-child {
+  padding-left: 0;
+  border-left: 0;
 }
 
-.table th {
-  font-weight: 950;
-  letter-spacing: .045em;
-}
+.heroInner > p {
+  margin: 22px 0 0;
 
-.table td {
-  font-weight: 800;
-}
-
-@media(max-width:650px) {
-  .sectionHeadingAccent {
-    min-height: 29px;
-    margin-bottom: 9px;
-    padding-left: 22px;
-    padding-bottom: 5px;
-  }
-  .sectionHeadingAccent::before {
-    width: 14px;
-    height: 19px;
-  }
-  .sectionHeadingAccent::after {
-    left: 13px;
-    width: 55px;
-  }
-  .sectionHeadingAccent h2 {
-    font-size: 23px;
-  }
-  .sectionHeadingAccent > a {
-    font-size: 6px;
-  }
+  color: var(--green);
+  font-size: 10px;
+  font-weight: 1000;
+  letter-spacing: .23em;
 }
 
 
 /* =========================================================
-   FC PPB — FINÁLNÍ NADPISY SEKCI
+   SEKCE
    ========================================================= */
 
+.scoreboardSection,
+.section {
+  padding-top: 54px;
+}
+
+.sectionHeaderRow {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 25px;
+
+  margin-bottom: 15px;
+}
+
 .sectionTitle {
-  position: relative !important;
-  min-height: 42px !important;
-  margin: 0 0 14px !important;
-  padding: 4px 0 10px 28px !important;
-  display: flex !important;
-  align-items: flex-end !important;
-  border-bottom: 1px solid rgba(255,255,255,.16) !important;
+  position: relative;
+
+  min-height: 45px;
+
+  padding:
+    5px 0 10px 28px;
+
+  display: flex;
+  align-items: flex-end;
+
+  border-bottom:
+    1px solid
+    rgba(255, 255, 255, .14);
 }
 
 .sectionTitle::before {
   position: absolute;
   top: 0;
   left: 0;
+
   width: 18px;
   height: 25px;
+
   content: "";
-  border-top: 2px solid var(--green);
+
   border-left: 2px solid var(--green);
+  border-top: 2px solid var(--green);
 }
 
 .sectionTitle::after {
   position: absolute;
   left: 17px;
   bottom: -1px;
-  width: 105px;
-  height: 1px;
-  content: "";
-  background: linear-gradient(90deg, var(--green), rgba(83,242,10,0));
-}
 
-.sectionTitle > span {
-  display: none !important;
+  width: 100px;
+  height: 1px;
+
+  content: "";
+
+  background:
+    linear-gradient(
+      90deg,
+      var(--green),
+      transparent
+    );
 }
 
 .sectionTitle h2 {
-  margin: 0 !important;
-  color: #fff !important;
-  font-family: Arial, Helvetica, sans-serif !important;
-  font-size: clamp(28px, 3vw, 42px) !important;
-  font-weight: 900 !important;
-  line-height: .9 !important;
-  letter-spacing: -.045em !important;
-  text-transform: uppercase !important;
+  margin: 0;
+
+  font-family: var(--heading);
+  font-size: clamp(29px, 3vw, 43px);
+  font-weight: 1000;
+  line-height: .9;
+  letter-spacing: -.045em;
 }
 
 .sectionTitleCompact h2 {
-  font-size: clamp(26px, 2.7vw, 38px) !important;
-}
-
-/* ZÁPASY používají stejný nadpisový systém */
-.scoreboardHeader {
-  align-items: flex-end !important;
-  margin-bottom: 14px !important;
-}
-
-.scoreboardHeader > .sectionTitle {
-  flex: 1 1 auto;
-  margin-bottom: 0 !important;
-}
-
-/* Hráč utkání: bez náhodného ID/čísla za hráčem */
-.bigNumber {
-  display: none !important;
-}
-
-.pomStage {
-  background:
-    radial-gradient(circle at 52% 58%, rgba(83,242,10,.045), transparent 38%);
-}
-
-.pomPlayer {
-  max-width: 100%;
-  filter: drop-shadow(0 20px 24px rgba(0,0,0,.5));
-}
-
-/* O něco čistší sportovní typografie uvnitř karet */
-.panelTopline span,
-.pomLabel,
-.pomCopy h3,
-.pomCopy > span,
-.pomStats b,
-.newsCopy h3,
-.teamVertical,
-.teamMenu span,
-.teamCardCopy b {
-  font-family: "Arial Narrow", "Roboto Condensed", "Helvetica Neue", Arial, sans-serif;
-}
-
-.pomCopy h3,
-.newsCopy h3,
-.teamVertical {
-  font-weight: 1000;
-}
-
-@media (max-width: 650px) {
-  .sectionTitle {
-    min-height: 35px !important;
-    margin-bottom: 9px !important;
-    padding: 3px 0 7px 22px !important;
-  }
-
-  .sectionTitle::before {
-    width: 14px;
-    height: 20px;
-  }
-
-  .sectionTitle::after {
-    left: 13px;
-    width: 68px;
-  }
-
-  .sectionTitle h2,
-  .sectionTitleCompact h2 {
-    font-size: 25px !important;
-  }
-}
-
-
-/* FC PPB — PNG hráči + hover efekt */
-.teamPlayers img {
-  object-fit: contain !important;
-  object-position: center bottom !important;
-  background: transparent !important;
-  transform-origin: center bottom;
-  transition: transform .38s cubic-bezier(.2,.7,.2,1), filter .38s ease;
-}
-
-.pomPlayer {
-  transform-origin: center bottom;
-  transition: transform .42s cubic-bezier(.2,.75,.2,1), filter .42s ease !important;
-  will-change: transform;
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .pomCard:hover .pomPlayer {
-    transform: scale(1.08);
-    filter:
-      drop-shadow(0 22px 28px rgba(0,0,0,.62))
-      drop-shadow(0 0 14px rgba(83,242,10,.12));
-  }
-
-  .pomCard:hover {
-    border-color: rgba(83,242,10,.38);
-  }
-
-  .teamCard:hover .teamPlayers img {
-    transform: scale(1.035);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .pomPlayer,
-  .teamPlayers img {
-    transition: none !important;
-  }
+  font-size: clamp(28px, 2.7vw, 39px);
 }
 
 
 /* =========================================================
-   FC PPB — ZNÁMKA HRÁČE UTKÁNÍ
-   ========================================================= */
-
-.pomRating {
-  order: 3;
-  width: fit-content;
-  min-width: 72px;
-  margin: 0 0 17px;
-  padding: 8px 13px 9px;
-  display: grid;
-  gap: 2px;
-  border-radius: 8px;
-  background: #176fc8;
-  box-shadow:
-    inset 0 0 0 1px rgba(255,255,255,.08),
-    0 8px 18px rgba(0,0,0,.18);
-}
-
-.pomRating small {
-  color: rgba(255,255,255,.8);
-  font-size: 6px;
-  font-weight: 900;
-  letter-spacing: .08em;
-}
-
-.pomRating strong {
-  color: #fff;
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 22px;
-  font-weight: 950;
-  line-height: 1;
-}
-
-.pomStats {
-  order: 4;
-}
-
-@media (max-width: 650px) {
-  .pomRating {
-    min-width: 58px;
-    margin-bottom: 11px;
-    padding: 6px 9px 7px;
-    border-radius: 7px;
-  }
-
-  .pomRating small {
-    font-size: 5px;
-  }
-
-  .pomRating strong {
-    font-size: 18px;
-  }
-}
-
-
-/* FC PPB — známka + zápas v pravém horním rohu karty */
-.pomMatchBadge {
-  position: absolute;
-  z-index: 12;
-  top: 14px;
-  right: 14px;
-  width: min(190px, 34%);
-  padding: 9px 10px 8px;
-  border: 1px solid rgba(36, 128, 221, .55);
-  border-radius: 7px;
-  background: rgba(13, 55, 96, .88);
-  backdrop-filter: blur(8px);
-  box-shadow: 0 8px 20px rgba(0,0,0,.22);
-}
-
-.pomMatchBadgeTitle {
-  overflow: hidden;
-  color: #fff;
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 8px;
-  font-weight: 900;
-  line-height: 1.15;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  text-transform: uppercase;
-}
-
-.pomMatchBadgeMeta {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 8px;
-  margin-top: 5px;
-}
-
-.pomMatchBadgeMeta span {
-  overflow: hidden;
-  color: rgba(255,255,255,.62);
-  font-size: 6px;
-  font-weight: 800;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.pomMatchBadgeMeta strong {
-  min-width: 42px;
-  padding: 6px 8px;
-  border-radius: 6px;
-  background: #176fc8;
-  color: #fff;
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 18px;
-  font-weight: 950;
-  line-height: 1;
-  text-align: center;
-}
-
-/* starý rating box už nepoužíváme */
-.pomRating {
-  display: none !important;
-}
-
-@media (max-width: 650px) {
-  .pomMatchBadge {
-    top: 8px;
-    right: 8px;
-    width: min(135px, 42%);
-    padding: 6px 7px;
-  }
-
-  .pomMatchBadgeTitle {
-    font-size: 6px;
-  }
-
-  .pomMatchBadgeMeta span {
-    font-size: 5px;
-  }
-
-  .pomMatchBadgeMeta strong {
-    min-width: 34px;
-    padding: 5px 6px;
-    font-size: 14px;
-  }
-}
-
-
-/* =========================================================
-   FC PPB — PLAYER OF MATCH / CLEAN RATING CORNER
-   ========================================================= */
-
-.pomMatchBadge {
-  display: none !important;
-}
-
-.pomRatingCorner {
-  position: absolute;
-  z-index: 14;
-  top: 14px;
-  right: 14px;
-  min-width: 54px;
-  padding: 9px 11px;
-  border-radius: 7px;
-  background: #176fc8;
-  color: #fff;
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 21px;
-  font-weight: 950;
-  line-height: 1;
-  text-align: center;
-  box-shadow:
-    inset 0 0 0 1px rgba(255,255,255,.08),
-    0 8px 18px rgba(0,0,0,.2);
-}
-
-.pomMatchTitle {
-  display: block;
-  max-width: 185px;
-  margin: 0 0 17px;
-  overflow: hidden;
-  color: #d7ddd8 !important;
-  font-family: Arial, Helvetica, sans-serif !important;
-  font-size: 8px !important;
-  font-weight: 900 !important;
-  line-height: 1.25;
-  letter-spacing: .015em !important;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  text-transform: uppercase;
-}
-
-@media (max-width: 650px) {
-  .pomRatingCorner {
-    top: 8px;
-    right: 8px;
-    min-width: 44px;
-    padding: 7px 8px;
-    font-size: 16px;
-  }
-
-  .pomMatchTitle {
-    max-width: 125px;
-    margin-bottom: 11px;
-    font-size: 6px !important;
-  }
-}
-
-
-/* =========================================================
-   FC PPB — NAŠE TÝMY / LABEL STEJNÝ JAKO HRÁČ UTKÁNÍ
-   ========================================================= */
-
-.teamVertical {
-  font-family: "Arial Narrow", "Roboto Condensed", "Helvetica Neue", Arial, sans-serif !important;
-  font-size: 22px !important;
-  font-weight: 1000 !important;
-  font-style: normal !important;
-  line-height: 1 !important;
-  letter-spacing: .01em !important;
-  color: var(--green) !important;
-  writing-mode: vertical-rl !important;
-  transform: rotate(180deg) !important;
-}
-
-/* Všechny portréty v NAŠE TÝMY mají stejné chování a žádné vlastní pozadí */
-.teamPlayers img {
-  display: block;
-  align-self: flex-end;
-  height: 100% !important;
-  object-fit: contain !important;
-  object-position: center bottom !important;
-  background: transparent !important;
-}
-
-@media (max-width: 650px) {
-  .teamVertical {
-    font-size: 16px !important;
-  }
-}
-
-
-/* =========================================================
-   FC PPB — ZÁPASY / A-TÝM + B-TÝM
+   A / B ZÁPASY
    ========================================================= */
 
 .matchTeamBlock {
-  margin-top: 26px;
+  margin-top: 25px;
 }
 
-.matchTeamBlock:first-of-type {
-  margin-top: 4px;
+.matchTeamBlock + .matchTeamBlock {
+  margin-top: 34px;
 }
 
 .matchTeamHeading {
   min-height: 34px;
   margin-bottom: 10px;
+
   display: flex;
   align-items: center;
   gap: 14px;
 }
 
 .matchTeamHeading strong {
-  flex: 0 0 auto;
   color: var(--green);
-  font-family:
-    "Arial Narrow",
-    "Roboto Condensed",
-    "Helvetica Neue",
-    Arial,
-    sans-serif;
+
+  font-family: var(--heading);
   font-size: 14px;
   font-weight: 1000;
-  line-height: 1;
-  letter-spacing: .055em;
+  letter-spacing: .07em;
 }
 
 .matchTeamHeading span {
-  width: 100%;
+  flex: 1;
   height: 1px;
-  display: block;
+
   background:
     linear-gradient(
       90deg,
-      rgba(83,242,10,.42),
-      rgba(255,255,255,.09) 16%,
-      rgba(255,255,255,.09)
+      rgba(83, 242, 10, .4),
+      rgba(255, 255, 255, .08),
+      transparent
     );
 }
 
+.scoreGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+
 /* =========================================================
-   FC PPB — NÁSLEDUJÍCÍ ZÁPAS / ODPOČET
+   KARTY / LIGHT SWEEP
    ========================================================= */
 
+.matchPanel,
+.pomCard,
+.newsCard,
+.teamCard {
+  position: relative;
+  overflow: hidden;
+
+  border:
+    1px solid
+    var(--line-strong);
+
+  transition:
+    transform .32s cubic-bezier(.2,.7,.2,1),
+    border-color .32s ease,
+    box-shadow .32s ease;
+}
+
+.cardSweep {
+  position: absolute;
+  z-index: 40;
+
+  top: -45%;
+  left: -50%;
+
+  width: 30%;
+  height: 190%;
+
+  pointer-events: none;
+  opacity: 0;
+
+  background:
+    linear-gradient(
+      105deg,
+      transparent,
+      rgba(255,255,255,.03),
+      rgba(255,255,255,.16),
+      rgba(83,242,10,.13),
+      transparent
+    );
+
+  transform:
+    skewX(-18deg)
+    translateX(0);
+}
+
+@media (hover:hover) and (pointer:fine) {
+  .matchPanel:hover,
+  .pomCard:hover,
+  .newsCard:hover,
+  .teamCard:hover {
+    z-index: 5;
+
+    transform:
+      translateY(-5px);
+
+    border-color:
+      rgba(83, 242, 10, .46);
+
+    box-shadow:
+      0 18px 42px
+      rgba(0,0,0,.38),
+
+      0 0 0 1px
+      rgba(83,242,10,.06),
+
+      0 0 26px
+      rgba(83,242,10,.07);
+  }
+
+  .matchPanel:hover .cardSweep,
+  .pomCard:hover .cardSweep,
+  .newsCard:hover .cardSweep,
+  .teamCard:hover .cardSweep {
+    opacity: 1;
+
+    animation:
+      cardSweep .8s
+      cubic-bezier(.2,.7,.2,1)
+      forwards;
+  }
+}
+
+
+/* =========================================================
+   ZÁPAS
+   ========================================================= */
+
+.matchPanel {
+  min-height: 310px;
+  padding: 22px 28px 72px;
+
+  background:
+    radial-gradient(
+      circle at 50% 110%,
+      rgba(83,242,10,.05),
+      transparent 45%
+    ),
+    #090c0a;
+}
+
 .nextPanel {
-  padding-bottom: 72px;
+  background:
+    radial-gradient(
+      circle at 50% 42%,
+      rgba(83,242,10,.09),
+      transparent 42%
+    ),
+    #090c0a;
+}
+
+.panelTopline {
+  position: relative;
+  z-index: 5;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.panelTopline span {
+  color: #f3f5f3;
+
+  font-family: var(--heading);
+  font-size: 9px;
+  font-weight: 1000;
+  letter-spacing: .04em;
+}
+
+.panelTopline b {
+  position: absolute;
+  right: 0;
+
+  padding: 6px 9px;
+
+  border:
+    1px solid
+    rgba(83,242,10,.28);
+
+  color: var(--green);
+
+  font-size: 7px;
+  font-weight: 1000;
+}
+
+.matchMain {
+  position: relative;
+  z-index: 5;
+
+  margin-top: 31px;
+
+  display: grid;
+
+  grid-template-columns:
+    minmax(0,1fr)
+    110px
+    minmax(0,1fr);
+
+  align-items: center;
+  gap: 18px;
+}
+
+.club {
+  min-width: 0;
+
+  display: grid;
+  justify-items: center;
+  gap: 7px;
+
+  text-align: center;
+}
+
+.clubLogo,
+.logoFallback {
+  width: 82px;
+  height: 82px;
+}
+
+.clubLogo {
+  object-fit: contain;
+
+  filter:
+    drop-shadow(
+      0 8px 13px
+      rgba(0,0,0,.3)
+    );
+
+  transition:
+    transform .3s ease,
+    filter .3s ease;
+}
+
+.logoFallback {
+  display: grid;
+  place-items: center;
+
+  border:
+    1px solid
+    var(--line);
+
+  color: #7c847e;
+
+  font-size: 11px;
+  font-weight: 1000;
+}
+
+.club strong {
+  max-width: 100%;
+
+  overflow: hidden;
+
+  color: #f0f2f0;
+
+  font-family: var(--heading);
+  font-size: 11px;
+  font-weight: 1000;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.club small {
+  color: var(--green);
+  font-size: 7px;
+  font-weight: 1000;
+}
+
+.score,
+.versus {
+  font-family: var(--heading);
+  font-size: clamp(43px, 5vw, 71px);
+  font-weight: 1000;
+  line-height: 1;
+  letter-spacing: -.08em;
+
+  text-align: center;
+
+  transition:
+    transform .3s ease,
+    text-shadow .3s ease,
+    color .3s ease;
+}
+
+.score i {
+  color: var(--green);
+  font-style: normal;
+}
+
+.versus {
+  color: var(--green);
 }
 
 .matchCountdown {
   position: absolute;
   z-index: 7;
+
   left: 50%;
-  bottom: 49px;
-  transform: translateX(-50%);
+  bottom: 47px;
+
+  transform:
+    translateX(-50%);
+
   display: flex;
   align-items: baseline;
-  justify-content: center;
-  gap: 11px;
+  gap: 9px;
+
   white-space: nowrap;
 }
 
 .matchCountdown > span {
   color: var(--green);
-  font-family:
-    "Arial Narrow",
-    "Roboto Condensed",
-    "Helvetica Neue",
-    Arial,
-    sans-serif;
+
   font-size: 7px;
   font-weight: 1000;
-  line-height: 1;
-  letter-spacing: .11em;
 }
 
 .matchCountdown > strong {
-  color: #fff;
-  font-family:
-    "Arial Narrow",
-    "Roboto Condensed",
-    "Helvetica Neue",
-    Arial,
-    sans-serif;
-  font-size: 17px;
+  font-family: var(--heading);
+  font-size: 16px;
   font-weight: 1000;
-  line-height: 1;
-  letter-spacing: -.015em;
+
+  transition:
+    text-shadow .3s ease;
 }
 
-.matchCountdown > strong small {
-  color: #8b938c;
-  font-size: 8px;
-  font-weight: 1000;
-  text-transform: lowercase;
+.matchCountdown small {
+  margin-left: 2px;
+
+  color: #848c86;
+
+  font-size: 7px;
 }
 
-.matchCountdown > strong i {
-  margin: 0 7px;
-  color: rgba(255,255,255,.24);
-  font-size: 11px;
+.matchCountdown i {
+  margin: 0 6px;
+
+  color:
+    rgba(255,255,255,.25);
+
+  font-size: 9px;
   font-style: normal;
 }
 
-.nextPanel .matchFoot {
+.matchFoot {
+  position: absolute;
+  z-index: 6;
+
+  right: 28px;
   bottom: 16px;
+  left: 28px;
+
+  padding-top: 12px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  border-top:
+    1px solid
+    var(--line);
+
+  color: #7c847e;
+
+  font-size: 8px;
+  font-weight: 900;
 }
 
-.nextPanel .venue {
-  bottom: 73px;
+.matchFoot a {
+  color: var(--green);
+
+  text-decoration: none;
+  font-weight: 1000;
 }
+
+.venue {
+  position: absolute;
+  z-index: 6;
+
+  left: 50%;
+  bottom: 72px;
+
+  transform:
+    translateX(-50%);
+
+  color: #737a74;
+
+  font-size: 7px;
+
+  white-space: nowrap;
+}
+
+@media (hover:hover) and (pointer:fine) {
+  .matchPanel:hover .clubLogo {
+    transform:
+      scale(1.06);
+
+    filter:
+      drop-shadow(
+        0 12px 17px
+        rgba(0,0,0,.4)
+      )
+      drop-shadow(
+        0 0 12px
+        rgba(83,242,10,.12)
+      );
+  }
+
+  .matchPanel:hover .score {
+    transform: scale(1.04);
+
+    text-shadow:
+      0 0 18px
+      rgba(255,255,255,.12);
+  }
+
+  .nextPanel:hover .versus {
+    transform: scale(1.08);
+
+    text-shadow:
+      0 0 12px
+      rgba(83,242,10,.4);
+  }
+
+  .nextPanel:hover
+  .matchCountdown > strong {
+    text-shadow:
+      0 0 12px
+      rgba(83,242,10,.3);
+  }
+}
+
 
 /* =========================================================
-   FC PPB — MATCH LOGA
+   HRÁČ UTKÁNÍ
    ========================================================= */
 
-.clubLogo {
-  width: 88px;
-  height: 88px;
+.playersOfMatchGrid {
+  display: grid;
+  grid-template-columns:
+    repeat(2, minmax(0,1fr));
+  gap: 14px;
+
+  margin-top: 15px;
+}
+
+.pomCard {
+  min-height: 360px;
+
+  color: inherit;
+  text-decoration: none;
+
+  background:
+    radial-gradient(
+      circle at 76% 45%,
+      rgba(83,242,10,.06),
+      transparent 30%
+    ),
+    #090c0a;
+}
+
+.pomStage {
+  position: absolute;
+  inset: 0;
+}
+
+.pomWatermark {
+  position: absolute;
+
+  z-index: 1;
+
+  right: 4%;
+  top: 50%;
+
+  width: 43%;
+  height: 70%;
+
   object-fit: contain;
-  object-position: center;
+
+  opacity: .045;
+
+  filter: grayscale(1);
+
+  transform:
+    translateY(-50%);
+}
+
+.pomPlayer {
+  position: absolute;
+  z-index: 3;
+
+  right: 3%;
+  bottom: 0;
+
+  width: 50%;
+  height: 92%;
+
+  object-fit: contain;
+  object-position:
+    center bottom;
+
   filter:
     drop-shadow(
-      0 8px 12px
-      rgba(0,0,0,.28)
+      0 18px 23px
+      rgba(0,0,0,.48)
+    );
+
+  transition:
+    transform .35s ease,
+    filter .35s ease;
+}
+
+.pomCard::after {
+  position: absolute;
+  z-index: 4;
+
+  inset: 0;
+
+  content: "";
+
+  pointer-events: none;
+
+  background:
+    linear-gradient(
+      90deg,
+      rgba(5,6,5,.96) 0%,
+      rgba(5,6,5,.85) 31%,
+      rgba(5,6,5,.35) 51%,
+      transparent 72%
+    ),
+
+    linear-gradient(
+      0deg,
+      rgba(5,6,5,.76),
+      transparent 45%
     );
 }
+
+.pomLabel {
+  position: absolute;
+  z-index: 8;
+
+  top: 18px;
+  left: 22px;
+
+  color: var(--green);
+
+  font-size: 9px;
+  font-weight: 1000;
+  letter-spacing: .1em;
+}
+
+.pomCopy {
+  position: absolute;
+  z-index: 8;
+
+  left: 27px;
+  bottom: 28px;
+
+  width: 48%;
+}
+
+.pomCopy h3 {
+  margin: 0 0 11px;
+
+  font-family: var(--heading);
+  font-size: clamp(29px, 3vw, 45px);
+  font-weight: 1000;
+  line-height: .87;
+  letter-spacing: -.05em;
+
+  text-transform: uppercase;
+}
+
+.pomCopy h3 strong {
+  display: block;
+  color: var(--green);
+}
+
+.pomMatchTitle {
+  display: block;
+
+  max-width: 240px;
+
+  margin-bottom: 18px;
+
+  overflow: hidden;
+
+  color: #d1d5d2;
+
+  font-size: 8px;
+  font-weight: 900;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pomStats {
+  display: flex;
+  gap: 28px;
+}
+
+.pomStats div {
+  display: grid;
+  gap: 4px;
+}
+
+.pomStats b {
+  font-size: 25px;
+  line-height: 1;
+}
+
+.pomStats small {
+  color: #7a827c;
+
+  font-size: 6px;
+  font-weight: 1000;
+}
+
+.pomRatingCorner {
+  position: absolute;
+  z-index: 10;
+
+  top: 15px;
+  right: 15px;
+
+  min-width: 52px;
+
+  padding: 9px;
+
+  border-radius: 6px;
+
+  background: #176fc8;
+
+  font-size: 20px;
+  font-weight: 1000;
+  line-height: 1;
+
+  text-align: center;
+
+  box-shadow:
+    0 8px 18px
+    rgba(0,0,0,.24);
+}
+
+@media (hover:hover) and (pointer:fine) {
+  .pomCard:hover .pomPlayer {
+    transform:
+      scale(1.055)
+      translateY(-2px);
+
+    filter:
+      drop-shadow(
+        0 22px 28px
+        rgba(0,0,0,.58)
+      );
+  }
+}
+
+
+/* =========================================================
+   NOVINKY
+   ========================================================= */
+
+.newsGrid {
+  display: grid;
+  grid-template-columns:
+    repeat(3, minmax(0,1fr));
+  gap: 13px;
+}
+
+.newsCard {
+  min-height: 265px;
+
+  color: inherit;
+  text-decoration: none;
+
+  background: #090c0a;
+}
+
+.newsVisual {
+  position: absolute;
+  inset: 0;
+}
+
+.newsVisual img {
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+
+  filter:
+    grayscale(.2)
+    brightness(.9);
+
+  transition:
+    transform .4s ease,
+    filter .4s ease;
+}
+
+.newsShade {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+
+  background:
+    linear-gradient(
+      0deg,
+      rgba(3,5,4,.97),
+      rgba(3,5,4,.12) 72%
+    );
+}
+
+.newsCopy {
+  position: absolute;
+  z-index: 7;
+
+  right: 20px;
+  bottom: 19px;
+  left: 20px;
+}
+
+.newsCopy span {
+  display: inline-flex;
+
+  padding: 6px 8px;
+
+  color: #071006;
+  background: var(--green);
+
+  font-size: 7px;
+  font-weight: 1000;
+}
+
+.newsCopy h3 {
+  margin: 10px 0 7px;
+
+  font-family: var(--heading);
+  font-size: 22px;
+  font-weight: 1000;
+  line-height: 1;
+}
+
+.newsCopy small {
+  color: #838b85;
+
+  font-size: 7px;
+  font-weight: 900;
+}
+
+@media (hover:hover) and (pointer:fine) {
+  .newsCard:hover .newsVisual img {
+    transform: scale(1.06);
+
+    filter:
+      grayscale(.03)
+      brightness(1.05);
+  }
+}
+
+.textLink {
+  color: var(--green);
+
+  font-size: 8px;
+  font-weight: 1000;
+
+  text-decoration: none;
+}
+
+
+/* =========================================================
+   TABULKA
+   ========================================================= */
+
+.toggle {
+  display: flex;
+
+  padding: 3px;
+
+  border:
+    1px solid
+    var(--line);
+
+  background: #090c0a;
+}
+
+.toggle button {
+  min-width: 86px;
+  height: 38px;
+
+  border: 0;
+
+  color: #858d87;
+  background: transparent;
+
+  font-size: 8px;
+  font-weight: 1000;
+
+  cursor: pointer;
+}
+
+.toggle .active {
+  color: #071006;
+  background: var(--green);
+}
+
+.tableCard {
+  width: 100%;
+  overflow: hidden;
+
+  border:
+    1px solid
+    var(--line-strong);
+
+  background: #0c100d;
+}
+
+/*
+   8 SLOUPCŮ NA PC:
+
+   #
+   TÝM
+   ZÁPASY
+   VÝHRY
+   REMÍZY
+   PROHRY
+   SKÓRE
+   BODY
+*/
+
+.tableHead,
+.tableRow {
+  width: 100%;
+
+  display: grid;
+
+  grid-template-columns:
+    52px
+    minmax(220px, 1fr)
+    100px
+    95px
+    95px
+    95px
+    120px
+    90px;
+
+  align-items: center;
+
+  column-gap: 0;
+
+  box-sizing: border-box;
+}
+
+.tableHead {
+  min-height: 45px;
+
+  padding:
+    0 20px;
+
+  color: #707870;
+
+  background:
+    rgba(255,255,255,.015);
+
+  font-size: 7px;
+  font-weight: 1000;
+
+  text-transform: uppercase;
+}
+
+.tableRow {
+  position: relative;
+
+  min-height: 57px;
+
+  padding:
+    0 20px;
+
+  border-top:
+    1px solid
+    rgba(255,255,255,.065);
+
+  color: #b2b8b3;
+
+  font-size: 9px;
+
+  transition:
+    background .25s ease,
+    transform .25s ease;
+}
+
+.tableHead > *,
+.tableRow > * {
+  min-width: 0;
+}
+
+.tableHead span:nth-child(n+3),
+.tableRow span:nth-child(n+3),
+.tableRow b {
+  text-align: center;
+}
+
+.tableRow strong {
+  overflow: hidden;
+
+  color: #fff;
+
+  font-size: 10px;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tableRow b {
+  color: #fff;
+  font-size: 11px;
+}
+
+.ourRow {
+  background:
+    linear-gradient(
+      90deg,
+      rgba(83,242,10,.23),
+      rgba(83,242,10,.05)
+    );
+}
+
+.ourRow::before {
+  position: absolute;
+
+  top: 0;
+  bottom: 0;
+  left: 0;
+
+  width: 3px;
+
+  content: "";
+
+  background: var(--green);
+}
+
+.tableLink {
+  min-height: 48px;
+
+  padding:
+    0 20px;
+
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+
+  border-top:
+    1px solid
+    var(--line);
+
+  color: var(--green);
+
+  font-size: 8px;
+  font-weight: 1000;
+
+  text-decoration: none;
+}
+
+.tableLink span {
+  font-size: 16px;
+}
+
+@media (hover:hover) and (pointer:fine) {
+  .tableRow:hover {
+    transform:
+      translateX(3px);
+
+    background:
+      linear-gradient(
+        90deg,
+        rgba(83,242,10,.08),
+        transparent
+      );
+  }
+
+  .ourRow:hover {
+    background:
+      linear-gradient(
+        90deg,
+        rgba(83,242,10,.3),
+        rgba(83,242,10,.06)
+      );
+  }
+}
+
+
+/* =========================================================
+   NAŠE TÝMY
+   ========================================================= */
+
+.teamsGrid {
+  display: grid;
+  grid-template-columns:
+    repeat(2, minmax(0,1fr));
+  gap: 14px;
+
+  margin-top: 14px;
+}
+
+.teamCard {
+  min-height: 365px;
+
+  color: inherit;
+  text-decoration: none;
+
+  background:
+    radial-gradient(
+      circle at 50% 50%,
+      rgba(83,242,10,.07),
+      transparent 35%
+    ),
+    #090c0a;
+}
+
+.teamTitle {
+  position: absolute;
+  z-index: 12;
+
+  top: 18px;
+  left: 50%;
+
+  transform:
+    translateX(-50%);
+
+  color: var(--green);
+
+  font-family: var(--heading);
+  font-size: 21px;
+  font-weight: 1000;
+  letter-spacing: .04em;
+
+  text-align: center;
+  white-space: nowrap;
+}
+
+.teamGhost {
+  position: absolute;
+  z-index: 1;
+
+  left: 50%;
+  top: 54%;
+
+  width: 42%;
+  height: 64%;
+
+  object-fit: contain;
+
+  opacity: .045;
+
+  filter: grayscale(1);
+
+  transform:
+    translate(-50%,-50%);
+}
+
+.teamPlayers {
+  position: absolute;
+  z-index: 4;
+
+  top: 52px;
+  right: 31%;
+  bottom: 0;
+  left: 4%;
+
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+}
+
+.teamPlayers img {
+  width: 45%;
+  height: 100%;
+
+  margin-left: -18%;
+
+  object-fit: contain;
+  object-position: center bottom;
+
+  filter:
+    drop-shadow(
+      0 17px 24px
+      rgba(0,0,0,.52)
+    );
+
+  transition:
+    transform .35s ease;
+}
+
+.teamPlayers img:first-child {
+  margin-left: 0;
+}
+
+.teamCardShade {
+  position: absolute;
+  z-index: 5;
+  inset: 0;
+
+  pointer-events: none;
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent 42%,
+      rgba(5,6,5,.18) 58%,
+      rgba(5,6,5,.92) 84%
+    ),
+
+    linear-gradient(
+      0deg,
+      rgba(5,6,5,.78),
+      transparent 36%
+    );
+}
+
+.teamCardCopy {
+  position: absolute;
+  z-index: 8;
+
+  top: 52%;
+  right: 26px;
+
+  width: 28%;
+
+  transform:
+    translateY(-50%);
+}
+
+.teamMenu {
+  margin-bottom: 23px;
+
+  display: grid;
+  gap: 10px;
+}
+
+.teamMenu span {
+  color: #fff;
+
+  font-size: 10px;
+  font-weight: 1000;
+}
+
+.teamMenu span::after {
+  content: " •";
+  color: var(--green);
+}
+
+.teamCardCopy b {
+  display: block;
+
+  width: 100%;
+
+  padding:
+    13px 8px;
+
+  border:
+    1px solid
+    rgba(83,242,10,.45);
+
+  color: var(--green);
+
+  font-size: 7px;
+  font-weight: 1000;
+
+  text-align: center;
+}
+
+@media (hover:hover) and (pointer:fine) {
+  .teamCard:hover
+  .teamPlayers img {
+    transform:
+      translateY(-3px)
+      scale(1.045);
+  }
+
+  .teamCard:hover
+  .teamCardCopy b {
+    color: #071006;
+    background: var(--green);
+  }
+}
+
+
+/* =========================================================
+   PARTNEŘI
+   ========================================================= */
+
+.partners {
+  margin-top: 58px;
+
+  min-height: 130px;
+
+  display: grid;
+
+  grid-template-columns:
+    1fr 1fr 1fr;
+
+  align-items: center;
+  gap: 35px;
+
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.partners > span {
+  color: #707870;
+
+  font-size: 8px;
+  font-weight: 1000;
+  letter-spacing: .15em;
+}
+
+.partners a {
+  min-height: 100px;
+
+  display: grid;
+  place-items: center;
+
+  transition:
+    transform .3s ease;
+}
+
+.partners img {
+  max-width: 220px;
+  max-height: 65px;
+
+  object-fit: contain;
+
+  transition:
+    transform .3s ease;
+}
+
+@media (hover:hover) and (pointer:fine) {
+  .partners a:hover {
+    transform:
+      translateY(-3px);
+  }
+
+  .partners a:hover img {
+    transform:
+      scale(1.045);
+  }
+}
+
+
+/* =========================================================
+   SOCIAL
+   ========================================================= */
+
+.social {
+  min-height: 120px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 30px;
+}
+
+.social > div:first-child {
+  display: grid;
+  gap: 5px;
+}
+
+.social span {
+  color: var(--green);
+
+  font-size: 8px;
+  font-weight: 1000;
+  letter-spacing: .12em;
+}
+
+.social strong {
+  font-size: 16px;
+}
+
+.social > div:last-child {
+  display: flex;
+  gap: 28px;
+}
+
+.social a {
+  color: #fff;
+
+  font-size: 8px;
+  font-weight: 1000;
+
+  text-decoration: none;
+
+  transition:
+    color .25s ease,
+    transform .25s ease;
+}
+
+.social a:hover {
+  color: var(--green);
+
+  transform:
+    translateY(-2px);
+}
+
+
+/* =========================================================
+   EMPTY
+   ========================================================= */
+
+.empty {
+  min-height: 160px;
+
+  display: grid;
+  place-items: center;
+
+  color: #747c76;
+
+  font-size: 9px;
+  font-weight: 900;
+
+  text-align: center;
+}
+
+
+/* =========================================================
+   ANIMACE
+   ========================================================= */
+
+@keyframes cardSweep {
+  from {
+    transform:
+      skewX(-18deg)
+      translateX(0);
+  }
+
+  to {
+    transform:
+      skewX(-18deg)
+      translateX(560%);
+  }
+}
+
+@keyframes heroSweep {
+  0%,
+  70% {
+    left: -35%;
+    opacity: 0;
+  }
+
+  75% {
+    opacity: .8;
+  }
+
+  100% {
+    left: 125%;
+    opacity: 0;
+  }
+}
+
+@keyframes logoShine {
+  0%,
+  66% {
+    left: -80%;
+    opacity: 0;
+  }
+
+  72% {
+    opacity: 1;
+  }
+
+  92%,
+  100% {
+    left: 150%;
+    opacity: 0;
+  }
+}
+
+@keyframes logoFloat {
+  0%,
+  100% {
+    transform:
+      translateY(-50%)
+      scale(1);
+  }
+
+  50% {
+    transform:
+      translateY(calc(-50% - 7px))
+      scale(1.015);
+  }
+}
+
+@keyframes claimShine {
+  0%,
+  58% {
+    background-position:
+      130% center;
+  }
+
+  82%,
+  100% {
+    background-position:
+      -130% center;
+  }
+}
+
 
 /* =========================================================
    TABLET
    ========================================================= */
 
 @media (max-width: 980px) {
-  .matchTeamBlock {
-    margin-top: 24px;
+  .shell,
+  .heroInner {
+    width:
+      calc(100% - 28px);
   }
 
-  .matchTeamHeading {
-    margin-bottom: 9px;
+  .scoreGrid,
+  .playersOfMatchGrid,
+  .teamsGrid {
+    grid-template-columns:
+      1fr;
   }
 
-  .matchCountdown {
-    bottom: 48px;
+  .newsGrid {
+    grid-template-columns:
+      1fr 1fr;
+  }
+
+  .newsCard:last-child {
+    grid-column:
+      1 / -1;
+  }
+
+  .tableHead,
+  .tableRow {
+    grid-template-columns:
+      42px
+      minmax(160px,1fr)
+      74px
+      70px
+      70px
+      70px
+      92px
+      62px;
+
+    padding:
+      0 14px;
+  }
+
+  .pomCard {
+    min-height: 380px;
+  }
+
+  .teamCard {
+    min-height: 380px;
   }
 }
+
 
 /* =========================================================
    MOBIL
    ========================================================= */
 
 @media (max-width: 650px) {
-  .matchTeamBlock {
-    margin-top: 22px;
+  .shell,
+  .heroInner {
+    width:
+      calc(100% - 20px);
   }
 
-  .matchTeamHeading {
-    min-height: 27px;
-    margin-bottom: 7px;
-    gap: 10px;
+  .hero,
+  .heroInner {
+    min-height: 360px;
   }
 
-  .matchTeamHeading strong {
-    font-size: 11px;
+  .heroLogoGhost {
+    right: -35%;
+
+    opacity: .035;
+
+    transform:
+      translateY(-50%)
+      scale(.76);
   }
 
-  .matchTeamBlock .scoreGrid {
+  .heroBrand {
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .heroBrand h1 {
+    font-size: 65px;
+  }
+
+  .heroClaim {
     display: grid;
+    gap: 7px;
+  }
+
+  .heroClaim strong {
+    padding: 0;
+    border: 0;
+
+    font-size: 20px;
+  }
+
+  .heroInner > p {
+    font-size: 8px;
+  }
+
+  .scoreboardSection,
+  .section {
+    padding-top: 39px;
+  }
+
+  .sectionHeaderRow {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .sectionTitle {
+    min-height: 36px;
+
+    padding:
+      4px 0 8px 23px;
+  }
+
+  .sectionTitle h2 {
+    font-size: 28px;
+  }
+
+  .toggle {
+    width: 100%;
+  }
+
+  .toggle button {
+    flex: 1;
+  }
+
+  .matchTeamBlock {
+    margin-top: 20px;
+  }
+
+  .matchTeamBlock +
+  .matchTeamBlock {
+    margin-top: 27px;
+  }
+
+  .scoreGrid {
     grid-template-columns: 1fr;
     gap: 8px;
   }
 
-  .nextPanel {
-    min-height: 282px;
-    padding-bottom: 76px;
+  .matchPanel {
+    min-height: 280px;
+
+    padding:
+      17px 13px 72px;
   }
 
-  .matchCountdown {
-    bottom: 45px;
-    width: calc(100% - 26px);
+  .panelTopline span {
+    padding: 0 48px;
+
+    font-size: 7px;
+    text-align: center;
+  }
+
+  .panelTopline b {
+    padding: 5px 6px;
+
+    font-size: 6px;
+  }
+
+  .matchMain {
+    margin-top: 27px;
+
+    grid-template-columns:
+      minmax(0,1fr)
+      70px
+      minmax(0,1fr);
+
     gap: 7px;
   }
 
-  .matchCountdown > span {
-    font-size: 6px;
-  }
-
-  .matchCountdown > strong {
-    font-size: 14px;
-  }
-
-  .matchCountdown > strong small {
-    font-size: 6px;
-  }
-
-  .matchCountdown > strong i {
-    margin: 0 4px;
-    font-size: 8px;
-  }
-
-  .nextPanel .matchFoot {
-    bottom: 11px;
-  }
-
-  .nextPanel .venue {
-    bottom: 67px;
-  }
-
-  .clubLogo {
+  .clubLogo,
+  .logoFallback {
     width: 58px;
     height: 58px;
   }
+
+  .score,
+  .versus {
+    font-size: 40px;
+  }
+
+  .club strong {
+    font-size: 8px;
+
+    white-space: normal;
+  }
+
+  .matchFoot {
+    right: 13px;
+    left: 13px;
+
+    font-size: 7px;
+  }
+
+  .matchCountdown {
+    bottom: 43px;
+
+    width:
+      calc(100% - 20px);
+
+    justify-content: center;
+  }
+
+  .matchCountdown > strong {
+    font-size: 13px;
+  }
+
+  /*
+     HRÁČ UTKÁNÍ
+  */
+
+  .pomCard {
+    min-height: 330px;
+  }
+
+  .pomPlayer {
+    right: -8%;
+
+    width: 66%;
+    height: 90%;
+  }
+
+  .pomWatermark {
+    right: -2%;
+
+    width: 57%;
+  }
+
+  .pomCopy {
+    left: 17px;
+    bottom: 20px;
+
+    width: 56%;
+  }
+
+  .pomCopy h3 {
+    font-size: 28px;
+  }
+
+  .pomMatchTitle {
+    max-width: 140px;
+
+    font-size: 6px;
+  }
+
+  .pomLabel {
+    left: 16px;
+    top: 14px;
+
+    font-size: 7px;
+  }
+
+  .pomRatingCorner {
+    top: 9px;
+    right: 9px;
+
+    min-width: 44px;
+
+    padding: 7px;
+
+    font-size: 16px;
+  }
+
+  /*
+     NOVINKY
+  */
+
+  .newsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .newsCard:last-child {
+    grid-column: auto;
+  }
+
+  .newsCard {
+    min-height: 230px;
+  }
+
+  /*
+     TABULKA MOBIL
+
+     # | TÝM | ZÁPASY | SKÓRE | BODY
+  */
+
+  .tableDesktopOnly {
+    display: none;
+  }
+
+  .tableHead,
+  .tableRow {
+    grid-template-columns:
+      28px
+      minmax(90px,1fr)
+      54px
+      70px
+      44px;
+
+    padding:
+      0 9px;
+
+    gap: 3px;
+  }
+
+  .tableHead {
+    min-height: 38px;
+
+    font-size: 5px;
+  }
+
+  .tableRow {
+    min-height: 49px;
+
+    font-size: 8px;
+  }
+
+  .tableRow strong {
+    font-size: 8px;
+  }
+
+  /*
+     NAŠE TÝMY
+  */
+
+  .teamsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .teamCard {
+    min-height: 315px;
+  }
+
+  .teamTitle {
+    top: 15px;
+
+    font-size: 17px;
+  }
+
+  .teamPlayers {
+    top: 47px;
+    right: 34%;
+    left: 2%;
+  }
+
+  .teamPlayers img {
+    width: 50%;
+    margin-left: -22%;
+  }
+
+  .teamCardCopy {
+    right: 12px;
+
+    width: 34%;
+  }
+
+  .teamMenu {
+    gap: 7px;
+
+    margin-bottom: 15px;
+  }
+
+  .teamMenu span {
+    font-size: 8px;
+  }
+
+  .teamCardCopy b {
+    padding:
+      10px 5px;
+
+    font-size: 6px;
+  }
+
+  /*
+     PARTNEŘI
+  */
+
+  .partners {
+    grid-template-columns:
+      1fr 1fr;
+
+    gap: 14px;
+
+    padding:
+      20px 0;
+  }
+
+  .partners > span {
+    grid-column:
+      1 / -1;
+  }
+
+  .partners img {
+    max-width: 135px;
+  }
+
+  .social {
+    align-items: flex-start;
+    flex-direction: column;
+
+    padding:
+      28px 0;
+  }
 }
+
 
 /* =========================================================
-   FC PPB — PREMIUM LIGHT / SHINE EFFECTS
-   MATRIX efekt je vypnutý. Nahrazuje ho jemný sportovní
-   light sweep, odlesky, mikro-fracture loga a hover karet.
+   REDUCED MOTION
    ========================================================= */
 
-/* Původní element z TSX necháváme v DOM, ale Matrix laser už se nepoužívá. */
-.heroClaimLaser {
-  display: none !important;
-}
-
-/* ---------------------------------------------------------
-   HERO — jemný pohyb a světelný odraz hlavního znaku
-   --------------------------------------------------------- */
-
-.heroLogoGhost {
-  isolation: isolate;
-  animation: heroLogoFloat 7s ease-in-out infinite;
-  will-change: transform, filter, opacity;
-}
-
-.heroLogoGhost::before,
-.heroLogoGhost::after {
-  position: absolute;
-  inset: 0;
-  content: "";
-  pointer-events: none;
-  background: url("/images/fc-ppb-logo.png") center / contain no-repeat;
-  opacity: 0;
-}
-
-/* Horní fragment znaku */
-.heroLogoGhost::before {
-  z-index: 2;
-  filter: drop-shadow(0 0 12px rgba(83,242,10,.22));
-  clip-path: polygon(0 10%,100% 10%,100% 43%,0 52%);
-  animation: heroLogoFractureTop 8.8s steps(1,end) 1.4s infinite;
-}
-
-/* Spodní fragment znaku */
-.heroLogoGhost::after {
-  z-index: 3;
-  filter: brightness(1.25) drop-shadow(0 0 10px rgba(255,255,255,.1));
-  clip-path: polygon(0 55%,100% 45%,100% 82%,0 88%);
-  animation: heroLogoFractureBottom 8.8s steps(1,end) 1.4s infinite;
-}
-
-.heroBrand {
-  position: relative;
-}
-
-/* Světelný odraz přes menší znak v hero */
-.heroLogo {
-  position: relative;
-  isolation: isolate;
-  overflow: hidden;
-}
-
-.heroLogo::after {
-  position: absolute;
-  z-index: 4;
-  top: -25%;
-  bottom: -25%;
-  left: -55%;
-  width: 28%;
-  content: "";
-  pointer-events: none;
-  opacity: 0;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255,255,255,.08) 22%,
-    rgba(255,255,255,.72) 50%,
-    rgba(83,242,10,.3) 64%,
-    transparent
-  );
-  filter: blur(.2px);
-  transform: skewX(-18deg);
-  animation: heroLogoShine 6.8s ease-in-out 1.2s infinite;
-}
-
-/* ---------------------------------------------------------
-   HERO — hodnoty: PŘÁTELSTVÍ / POKORA / BOJOVNOST
-   --------------------------------------------------------- */
-
-.heroClaim {
-  position: relative;
-  isolation: isolate;
-  overflow: visible;
-}
-
-.heroClaim strong {
-  position: relative;
-  z-index: 2;
-  overflow: hidden;
-  color: #fff;
-  transition:
-    color .25s ease,
-    text-shadow .25s ease,
-    transform .25s ease;
-}
-
-/* Lesklá kopie textu, která občas přejede přes slovo. */
-.heroClaim strong::after {
-  position: absolute;
-  inset: 0;
-  z-index: 3;
-  content: attr(data-text);
-  pointer-events: none;
-  color: transparent;
-  opacity: 0;
-  background: linear-gradient(
-    105deg,
-    transparent 0%,
-    transparent 35%,
-    rgba(255,255,255,.9) 48%,
-    #a8ff7b 52%,
-    rgba(255,255,255,.22) 58%,
-    transparent 68%,
-    transparent 100%
-  );
-  background-size: 260% 100%;
-  background-position: 140% 0;
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  animation: heroValueShimmer 7.4s ease-in-out infinite;
-}
-
-.heroClaim strong:nth-of-type(2)::after {
-  animation-delay: .32s;
-}
-
-.heroClaim strong:nth-of-type(3)::after {
-  animation-delay: .64s;
-}
-
-/* ---------------------------------------------------------
-   MATCH CARDS — lift + green glow + moving spotlight
-   --------------------------------------------------------- */
-
-.matchPanel {
-  isolation: isolate;
-  transform: translateZ(0);
-  transition:
-    transform .34s cubic-bezier(.2,.75,.2,1),
-    border-color .34s ease,
-    box-shadow .34s ease,
-    background .34s ease;
-  will-change: transform;
-}
-
-.matchPanel::before {
-  position: absolute;
-  z-index: 0;
-  top: -38%;
-  bottom: -38%;
-  left: -46%;
-  width: 24%;
-  content: "";
-  pointer-events: none;
-  opacity: 0;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255,255,255,.055) 28%,
-    rgba(255,255,255,.2) 50%,
-    rgba(83,242,10,.13) 66%,
-    transparent
-  );
-  filter: blur(1px);
-  transform: skewX(-17deg);
-  transition: opacity .22s ease;
-}
-
-.matchPanel::after {
-  position: absolute;
-  z-index: 0;
-  inset: 0;
-  content: "";
-  pointer-events: none;
-  opacity: 0;
-  background:
-    radial-gradient(circle at 50% 42%, rgba(83,242,10,.11), transparent 42%),
-    linear-gradient(115deg, rgba(83,242,10,.035), transparent 34%);
-  transition: opacity .35s ease;
-}
-
-.panelTopline,
-.matchMain,
-.empty {
-  position: relative;
-  z-index: 2;
-}
-
-.matchFoot,
-.venue,
-.matchCountdown {
-  z-index: 3;
-}
-
-.matchMain,
-.clubLogo,
-.score,
-.versus,
-.matchCountdown {
-  transition:
-    transform .34s cubic-bezier(.2,.75,.2,1),
-    filter .34s ease,
-    text-shadow .34s ease,
-    color .34s ease;
-}
-
-/* Výsledek po hoveru působí jako nasvícený displej. */
-.score {
-  transform-origin: center;
-}
-
-/* Další zápas má lehce živější VS. */
-.nextPanel .versus {
-  transform-origin: center;
-}
-
-/* Odpočet v klidu zůstává čistý. */
-.matchCountdown {
-  text-shadow: 0 0 0 rgba(83,242,10,0);
-}
-
-/* ---------------------------------------------------------
-   HRÁČ UTKÁNÍ — light sweep přes kartu
-   --------------------------------------------------------- */
-
-.pomCard {
-  isolation: isolate;
-  transition:
-    transform .34s cubic-bezier(.2,.75,.2,1),
-    border-color .34s ease,
-    box-shadow .34s ease;
-}
-
-.pomCard::before {
-  position: absolute;
-  z-index: 10;
-  top: -35%;
-  bottom: -35%;
-  left: -38%;
-  width: 18%;
-  content: "";
-  pointer-events: none;
-  opacity: 0;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255,255,255,.06) 26%,
-    rgba(255,255,255,.28) 50%,
-    rgba(83,242,10,.11) 66%,
-    transparent
-  );
-  filter: blur(1px);
-  transform: skewX(-18deg);
-}
-
-.pomRatingCorner {
-  transition:
-    transform .3s ease,
-    box-shadow .3s ease,
-    filter .3s ease;
-}
-
-/* ---------------------------------------------------------
-   NAŠE TÝMY — jemný spotlight na pozadí
-   --------------------------------------------------------- */
-
-.teamCard {
-  isolation: isolate;
-  transition:
-    transform .34s cubic-bezier(.2,.75,.2,1),
-    border-color .34s ease,
-    box-shadow .34s ease;
-}
-
-.teamCard::before {
-  position: absolute;
-  z-index: 2;
-  inset: -30%;
-  content: "";
-  pointer-events: none;
-  opacity: 0;
-  background: radial-gradient(
-    circle at 42% 50%,
-    rgba(83,242,10,.16),
-    rgba(83,242,10,.04) 28%,
-    transparent 58%
-  );
-  transform: translateX(-12%);
-  transition:
-    opacity .4s ease,
-    transform .65s cubic-bezier(.2,.7,.2,1);
-}
-
-/* ---------------------------------------------------------
-   DESKTOP HOVER EFEKTY
-   --------------------------------------------------------- */
-
-@media (hover: hover) and (pointer: fine) {
-  .heroClaim strong:hover {
-    color: #f8fff5;
-    text-shadow:
-      0 0 8px rgba(255,255,255,.08),
-      0 0 18px rgba(83,242,10,.16);
-    transform: translateY(-1px);
-  }
-
-  .matchPanel:hover {
-    z-index: 5;
-    transform: translateY(-5px) scale(1.006);
-    border-color: rgba(83,242,10,.48);
-    box-shadow:
-      0 18px 45px rgba(0,0,0,.32),
-      0 0 0 1px rgba(83,242,10,.05),
-      0 0 28px rgba(83,242,10,.075);
-  }
-
-  .matchPanel:hover::before {
-    opacity: 1;
-    animation: matchPanelSweep .85s cubic-bezier(.2,.7,.2,1) 1;
-  }
-
-  .matchPanel:hover::after {
-    opacity: 1;
-  }
-
-  .matchPanel:hover .clubLogo {
-    transform: translateY(-2px) scale(1.055);
-    filter:
-      drop-shadow(0 10px 15px rgba(0,0,0,.35))
-      drop-shadow(0 0 9px rgba(83,242,10,.08));
-  }
-
-  .matchPanel:hover .score {
-    transform: scale(1.035);
-    text-shadow:
-      0 0 12px rgba(255,255,255,.11),
-      0 0 28px rgba(83,242,10,.08);
-  }
-
-  .nextPanel:hover .versus {
-    animation: versusSoftPulse 1.25s ease-in-out infinite;
-    text-shadow:
-      0 0 8px rgba(83,242,10,.34),
-      0 0 24px rgba(83,242,10,.12);
-  }
-
-  .nextPanel:hover .matchCountdown {
-    transform: translateX(-50%) translateY(-2px);
-    filter: brightness(1.08);
-    text-shadow: 0 0 14px rgba(83,242,10,.15);
-  }
-
-  .nextPanel:hover .matchCountdown > strong {
-    text-shadow:
-      0 0 8px rgba(255,255,255,.08),
-      0 0 16px rgba(83,242,10,.1);
-  }
-
-  .pomCard:hover {
-    transform: translateY(-4px);
-    border-color: rgba(83,242,10,.4);
-    box-shadow:
-      0 16px 40px rgba(0,0,0,.28),
-      0 0 24px rgba(83,242,10,.055);
-  }
-
-  .pomCard:hover::before {
-    opacity: 1;
-    animation: pomCardSweep .95s cubic-bezier(.2,.72,.2,1) 1;
-  }
-
-  .pomCard:hover .pomRatingCorner {
-    transform: translateY(-2px) scale(1.055);
-    filter: brightness(1.1);
-    box-shadow:
-      inset 0 0 0 1px rgba(255,255,255,.12),
-      0 10px 24px rgba(23,111,200,.28),
-      0 0 18px rgba(23,111,200,.16);
-  }
-
-  .teamCard:hover {
-    transform: translateY(-4px);
-    border-color: rgba(83,242,10,.36);
-    box-shadow:
-      0 16px 40px rgba(0,0,0,.26),
-      0 0 24px rgba(83,242,10,.05);
-  }
-
-  .teamCard:hover::before {
-    opacity: 1;
-    transform: translateX(7%);
-  }
-}
-
-/* ---------------------------------------------------------
-   KEYFRAMES
-   --------------------------------------------------------- */
-
-@keyframes heroLogoFloat {
-  0%, 100% {
-    transform: translateY(-50%) translate3d(0,0,0) scale(1);
-    filter: grayscale(1) brightness(1);
-  }
-  50% {
-    transform: translateY(-50%) translate3d(0,-5px,0) scale(1.012);
-    filter: grayscale(1) brightness(1.08);
-  }
-}
-
-@keyframes heroLogoShine {
-  0%, 13% {
-    left: -55%;
-    opacity: 0;
-  }
-  16% {
-    opacity: .85;
-  }
-  31% {
-    left: 128%;
-    opacity: .8;
-  }
-  34%, 100% {
-    left: 128%;
-    opacity: 0;
-  }
-}
-
-@keyframes heroLogoFractureTop {
-  0%, 44%, 49%, 100% {
-    opacity: 0;
-    transform: translate3d(0,0,0);
-  }
-  45% {
-    opacity: .22;
-    transform: translate3d(7px,-2px,0);
-  }
-  46% {
-    opacity: .12;
-    transform: translate3d(-4px,1px,0);
-  }
-  47% {
-    opacity: .18;
-    transform: translate3d(3px,0,0);
-  }
-  48% {
-    opacity: 0;
-    transform: translate3d(0,0,0);
-  }
-}
-
-@keyframes heroLogoFractureBottom {
-  0%, 44%, 49%, 100% {
-    opacity: 0;
-    transform: translate3d(0,0,0);
-  }
-  45% {
-    opacity: .14;
-    transform: translate3d(-7px,2px,0);
-  }
-  46% {
-    opacity: .2;
-    transform: translate3d(5px,-1px,0);
-  }
-  47% {
-    opacity: .1;
-    transform: translate3d(-2px,0,0);
-  }
-  48% {
-    opacity: 0;
-    transform: translate3d(0,0,0);
-  }
-}
-
-@keyframes heroValueShimmer {
-  0%, 8% {
-    opacity: 0;
-    background-position: 140% 0;
-  }
-  10% {
-    opacity: .95;
-  }
-  24% {
-    opacity: .8;
-    background-position: -80% 0;
-  }
-  27%, 100% {
-    opacity: 0;
-    background-position: -80% 0;
-  }
-}
-
-@keyframes matchPanelSweep {
-  from {
-    left: -46%;
-  }
-  to {
-    left: 128%;
-  }
-}
-
-@keyframes pomCardSweep {
-  from {
-    left: -38%;
-  }
-  to {
-    left: 126%;
-  }
-}
-
-@keyframes versusSoftPulse {
-  0%, 100% {
-    transform: scale(1);
-    filter: brightness(1);
-  }
-  50% {
-    transform: scale(1.055);
-    filter: brightness(1.18);
-  }
-}
-
-/* ---------------------------------------------------------
-   ACCESSIBILITY / REDUCED MOTION
-   --------------------------------------------------------- */
-
 @media (prefers-reduced-motion: reduce) {
+  .heroLight,
+  .heroLogoShine,
   .heroLogoGhost,
-  .heroLogoGhost::before,
-  .heroLogoGhost::after,
-  .heroLogo::after,
-  .heroClaim strong::after,
-  .matchPanel::before,
-  .pomCard::before,
-  .nextPanel .versus {
-    animation: none !important;
+  .heroClaim strong {
+    animation:
+      none !important;
   }
 
-  .heroLogoGhost::before,
-  .heroLogoGhost::after,
-  .heroLogo::after,
-  .heroClaim strong::after,
-  .matchPanel::before,
-  .pomCard::before {
-    display: none !important;
+  .cardSweep {
+    display:
+      none !important;
   }
 
   .matchPanel,
   .pomCard,
+  .newsCard,
   .teamCard,
   .clubLogo,
-  .score,
-  .versus,
-  .matchCountdown,
-  .pomRatingCorner {
-    transition: none !important;
+  .pomPlayer,
+  .newsVisual img,
+  .teamPlayers img {
+    transition:
+      none !important;
   }
 }
-

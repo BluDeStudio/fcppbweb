@@ -84,31 +84,13 @@ export function HomeDashboard(
       ? props.aLeagueTable
       : props.bLeagueTable;
 
-  const aLastMatch =
-    props.aMatches[0] ??
-    null;
-
-  const bLastMatch =
-    props.bMatches[0] ??
-    null;
-
   return (
     <main className={styles.page}>
       <Hero />
 
       <div className={styles.shell}>
-        <section
-          className={
-            styles.scoreboardSection
-          }
-        >
-          <div
-            className={
-              styles.scoreboardHeader
-            }
-          >
-            <SectionTitle title="ZÁPASY." />
-          </div>
+        <section className={styles.scoreboardSection}>
+          <SectionTitle title="ZÁPASY." />
 
           <MatchTeamBlock label="A-TÝM">
             <NextMatchPanel
@@ -118,7 +100,7 @@ export function HomeDashboard(
             />
 
             <LastMatchPanel
-              match={aLastMatch}
+              match={props.aMatches[0] ?? null}
               team="a"
             />
           </MatchTeamBlock>
@@ -131,34 +113,24 @@ export function HomeDashboard(
             />
 
             <LastMatchPanel
-              match={bLastMatch}
+              match={props.bMatches[0] ?? null}
               team="b"
             />
           </MatchTeamBlock>
         </section>
 
         <section className={styles.section}>
-          <SectionTitle
-            title="HRÁČI UTKÁNÍ."
-          />
+          <SectionTitle title="HRÁČI UTKÁNÍ." />
 
-          <div
-            className={
-              styles.playersOfMatchGrid
-            }
-          >
+          <div className={styles.playersOfMatchGrid}>
             <PlayerOfMatchCard
               teamLabel="A-TÝM"
-              player={
-                props.aPlayerOfMatch
-              }
+              player={props.aPlayerOfMatch}
             />
 
             <PlayerOfMatchCard
               teamLabel="B-TÝM"
-              player={
-                props.bPlayerOfMatch
-              }
+              player={props.bPlayerOfMatch}
             />
           </div>
         </section>
@@ -166,11 +138,7 @@ export function HomeDashboard(
         <NewsSection props={props} />
 
         <section className={styles.section}>
-          <div
-            className={
-              styles.sectionHeaderRow
-            }
-          >
+          <div className={styles.sectionHeaderRow}>
             <SectionTitle
               title="TABULKA."
               compact
@@ -182,9 +150,7 @@ export function HomeDashboard(
             />
           </div>
 
-          <LeaguePreview
-            rows={tableRows}
-          />
+          <LeaguePreview rows={tableRows} />
         </section>
 
         <TeamsPreview
@@ -203,54 +169,27 @@ export function HomeDashboard(
 function Hero() {
   return (
     <section className={styles.hero}>
+      <div className={styles.heroNoise} />
       <div
-        className={styles.heroNoise}
-      />
-
-      <div
-        className={
-          styles.heroLight
-        }
+        className={styles.heroLight}
         aria-hidden="true"
       />
 
       <div
-        className={
-          styles.heroLogoGhost
-        }
+        className={styles.heroLogoGhost}
         aria-hidden="true"
       >
-        <div
-          className={
-            styles.heroGhostLogoInner
-          }
-        >
-          <AnimatedLogo
-            size={470}
-            priority
-          />
-        </div>
+        <AnimatedLogo
+          size={470}
+          priority
+        />
       </div>
 
-      <div
-        className={
-          styles.heroInner
-        }
-      >
-        <div
-          className={
-            styles.heroBrand
-          }
-        >
-          <div
-            className={
-              styles.heroLogo
-            }
-          >
+      <div className={styles.heroInner}>
+        <div className={styles.heroBrand}>
+          <div className={styles.heroLogo}>
             <div
-              className={
-                styles.heroLogoShine
-              }
+              className={styles.heroLogoShine}
               aria-hidden="true"
             />
 
@@ -269,22 +208,10 @@ function Hero() {
           </div>
         </div>
 
-        <div
-          className={
-            styles.heroClaim
-          }
-        >
-          <strong>
-            PŘÁTELSTVÍ.
-          </strong>
-
-          <strong>
-            POKORA.
-          </strong>
-
-          <strong>
-            BOJOVNOST.
-          </strong>
+        <div className={styles.heroClaim}>
+          <strong>PŘÁTELSTVÍ.</strong>
+          <strong>POKORA.</strong>
+          <strong>BOJOVNOST.</strong>
         </div>
 
         <p>
@@ -303,25 +230,13 @@ function MatchTeamBlock({
   children: ReactNode;
 }) {
   return (
-    <div
-      className={
-        styles.matchTeamBlock
-      }
-    >
-      <div
-        className={
-          styles.matchTeamHeading
-        }
-      >
+    <div className={styles.matchTeamBlock}>
+      <div className={styles.matchTeamHeading}>
         <strong>{label}</strong>
         <span />
       </div>
 
-      <div
-        className={
-          styles.scoreGrid
-        }
-      >
+      <div className={styles.scoreGrid}>
         {children}
       </div>
     </div>
@@ -336,23 +251,10 @@ function LastMatchPanel({
   team: Team;
 }) {
   return (
-    <article
-      className={
-        styles.matchPanel
-      }
-    >
-      <div
-        className={
-          styles.cardSweep
-        }
-        aria-hidden="true"
-      />
+    <article className={styles.matchPanel}>
+      <CardSweep />
 
-      <div
-        className={
-          styles.panelTopline
-        }
-      >
+      <div className={styles.panelTopline}>
         <span>
           POSLEDNÍ ZÁPAS ·{" "}
           {team === "a"
@@ -365,23 +267,13 @@ function LastMatchPanel({
 
       {match ? (
         <>
-          <div
-            className={
-              styles.matchMain
-            }
-          >
+          <div className={styles.matchMain}>
             <MatchClub
               name={match.homeTeam}
-              teamId={
-                match.homeTeamId
-              }
+              teamId={match.homeTeamId}
             />
 
-            <div
-              className={
-                styles.score
-              }
-            >
+            <div className={styles.score}>
               {match.homeScore}
               <i>:</i>
               {match.awayScore}
@@ -389,26 +281,16 @@ function LastMatchPanel({
 
             <MatchClub
               name={match.awayTeam}
-              teamId={
-                match.awayTeamId
-              }
+              teamId={match.awayTeamId}
             />
           </div>
 
-          <div
-            className={
-              styles.matchFoot
-            }
-          >
-            <span>
-              {match.date}
-            </span>
+          <div className={styles.matchFoot}>
+            <span>{match.date}</span>
 
             {match.detailUrl ? (
               <a
-                href={
-                  match.detailUrl
-                }
+                href={match.detailUrl}
                 target="_blank"
                 rel="noreferrer"
               >
@@ -418,9 +300,7 @@ function LastMatchPanel({
           </div>
         </>
       ) : (
-        <Empty
-          text="Bez odehraného zápasu."
-        />
+        <Empty text="Bez odehraného zápasu." />
       )}
     </article>
   );
@@ -455,18 +335,9 @@ function NextMatchPanel({
     <article
       className={`${styles.matchPanel} ${styles.nextPanel}`}
     >
-      <div
-        className={
-          styles.cardSweep
-        }
-        aria-hidden="true"
-      />
+      <CardSweep />
 
-      <div
-        className={
-          styles.panelTopline
-        }
-      >
+      <div className={styles.panelTopline}>
         <span>
           NÁSLEDUJÍCÍ ZÁPAS ·{" "}
           {team === "a"
@@ -479,51 +350,29 @@ function NextMatchPanel({
 
       {match ? (
         <>
-          <div
-            className={
-              styles.matchMain
-            }
-          >
+          <div className={styles.matchMain}>
             <MatchClub
               name={match.homeTeam}
-              teamId={
-                match.homeTeamId
-              }
-              position={
-                home?.position
-              }
+              teamId={match.homeTeamId}
+              position={home?.position}
             />
 
-            <div
-              className={
-                styles.versus
-              }
-            >
+            <div className={styles.versus}>
               VS
             </div>
 
             <MatchClub
               name={match.awayTeam}
-              teamId={
-                match.awayTeamId
-              }
-              position={
-                away?.position
-              }
+              teamId={match.awayTeamId}
+              position={away?.position}
             />
           </div>
 
           <MatchCountdown
-            dateTimeIso={
-              match.dateTimeIso
-            }
+            dateTimeIso={match.dateTimeIso}
           />
 
-          <div
-            className={
-              styles.matchFoot
-            }
-          >
+          <div className={styles.matchFoot}>
             <span>
               {[
                 match.date,
@@ -539,19 +388,13 @@ function NextMatchPanel({
           </div>
 
           {match.venue ? (
-            <div
-              className={
-                styles.venue
-              }
-            >
+            <div className={styles.venue}>
               {match.venue}
             </div>
           ) : null}
         </>
       ) : (
-        <Empty
-          text="Další zápas zatím není v rozpisu."
-        />
+        <Empty text="Další zápas zatím není v rozpisu." />
       )}
     </article>
   );
@@ -560,8 +403,7 @@ function NextMatchPanel({
 function MatchCountdown({
   dateTimeIso,
 }: {
-  dateTimeIso:
-    string | null;
+  dateTimeIso: string | null;
 }) {
   const [
     countdown,
@@ -583,22 +425,15 @@ function MatchCountdown({
           dateTimeIso,
         ).getTime();
 
-      if (
-        !Number.isFinite(
-          target,
-        )
-      ) {
+      if (!Number.isFinite(target)) {
         setCountdown(null);
         return;
       }
 
       const difference =
-        target -
-        Date.now();
+        target - Date.now();
 
-      if (
-        difference <= 0
-      ) {
+      if (difference <= 0) {
         setCountdown({
           days: 0,
           hours: 0,
@@ -611,26 +446,22 @@ function MatchCountdown({
 
       const totalMinutes =
         Math.ceil(
-          difference /
-            60_000,
+          difference / 60_000,
         );
 
       const days =
         Math.floor(
-          totalMinutes /
-            1440,
+          totalMinutes / 1440,
         );
 
       const hours =
         Math.floor(
-          (totalMinutes %
-            1440) /
+          (totalMinutes % 1440) /
             60,
         );
 
       const minutes =
-        totalMinutes %
-        60;
+        totalMinutes % 60;
 
       setCountdown({
         days,
@@ -642,17 +473,16 @@ function MatchCountdown({
 
     update();
 
-    const interval =
+    const timer =
       window.setInterval(
         update,
         30_000,
       );
 
-    return () => {
+    return () =>
       window.clearInterval(
-        interval,
+        timer,
       );
-    };
   }, [dateTimeIso]);
 
   if (!dateTimeIso) {
@@ -660,17 +490,12 @@ function MatchCountdown({
   }
 
   return (
-    <div
-      className={
-        styles.matchCountdown
-      }
-    >
+    <div className={styles.matchCountdown}>
       <span>
-        HRAJEME ZA
+        HRAJEME ZA:
       </span>
 
-      {countdown ===
-      null ? (
+      {countdown === null ? (
         <strong>
           -- d / -- h / -- m
         </strong>
@@ -704,46 +529,23 @@ function MatchCountdown({
   );
 }
 
-function padCountdown(
-  value: number,
-): string {
-  return String(value)
-    .padStart(2, "0");
-}
-
 function PlayerOfMatchCard({
   player,
   teamLabel,
 }: {
-  player:
-    PlayerOfMatch | null;
+  player: PlayerOfMatch | null;
   teamLabel: string;
 }) {
   if (!player) {
     return (
-      <article
-        className={
-          styles.pomCard
-        }
-      >
-        <div
-          className={
-            styles.cardSweep
-          }
-          aria-hidden="true"
-        />
+      <article className={styles.pomCard}>
+        <CardSweep />
 
-        <div
-          className={
-            styles.pomLabel
-          }
-        >
+        <div className={styles.pomLabel}>
           {teamLabel}
         </div>
 
-        <Empty
-          text="Hráč utkání zatím není dostupný."
-        />
+        <Empty text="Hráč utkání zatím není dostupný." />
       </article>
     );
   }
@@ -751,58 +553,35 @@ function PlayerOfMatchCard({
   return (
     <Link
       href={`/hrac/${player.id}`}
-      className={
-        styles.pomCard
-      }
+      className={styles.pomCard}
     >
-      <div
-        className={
-          styles.cardSweep
-        }
-        aria-hidden="true"
-      />
+      <CardSweep />
 
-      <div
-        className={
-          styles.pomLabel
-        }
-      >
+      <div className={styles.pomLabel}>
         {teamLabel}
       </div>
 
-      <div
-        className={
-          styles.pomStage
-        }
-      >
+      <div className={styles.pomStage}>
         <img
-          className={
-            styles.pomWatermark
-          }
+          className={styles.pomWatermark}
           src="/images/fc-ppb-logo.png"
           alt=""
           aria-hidden="true"
         />
 
         <img
-          className={
-            styles.pomPlayer
-          }
+          className={styles.pomPlayer}
           src={`/images/${player.id}.png`}
           alt={player.name}
-          onError={(
-            event,
-          ) => {
+          onError={(event) => {
             const image =
               event.currentTarget;
 
             if (
-              image.dataset
-                .fallback !==
+              image.dataset.fallback !==
               "jpg"
             ) {
-              image.dataset
-                .fallback =
+              image.dataset.fallback =
                 "jpg";
 
               image.src =
@@ -817,54 +596,32 @@ function PlayerOfMatchCard({
         />
       </div>
 
-      {player.rating !== null && (
-        <div
-          className={
-            styles.pomRatingCorner
-          }
-        >
-          {player.rating.toFixed(
-            1,
-          )}
+      {player.rating !== null ? (
+        <div className={styles.pomRatingCorner}>
+          {player.rating.toFixed(1)}
         </div>
-      )}
+      ) : null}
 
-      <div
-        className={
-          styles.pomCopy
-        }
-      >
+      <div className={styles.pomCopy}>
         <h3>
           {formatPlayerName(
             player.name,
           )}
         </h3>
 
-        <span
-          className={
-            styles.pomMatchTitle
-          }
-        >
+        <span className={styles.pomMatchTitle}>
           {player.matchTitle}
         </span>
 
-        <div
-          className={
-            styles.pomStats
-          }
-        >
+        <div className={styles.pomStats}>
           <div>
             <b>{player.goals}</b>
             <small>GÓLY</small>
           </div>
 
           <div>
-            <b>
-              {player.assists}
-            </b>
-            <small>
-              ASISTENCE
-            </small>
+            <b>{player.assists}</b>
+            <small>ASISTENCE</small>
           </div>
         </div>
       </div>
@@ -880,9 +637,7 @@ function formatPlayerName(
       .trim()
       .split(/\s+/);
 
-  if (
-    parts.length < 2
-  ) {
+  if (parts.length < 2) {
     return name;
   }
 
@@ -892,6 +647,7 @@ function formatPlayerName(
   return (
     <>
       {parts.join(" ")}
+
       <strong>
         {last}
       </strong>
@@ -1011,87 +767,46 @@ function NewsSection({
       props.bMatches,
     ]);
 
-  if (
-    cards.length === 0
-  ) {
+  if (cards.length === 0) {
     return null;
   }
 
   return (
-    <section
-      className={
-        styles.section
-      }
-    >
-      <div
-        className={
-          styles.sectionHeaderRow
-        }
-      >
+    <section className={styles.section}>
+      <div className={styles.sectionHeaderRow}>
         <SectionTitle
           title="ZPRÁVY Z KABINY."
           compact
         />
 
         <Link
-          className={
-            styles.textLink
-          }
+          className={styles.textLink}
           href="/novinky"
         >
           VŠECHNY NOVINKY →
         </Link>
       </div>
 
-      <div
-        className={
-          styles.newsGrid
-        }
-      >
+      <div className={styles.newsGrid}>
         {cards.map(
           (card) => (
             <Link
-              href={
-                card.href
-              }
-              className={
-                styles.newsCard
-              }
-              key={
-                card.key
-              }
+              href={card.href}
+              className={styles.newsCard}
+              key={card.key}
             >
-              <div
-                className={
-                  styles.cardSweep
-                }
-                aria-hidden="true"
-              />
+              <CardSweep />
 
-              <div
-                className={
-                  styles.newsVisual
-                }
-              >
+              <div className={styles.newsVisual}>
                 <img
-                  src={
-                    card.image
-                  }
+                  src={card.image}
                   alt=""
                 />
               </div>
 
-              <div
-                className={
-                  styles.newsShade
-                }
-              />
+              <div className={styles.newsShade} />
 
-              <div
-                className={
-                  styles.newsCopy
-                }
-              >
+              <div className={styles.newsCopy}>
                 <span>
                   {card.tag}
                 </span>
@@ -1124,42 +839,21 @@ function LeaguePreview({
     );
 
   return (
-    <div
-      className={
-        styles.tableCard
-      }
-    >
-      <div
-        className={
-          styles.tableHead
-        }
-      >
+    <div className={styles.tableCard}>
+      <div className={styles.tableHead}>
         <span>#</span>
         <span>TÝM</span>
-
         <span>ZÁPASY</span>
 
-        <span
-          className={
-            styles.tableDesktopOnly
-          }
-        >
+        <span className={styles.tableDesktopOnly}>
           VÝHRY
         </span>
 
-        <span
-          className={
-            styles.tableDesktopOnly
-          }
-        >
+        <span className={styles.tableDesktopOnly}>
           REMÍZY
         </span>
 
-        <span
-          className={
-            styles.tableDesktopOnly
-          }
-        >
+        <span className={styles.tableDesktopOnly}>
           PROHRY
         </span>
 
@@ -1189,27 +883,15 @@ function LeaguePreview({
               {row.matches}
             </span>
 
-            <span
-              className={
-                styles.tableDesktopOnly
-              }
-            >
+            <span className={styles.tableDesktopOnly}>
               {row.wins}
             </span>
 
-            <span
-              className={
-                styles.tableDesktopOnly
-              }
-            >
+            <span className={styles.tableDesktopOnly}>
               {row.draws}
             </span>
 
-            <span
-              className={
-                styles.tableDesktopOnly
-              }
-            >
+            <span className={styles.tableDesktopOnly}>
               {row.losses}
             </span>
 
@@ -1226,9 +908,7 @@ function LeaguePreview({
 
       <Link
         href="/zapasy#tabulka"
-        className={
-          styles.tableLink
-        }
+        className={styles.tableLink}
       >
         CELÁ TABULKA
         <span>→</span>
@@ -1241,26 +921,14 @@ function TeamsPreview({
   aPlayers,
   bPlayers,
 }: {
-  aPlayers:
-    SquadPlayer[];
-  bPlayers:
-    SquadPlayer[];
+  aPlayers: SquadPlayer[];
+  bPlayers: SquadPlayer[];
 }) {
   return (
-    <section
-      className={
-        styles.section
-      }
-    >
-      <SectionTitle
-        title="NAŠE TÝMY."
-      />
+    <section className={styles.section}>
+      <SectionTitle title="NAŠE TÝMY." />
 
-      <div
-        className={
-          styles.teamsGrid
-        }
-      >
+      <div className={styles.teamsGrid}>
         <TeamPreviewCard
           label="A-TÝM"
           players={aPlayers}
@@ -1283,8 +951,7 @@ function TeamPreviewCard({
   href,
 }: {
   label: string;
-  players:
-    SquadPlayer[];
+  players: SquadPlayer[];
   href: string;
 }) {
   const featured =
@@ -1303,86 +970,42 @@ function TeamPreviewCard({
   return (
     <Link
       href={href}
-      className={
-        styles.teamCard
-      }
+      className={styles.teamCard}
     >
-      <div
-        className={
-          styles.cardSweep
-        }
-        aria-hidden="true"
-      />
+      <CardSweep />
 
-      <div
-        className={
-          styles.teamVertical
-        }
-      >
+      <div className={styles.teamTitle}>
         {label}
       </div>
 
       <img
-        className={
-          styles.teamGhost
-        }
+        className={styles.teamGhost}
         src="/images/fc-ppb-logo.png"
         alt=""
         aria-hidden="true"
       />
 
-      <div
-        className={
-          styles.teamPlayers
-        }
-      >
+      <div className={styles.teamPlayers}>
         {featured.map(
           (
             player,
             index,
           ) => (
             <RosterImage
-              key={
-                player.id
-              }
-              player={
-                player
-              }
-              index={
-                index
-              }
+              key={player.id}
+              player={player}
+              index={index}
             />
           ),
         )}
       </div>
 
-      <div
-        className={
-          styles.teamCardShade
-        }
-      />
+      <div className={styles.teamCardShade} />
 
-      <div
-        className={
-          styles.teamCardCopy
-        }
-      >
-        <div
-          className={
-            styles.teamMenu
-          }
-        >
-          <span>
-            SOUPISKA
-          </span>
-
-          <span>
-            STATISTIKY
-          </span>
-
-          <span>
-            REALIZAČNÍ TÝM
-          </span>
+      <div className={styles.teamCardCopy}>
+        <div className={styles.teamMenu}>
+          <span>SOUPISKA</span>
+          <span>STATISTIKY</span>
         </div>
 
         <b>
@@ -1397,10 +1020,8 @@ function RosterImage({
   player,
   index,
 }: {
-  player:
-    SquadPlayer;
-  index:
-    number;
+  player: SquadPlayer;
+  index: number;
 }) {
   return (
     <img
@@ -1410,22 +1031,16 @@ function RosterImage({
         zIndex:
           index + 1,
       }}
-      onError={(
-        event,
-      ) => {
+      onError={(event) => {
         const img =
           event.currentTarget;
 
         const fallback =
-          img.dataset
-            .fallback ||
+          img.dataset.fallback ||
           "";
 
-        if (
-          fallback === ""
-        ) {
-          img.dataset
-            .fallback =
+        if (fallback === "") {
+          img.dataset.fallback =
             "jpg";
 
           img.src =
@@ -1435,12 +1050,10 @@ function RosterImage({
         }
 
         if (
-          fallback ===
-            "jpg" &&
+          fallback === "jpg" &&
           player.imageUrl
         ) {
-          img.dataset
-            .fallback =
+          img.dataset.fallback =
             "remote";
 
           img.src =
@@ -1458,11 +1071,7 @@ function RosterImage({
 
 function Partners() {
   return (
-    <section
-      className={
-        styles.partners
-      }
-    >
+    <section className={styles.partners}>
       <span>
         HRAJÍ S NÁMI
       </span>
@@ -1494,19 +1103,14 @@ function Partners() {
 
 function Social() {
   return (
-    <section
-      className={
-        styles.social
-      }
-    >
+    <section className={styles.social}>
       <div>
         <span>
           SLEDUJ FC PPB
         </span>
 
         <strong>
-          ZÁPASY. KABINA.
-          TRÉNINKY.
+          ZÁPASY. KABINA. TRÉNINKY.
         </strong>
       </div>
 
@@ -1520,9 +1124,7 @@ function Social() {
         </a>
 
         <a
-          href={
-            INSTAGRAM_URL
-          }
+          href={INSTAGRAM_URL}
           target="_blank"
           rel="noreferrer"
         >
@@ -1548,9 +1150,7 @@ function SectionTitle({
           : ""
       }`}
     >
-      <h2>
-        {title}
-      </h2>
+      <h2>{title}</h2>
     </div>
   );
 }
@@ -1566,11 +1166,7 @@ function TeamToggle({
     ) => void;
 }) {
   return (
-    <div
-      className={
-        styles.toggle
-      }
-    >
+    <div className={styles.toggle}>
       <button
         type="button"
         className={
@@ -1608,16 +1204,11 @@ function MatchClub({
   position,
 }: {
   name: string;
-  teamId:
-    number | null;
+  teamId: number | null;
   position?: number;
 }) {
   return (
-    <div
-      className={
-        styles.club
-      }
-    >
+    <div className={styles.club}>
       <TeamLogo
         name={name}
         teamId={teamId}
@@ -1641,8 +1232,7 @@ function TeamLogo({
   teamId,
 }: {
   name: string;
-  teamId:
-    number | null;
+  teamId: number | null;
 }) {
   const ours =
     normalize(name).includes(
@@ -1662,16 +1252,9 @@ function TeamLogo({
   ] =
     useState(false);
 
-  if (
-    !src ||
-    failed
-  ) {
+  if (!src || failed) {
     return (
-      <div
-        className={
-          styles.logoFallback
-        }
-      >
+      <div className={styles.logoFallback}>
         {initials(name)}
       </div>
     );
@@ -1679,14 +1262,21 @@ function TeamLogo({
 
   return (
     <img
-      className={
-        styles.clubLogo
-      }
+      className={styles.clubLogo}
       src={src}
       alt={name}
       onError={() =>
         setFailed(true)
       }
+    />
+  );
+}
+
+function CardSweep() {
+  return (
+    <span
+      className={styles.cardSweep}
+      aria-hidden="true"
     />
   );
 }
@@ -1697,11 +1287,7 @@ function Empty({
   text: string;
 }) {
   return (
-    <div
-      className={
-        styles.empty
-      }
-    >
+    <div className={styles.empty}>
       {text}
     </div>
   );
@@ -1712,17 +1298,14 @@ function findTeamRow(
   teamName: string,
 ): LeagueRow | null {
   const wanted =
-    normalize(
-      teamName,
-    );
+    normalize(teamName);
 
   return (
     rows.find(
       (row) =>
         normalize(
           row.teamName,
-        ) ===
-        wanted,
+        ) === wanted,
     ) ??
     rows.find(
       (row) => {
@@ -1749,9 +1332,7 @@ function aroundOurTeam(
   rows: LeagueRow[],
   count: number,
 ): LeagueRow[] {
-  if (
-    rows.length === 0
-  ) {
+  if (rows.length === 0) {
     return [];
   }
 
@@ -1761,9 +1342,7 @@ function aroundOurTeam(
         row.isOurTeam,
     );
 
-  if (
-    index < 0
-  ) {
+  if (index < 0) {
     return rows.slice(
       0,
       count,
@@ -1798,8 +1377,7 @@ function aroundOurTeam(
 }
 
 function movementLabel(
-  transfer:
-    ClubTransfer,
+  transfer: ClubTransfer,
 ): string {
   switch (
     transfer.movementDetail
@@ -1826,8 +1404,7 @@ function movementLabel(
 }
 
 function getTransferImage(
-  transfer:
-    ClubTransfer,
+  transfer: ClubTransfer,
 ): string {
   if (
     transfer.playerId &&
@@ -1842,6 +1419,16 @@ function getTransferImage(
     transfer.imageUrl ||
     "/images/fc-ppb-logo.png"
   );
+}
+
+function padCountdown(
+  value: number,
+): string {
+  return String(value)
+    .padStart(
+      2,
+      "0",
+    );
 }
 
 function normalize(
