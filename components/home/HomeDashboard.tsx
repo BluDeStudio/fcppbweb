@@ -5,9 +5,11 @@ import {
   useEffect,
   useMemo,
   useState,
+  type ReactNode,
 } from "react";
 
 import { AnimatedLogo } from "@/components/ui/AnimatedLogo/AnimatedLogo";
+
 import type { LeagueRow } from "@/types/league";
 import type { MatchResult } from "@/types/match";
 import type { NextMatch } from "@/types/nextMatch";
@@ -41,19 +43,13 @@ type Props = {
   aPlayers: SquadPlayer[];
   bPlayers: SquadPlayer[];
 
-  aPlayerOfMatch:
-    PlayerOfMatch | null;
+  aPlayerOfMatch: PlayerOfMatch | null;
+  bPlayerOfMatch: PlayerOfMatch | null;
 
-  bPlayerOfMatch:
-    PlayerOfMatch | null;
-
-  transfers:
-    ClubTransfer[];
+  transfers: ClubTransfer[];
 };
 
-type Team =
-  | "a"
-  | "b";
+type Team = "a" | "b";
 
 type CountdownValue = {
   days: number;
@@ -62,13 +58,12 @@ type CountdownValue = {
   finished: boolean;
 };
 
-const PNG_PLAYER_IDS =
-  new Set([
-    532,
-    997,
-    1562,
-    3937,
-  ]);
+const PNG_PLAYER_IDS = new Set([
+  532,
+  997,
+  1562,
+  3937,
+]);
 
 const TIKTOK_URL =
   "https://www.tiktok.com/@fcppbfutsal";
@@ -79,18 +74,10 @@ const INSTAGRAM_URL =
 export function HomeDashboard(
   props: Props,
 ) {
-  /*
-   * Přepínač zápasů už nepotřebujeme.
-   *
-   * Oba týmy jsou na homepage
-   * viditelné rovnou.
-   */
-
   const [
     tableTeam,
     setTableTeam,
-  ] =
-    useState<Team>("a");
+  ] = useState<Team>("a");
 
   const tableRows =
     tableTeam === "a"
@@ -106,14 +93,10 @@ export function HomeDashboard(
     null;
 
   return (
-    <main
-      className={styles.page}
-    >
+    <main className={styles.page}>
       <Hero />
 
-      <div
-        className={styles.shell}
-      >
+      <div className={styles.shell}>
         <section
           className={
             styles.scoreboardSection
@@ -124,28 +107,14 @@ export function HomeDashboard(
               styles.scoreboardHeader
             }
           >
-            <SectionTitle
-              title="ZÁPASY."
-            />
+            <SectionTitle title="ZÁPASY." />
           </div>
 
-          {/*
-           * ================================================
-           * A-TÝM
-           * ================================================
-           */}
-
-          <MatchTeamBlock
-            label="A-TÝM"
-          >
+          <MatchTeamBlock label="A-TÝM">
             <NextMatchPanel
-              match={
-                props.aNextMatch
-              }
+              match={props.aNextMatch}
               team="a"
-              rows={
-                props.aLeagueTable
-              }
+              rows={props.aLeagueTable}
             />
 
             <LastMatchPanel
@@ -154,23 +123,11 @@ export function HomeDashboard(
             />
           </MatchTeamBlock>
 
-          {/*
-           * ================================================
-           * B-TÝM
-           * ================================================
-           */}
-
-          <MatchTeamBlock
-            label="B-TÝM"
-          >
+          <MatchTeamBlock label="B-TÝM">
             <NextMatchPanel
-              match={
-                props.bNextMatch
-              }
+              match={props.bNextMatch}
               team="b"
-              rows={
-                props.bLeagueTable
-              }
+              rows={props.bLeagueTable}
             />
 
             <LastMatchPanel
@@ -180,17 +137,7 @@ export function HomeDashboard(
           </MatchTeamBlock>
         </section>
 
-        {/*
-         * ==================================================
-         * HRÁČI UTKÁNÍ
-         * ==================================================
-         */}
-
-        <section
-          className={
-            styles.section
-          }
-        >
+        <section className={styles.section}>
           <SectionTitle
             title="HRÁČI UTKÁNÍ."
           />
@@ -216,15 +163,9 @@ export function HomeDashboard(
           </div>
         </section>
 
-        <NewsSection
-          props={props}
-        />
+        <NewsSection props={props} />
 
-        <section
-          className={
-            styles.section
-          }
-        >
+        <section className={styles.section}>
           <div
             className={
               styles.sectionHeaderRow
@@ -237,9 +178,7 @@ export function HomeDashboard(
 
             <TeamToggle
               team={tableTeam}
-              setTeam={
-                setTableTeam
-              }
+              setTeam={setTableTeam}
             />
           </div>
 
@@ -249,12 +188,8 @@ export function HomeDashboard(
         </section>
 
         <TeamsPreview
-          aPlayers={
-            props.aPlayers
-          }
-          bPlayers={
-            props.bPlayers
-          }
+          aPlayers={props.aPlayers}
+          bPlayers={props.bPlayers}
         />
 
         <Partners />
@@ -265,21 +200,18 @@ export function HomeDashboard(
   );
 }
 
-/*
- * ============================================================
- * HERO
- * ============================================================
- */
-
 function Hero() {
   return (
-    <section
-      className={styles.hero}
-    >
+    <section className={styles.hero}>
+      <div
+        className={styles.heroNoise}
+      />
+
       <div
         className={
-          styles.heroNoise
+          styles.heroLight
         }
+        aria-hidden="true"
       />
 
       <div
@@ -288,10 +220,16 @@ function Hero() {
         }
         aria-hidden="true"
       >
-        <AnimatedLogo
-          size={470}
-          priority
-        />
+        <div
+          className={
+            styles.heroGhostLogoInner
+          }
+        >
+          <AnimatedLogo
+            size={470}
+            priority
+          />
+        </div>
       </div>
 
       <div
@@ -309,6 +247,13 @@ function Hero() {
               styles.heroLogo
             }
           >
+            <div
+              className={
+                styles.heroLogoShine
+              }
+              aria-hidden="true"
+            />
+
             <AnimatedLogo
               size={118}
               priority
@@ -317,13 +262,10 @@ function Hero() {
 
           <div>
             <span>
-              FC PPB · FUTSAL
-              PLZEŇ
+              FC PPB · FUTSAL PLZEŇ
             </span>
 
-            <h1>
-              FC PPB
-            </h1>
+            <h1>FC PPB</h1>
           </div>
         </div>
 
@@ -332,54 +274,33 @@ function Hero() {
             styles.heroClaim
           }
         >
-          <div
-            className={
-              styles.heroClaimLaser
-            }
-            aria-hidden="true"
-          />
-
-          <strong
-            data-text="PŘÁTELSTVÍ."
-          >
+          <strong>
             PŘÁTELSTVÍ.
           </strong>
 
-          <strong
-            data-text="POKORA."
-          >
+          <strong>
             POKORA.
           </strong>
 
-          <strong
-            data-text="BOJOVNOST."
-          >
+          <strong>
             BOJOVNOST.
           </strong>
         </div>
 
         <p>
-          SPOJUJE NÁS VÍC NEŽ
-          HRA.
+          SPOJUJE NÁS VÍC NEŽ HRA.
         </p>
       </div>
     </section>
   );
 }
 
-/*
- * ============================================================
- * BLOK TÝMU V SEKCI ZÁPASY
- * ============================================================
- */
-
 function MatchTeamBlock({
   label,
   children,
 }: {
   label: string;
-  children:
-    React.ReactNode;
+  children: ReactNode;
 }) {
   return (
     <div
@@ -392,10 +313,7 @@ function MatchTeamBlock({
           styles.matchTeamHeading
         }
       >
-        <strong>
-          {label}
-        </strong>
-
+        <strong>{label}</strong>
         <span />
       </div>
 
@@ -410,20 +328,12 @@ function MatchTeamBlock({
   );
 }
 
-/*
- * ============================================================
- * POSLEDNÍ ZÁPAS
- * ============================================================
- */
-
 function LastMatchPanel({
   match,
   team,
 }: {
-  match:
-    MatchResult | null;
-  team:
-    Team;
+  match: MatchResult | null;
+  team: Team;
 }) {
   return (
     <article
@@ -431,6 +341,13 @@ function LastMatchPanel({
         styles.matchPanel
       }
     >
+      <div
+        className={
+          styles.cardSweep
+        }
+        aria-hidden="true"
+      />
+
       <div
         className={
           styles.panelTopline
@@ -443,9 +360,7 @@ function LastMatchPanel({
             : "B-TÝM"}
         </span>
 
-        <b>
-          KONEC
-        </b>
+        <b>KONEC</b>
       </div>
 
       {match ? (
@@ -456,9 +371,7 @@ function LastMatchPanel({
             }
           >
             <MatchClub
-              name={
-                match.homeTeam
-              }
+              name={match.homeTeam}
               teamId={
                 match.homeTeamId
               }
@@ -475,9 +388,7 @@ function LastMatchPanel({
             </div>
 
             <MatchClub
-              name={
-                match.awayTeam
-              }
+              name={match.awayTeam}
               teamId={
                 match.awayTeamId
               }
@@ -515,25 +426,14 @@ function LastMatchPanel({
   );
 }
 
-/*
- * ============================================================
- * NÁSLEDUJÍCÍ ZÁPAS
- * ============================================================
- */
-
 function NextMatchPanel({
   match,
   team,
   rows,
 }: {
-  match:
-    NextMatch | null;
-
-  team:
-    Team;
-
-  rows:
-    LeagueRow[];
+  match: NextMatch | null;
+  team: Team;
+  rows: LeagueRow[];
 }) {
   const home =
     match
@@ -557,6 +457,13 @@ function NextMatchPanel({
     >
       <div
         className={
+          styles.cardSweep
+        }
+        aria-hidden="true"
+      />
+
+      <div
+        className={
           styles.panelTopline
         }
       >
@@ -567,9 +474,7 @@ function NextMatchPanel({
             : "B-TÝM"}
         </span>
 
-        <b>
-          DALŠÍ
-        </b>
+        <b>DALŠÍ</b>
       </div>
 
       {match ? (
@@ -580,9 +485,7 @@ function NextMatchPanel({
             }
           >
             <MatchClub
-              name={
-                match.homeTeam
-              }
+              name={match.homeTeam}
               teamId={
                 match.homeTeamId
               }
@@ -600,9 +503,7 @@ function NextMatchPanel({
             </div>
 
             <MatchClub
-              name={
-                match.awayTeam
-              }
+              name={match.awayTeam}
               teamId={
                 match.awayTeamId
               }
@@ -632,9 +533,7 @@ function NextMatchPanel({
                 .join(" · ")}
             </span>
 
-            <Link
-              href="/zapasy"
-            >
+            <Link href="/zapasy">
               PROGRAM →
             </Link>
           </div>
@@ -657,12 +556,6 @@ function NextMatchPanel({
     </article>
   );
 }
-
-/*
- * ============================================================
- * ŽIVÝ ODPOČET
- * ============================================================
- */
 
 function MatchCountdown({
   dateTimeIso,
@@ -717,7 +610,7 @@ function MatchCountdown({
       }
 
       const totalMinutes =
-        Math.floor(
+        Math.ceil(
           difference /
             60_000,
         );
@@ -748,10 +641,6 @@ function MatchCountdown({
     };
 
     update();
-
-    /*
-     * Aktualizace každých 30 sekund.
-     */
 
     const interval =
       window.setInterval(
@@ -793,17 +682,21 @@ function MatchCountdown({
         <strong>
           {padCountdown(
             countdown.days,
-          )}{" "}
+          )}
           <small>d</small>
+
           <i>/</i>
+
           {padCountdown(
             countdown.hours,
-          )}{" "}
+          )}
           <small>h</small>
+
           <i>/</i>
+
           {padCountdown(
             countdown.minutes,
-          )}{" "}
+          )}
           <small>m</small>
         </strong>
       )}
@@ -815,17 +708,8 @@ function padCountdown(
   value: number,
 ): string {
   return String(value)
-    .padStart(
-      2,
-      "0",
-    );
+    .padStart(2, "0");
 }
-
-/*
- * ============================================================
- * PLAYER OF MATCH
- * ============================================================
- */
 
 function PlayerOfMatchCard({
   player,
@@ -833,9 +717,7 @@ function PlayerOfMatchCard({
 }: {
   player:
     PlayerOfMatch | null;
-
-  teamLabel:
-    string;
+  teamLabel: string;
 }) {
   if (!player) {
     return (
@@ -844,6 +726,13 @@ function PlayerOfMatchCard({
           styles.pomCard
         }
       >
+        <div
+          className={
+            styles.cardSweep
+          }
+          aria-hidden="true"
+        />
+
         <div
           className={
             styles.pomLabel
@@ -866,6 +755,13 @@ function PlayerOfMatchCard({
         styles.pomCard
       }
     >
+      <div
+        className={
+          styles.cardSweep
+        }
+        aria-hidden="true"
+      />
+
       <div
         className={
           styles.pomLabel
@@ -921,8 +817,7 @@ function PlayerOfMatchCard({
         />
       </div>
 
-      {player.rating !==
-        null && (
+      {player.rating !== null && (
         <div
           className={
             styles.pomRatingCorner
@@ -959,20 +854,14 @@ function PlayerOfMatchCard({
           }
         >
           <div>
-            <b>
-              {player.goals}
-            </b>
-
-            <small>
-              GÓLY
-            </small>
+            <b>{player.goals}</b>
+            <small>GÓLY</small>
           </div>
 
           <div>
             <b>
               {player.assists}
             </b>
-
             <small>
               ASISTENCE
             </small>
@@ -1003,19 +892,12 @@ function formatPlayerName(
   return (
     <>
       {parts.join(" ")}
-
       <strong>
         {last}
       </strong>
     </>
   );
 }
-
-/*
- * ============================================================
- * NEWS
- * ============================================================
- */
 
 function NewsSection({
   props,
@@ -1181,6 +1063,13 @@ function NewsSection({
             >
               <div
                 className={
+                  styles.cardSweep
+                }
+                aria-hidden="true"
+              />
+
+              <div
+                className={
                   styles.newsVisual
                 }
               >
@@ -1223,17 +1112,10 @@ function NewsSection({
   );
 }
 
-/*
- * ============================================================
- * TABLE
- * ============================================================
- */
-
 function LeaguePreview({
   rows,
 }: {
-  rows:
-    LeagueRow[];
+  rows: LeagueRow[];
 }) {
   const visible =
     aroundOurTeam(
@@ -1254,9 +1136,35 @@ function LeaguePreview({
       >
         <span>#</span>
         <span>TÝM</span>
-        <span>Z</span>
+
+        <span>ZÁPASY</span>
+
+        <span
+          className={
+            styles.tableDesktopOnly
+          }
+        >
+          VÝHRY
+        </span>
+
+        <span
+          className={
+            styles.tableDesktopOnly
+          }
+        >
+          REMÍZY
+        </span>
+
+        <span
+          className={
+            styles.tableDesktopOnly
+          }
+        >
+          PROHRY
+        </span>
+
         <span>SKÓRE</span>
-        <span>B</span>
+        <span>BODY</span>
       </div>
 
       {visible.map(
@@ -1281,6 +1189,30 @@ function LeaguePreview({
               {row.matches}
             </span>
 
+            <span
+              className={
+                styles.tableDesktopOnly
+              }
+            >
+              {row.wins}
+            </span>
+
+            <span
+              className={
+                styles.tableDesktopOnly
+              }
+            >
+              {row.draws}
+            </span>
+
+            <span
+              className={
+                styles.tableDesktopOnly
+              }
+            >
+              {row.losses}
+            </span>
+
             <span>
               {row.score}
             </span>
@@ -1299,20 +1231,11 @@ function LeaguePreview({
         }
       >
         CELÁ TABULKA
-
-        <span>
-          →
-        </span>
+        <span>→</span>
       </Link>
     </div>
   );
 }
-
-/*
- * ============================================================
- * TEAMS
- * ============================================================
- */
 
 function TeamsPreview({
   aPlayers,
@@ -1320,7 +1243,6 @@ function TeamsPreview({
 }: {
   aPlayers:
     SquadPlayer[];
-
   bPlayers:
     SquadPlayer[];
 }) {
@@ -1361,10 +1283,8 @@ function TeamPreviewCard({
   href,
 }: {
   label: string;
-
   players:
     SquadPlayer[];
-
   href: string;
 }) {
   const featured =
@@ -1387,6 +1307,13 @@ function TeamPreviewCard({
         styles.teamCard
       }
     >
+      <div
+        className={
+          styles.cardSweep
+        }
+        aria-hidden="true"
+      />
+
       <div
         className={
           styles.teamVertical
@@ -1472,7 +1399,6 @@ function RosterImage({
 }: {
   player:
     SquadPlayer;
-
   index:
     number;
 }) {
@@ -1530,12 +1456,6 @@ function RosterImage({
   );
 }
 
-/*
- * ============================================================
- * PARTNERS
- * ============================================================
- */
-
 function Partners() {
   return (
     <section
@@ -1572,12 +1492,6 @@ function Partners() {
   );
 }
 
-/*
- * ============================================================
- * SOCIAL
- * ============================================================
- */
-
 function Social() {
   return (
     <section
@@ -1598,9 +1512,7 @@ function Social() {
 
       <div>
         <a
-          href={
-            TIKTOK_URL
-          }
+          href={TIKTOK_URL}
           target="_blank"
           rel="noreferrer"
         >
@@ -1620,12 +1532,6 @@ function Social() {
     </section>
   );
 }
-
-/*
- * ============================================================
- * SECTION TITLE
- * ============================================================
- */
 
 function SectionTitle({
   title,
@@ -1649,18 +1555,11 @@ function SectionTitle({
   );
 }
 
-/*
- * ============================================================
- * TABLE TOGGLE
- * ============================================================
- */
-
 function TeamToggle({
   team,
   setTeam,
 }: {
   team: Team;
-
   setTeam:
     (
       team: Team,
@@ -1703,22 +1602,14 @@ function TeamToggle({
   );
 }
 
-/*
- * ============================================================
- * CLUB
- * ============================================================
- */
-
 function MatchClub({
   name,
   teamId,
   position,
 }: {
   name: string;
-
   teamId:
     number | null;
-
   position?: number;
 }) {
   return (
@@ -1745,31 +1636,11 @@ function MatchClub({
   );
 }
 
-/*
- * ============================================================
- * TEAM LOGO
- * ============================================================
- *
- * FC PPB:
- *
- * /images/fc-ppb-logo.png
- *
- * Soupeř:
- *
- * /teams/APF_ID.png
- *
- * Příklad:
- *
- * /teams/14.png
- * ============================================================
- */
-
 function TeamLogo({
   name,
   teamId,
 }: {
   name: string;
-
   teamId:
     number | null;
 }) {
@@ -1820,12 +1691,6 @@ function TeamLogo({
   );
 }
 
-/*
- * ============================================================
- * EMPTY
- * ============================================================
- */
-
 function Empty({
   text,
 }: {
@@ -1841,12 +1706,6 @@ function Empty({
     </div>
   );
 }
-
-/*
- * ============================================================
- * HELPERS
- * ============================================================
- */
 
 function findTeamRow(
   rows: LeagueRow[],
