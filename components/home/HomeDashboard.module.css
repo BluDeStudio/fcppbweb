@@ -15,20 +15,13 @@
     sans-serif;
 
   min-height: 100vh;
-
   color: var(--text);
   background: var(--bg);
 }
 
 .shell {
-  width:
-    min(
-      1440px,
-      calc(100% - 48px)
-    );
-
-  margin:
-    0 auto;
+  width: min(1440px, calc(100% - 48px));
+  margin: 0 auto;
 }
 
 
@@ -38,14 +31,10 @@
 
 .hero {
   position: relative;
-
   min-height: 390px;
-
   overflow: hidden;
 
-  border-bottom:
-    1px solid
-    var(--line);
+  border-bottom: 1px solid var(--line);
 
   background:
     radial-gradient(
@@ -63,11 +52,8 @@
 
 .heroNoise {
   position: absolute;
-
   inset: 0;
-
   pointer-events: none;
-
   opacity: .05;
 
   background-image:
@@ -95,8 +81,7 @@
       transparent
     );
 
-  transform:
-    skewX(-18deg);
+  transform: skewX(-18deg);
 
   animation:
     heroSweep
@@ -113,11 +98,9 @@
 
   opacity: .05;
 
-  filter:
-    grayscale(1);
+  filter: grayscale(1);
 
-  transform:
-    translateY(-50%);
+  transform: translateY(-50%);
 
   animation:
     ghostFloat
@@ -130,16 +113,10 @@
   position: relative;
   z-index: 3;
 
-  width:
-    min(
-      1440px,
-      calc(100% - 48px)
-    );
-
+  width: min(1440px, calc(100% - 48px));
   min-height: 390px;
 
-  margin:
-    0 auto;
+  margin: 0 auto;
 
   display: flex;
   flex-direction: column;
@@ -149,7 +126,6 @@
 .heroBrand {
   display: flex;
   align-items: center;
-
   gap: 24px;
 }
 
@@ -159,8 +135,7 @@
   width: 118px;
   height: 118px;
 
-  flex:
-    0 0 118px;
+  flex: 0 0 118px;
 
   display: grid;
   place-items: center;
@@ -200,8 +175,7 @@
       transparent
     );
 
-  transform:
-    skewX(-17deg);
+  transform: skewX(-17deg);
 
   animation:
     logoShine
@@ -212,15 +186,13 @@
 
 .heroBrandCopy {
   position: relative;
-
   min-width: 0;
 }
 
 .heroBrandCopy span {
   display: block;
 
-  color:
-    var(--green);
+  color: var(--green);
 
   font-size: 9px;
   font-weight: 1000;
@@ -230,18 +202,11 @@
 }
 
 .heroBrandCopy h1 {
-  margin:
-    3px 0 0;
+  margin: 3px 0 0;
 
-  font-family:
-    var(--heading);
+  font-family: var(--heading);
 
-  font-size:
-    clamp(
-      68px,
-      8vw,
-      118px
-    );
+  font-size: clamp(68px, 8vw, 118px);
 
   font-weight: 1000;
   line-height: .82;
@@ -258,22 +223,15 @@
 }
 
 .heroClaim strong {
-  padding:
-    0 25px;
+  padding: 0 25px;
 
   border-left:
     1px solid
     rgba(83,242,10,.42);
 
-  font-family:
-    var(--heading);
+  font-family: var(--heading);
 
-  font-size:
-    clamp(
-      18px,
-      2vw,
-      30px
-    );
+  font-size: clamp(18px, 2vw, 30px);
 
   font-weight: 1000;
   letter-spacing: -.03em;
@@ -288,17 +246,12 @@
       #fff 100%
     );
 
-  background-size:
-    250% 100%;
+  background-size: 250% 100%;
 
-  -webkit-background-clip:
-    text;
+  -webkit-background-clip: text;
+  background-clip: text;
 
-  background-clip:
-    text;
-
-  color:
-    transparent;
+  color: transparent;
 
   animation:
     claimShine
@@ -313,11 +266,9 @@
 }
 
 .heroInner > p {
-  margin:
-    22px 0 0;
+  margin: 22px 0 0;
 
-  color:
-    var(--green);
+  color: var(--green);
 
   font-size: 10px;
   font-weight: 1000;
@@ -331,8 +282,7 @@
 
 .scoreboardSection,
 .section {
-  padding-top:
-    54px;
+  padding-top: 54px;
 }
 
 .sectionHeaderRow {
@@ -342,8 +292,7 @@
 
   gap: 25px;
 
-  margin-bottom:
-    15px;
+  margin-bottom: 15px;
 }
 
 .sectionTitle {
@@ -405,15 +354,9 @@
 .sectionTitle h2 {
   margin: 0;
 
-  font-family:
-    var(--heading);
+  font-family: var(--heading);
 
-  font-size:
-    clamp(
-      29px,
-      3vw,
-      43px
-    );
+  font-size: clamp(29px, 3vw, 43px);
 
   font-weight: 1000;
   line-height: .9;
@@ -421,12 +364,7 @@
 }
 
 .sectionTitleCompact h2 {
-  font-size:
-    clamp(
-      28px,
-      2.7vw,
-      39px
-    );
+  font-size: clamp(28px, 2.7vw, 39px);
 }
 
 
@@ -462,17 +400,13 @@
   top: -8px;
   left: 20px;
 
-  padding:
-    0 10px;
+  padding: 0 10px;
 
-  color:
-    var(--green);
+  color: var(--green);
 
-  background:
-    var(--bg);
+  background: var(--bg);
 
-  font-family:
-    var(--heading);
+  font-family: var(--heading);
 
   font-size: 14px;
   font-weight: 1000;
@@ -506,17 +440,13 @@
   top: -8px;
   left: 20px;
 
-  padding:
-    0 10px;
+  padding: 0 10px;
 
-  color:
-    var(--green);
+  color: var(--green);
 
-  background:
-    var(--bg);
+  background: var(--bg);
 
-  font-family:
-    var(--heading);
+  font-family: var(--heading);
 
   font-size: 13px;
   font-weight: 1000;
@@ -528,10 +458,7 @@
 
 .teamCardFrameInner {
   height: 100%;
-
-  padding:
-    0;
-
+  padding: 0;
   overflow: visible;
 }
 
@@ -549,8 +476,7 @@
   overflow: hidden;
 
   transition:
-    transform .32s
-      cubic-bezier(.2,.7,.2,1),
+    transform .32s cubic-bezier(.2,.7,.2,1),
     border-color .32s ease,
     box-shadow .32s ease;
 }
@@ -602,25 +528,15 @@ and
       rgba(83,242,10,.46);
 
     box-shadow:
-      0 18px 42px
-        rgba(0,0,0,.38),
-      0 0 0 1px
-        rgba(83,242,10,.06),
-      0 0 26px
-        rgba(83,242,10,.07);
+      0 18px 42px rgba(0,0,0,.38),
+      0 0 0 1px rgba(83,242,10,.06),
+      0 0 26px rgba(83,242,10,.07);
   }
 
-  .matchPanel:hover
-  .cardSweep,
-
-  .pomCard:hover
-  .cardSweep,
-
-  .newsCard:hover
-  .cardSweep,
-
-  .teamCard:hover
-  .cardSweep {
+  .matchPanel:hover .cardSweep,
+  .pomCard:hover .cardSweep,
+  .newsCard:hover .cardSweep,
+  .teamCard:hover .cardSweep {
     opacity: 1;
 
     animation:
@@ -689,11 +605,9 @@ and
 }
 
 .panelTopline span {
-  color:
-    #f3f5f3;
+  color: #f3f5f3;
 
-  font-family:
-    var(--heading);
+  font-family: var(--heading);
 
   font-size: 9px;
   font-weight: 1000;
@@ -759,8 +673,7 @@ and
     1px solid
     var(--line);
 
-  color:
-    #7c847e;
+  color: #7c847e;
 
   font-size: 11px;
   font-weight: 1000;
@@ -771,25 +684,19 @@ and
 
   overflow: hidden;
 
-  color:
-    #f0f2f0;
+  color: #f0f2f0;
 
-  font-family:
-    var(--heading);
+  font-family: var(--heading);
 
   font-size: 11px;
   font-weight: 1000;
 
-  text-overflow:
-    ellipsis;
-
-  white-space:
-    nowrap;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .club small {
-  color:
-    var(--green);
+  color: var(--green);
 
   font-size: 7px;
   font-weight: 1000;
@@ -802,15 +709,9 @@ and
 
 .score,
 .versus {
-  font-family:
-    var(--heading);
+  font-family: var(--heading);
 
-  font-size:
-    clamp(
-      43px,
-      5vw,
-      71px
-    );
+  font-size: clamp(43px, 5vw, 71px);
 
   font-weight: 1000;
   line-height: 1;
@@ -835,14 +736,11 @@ and
 }
 
 .score i {
-  color:
-    var(--green);
+  color: var(--green);
 
-  font-style:
-    normal;
+  font-style: normal;
 
   font-size: .76em;
-
   line-height: 1;
 
   transform:
@@ -850,11 +748,8 @@ and
 }
 
 .versus {
-  color:
-    var(--green);
-
-  letter-spacing:
-    -.04em;
+  color: var(--green);
+  letter-spacing: -.04em;
 }
 
 .matchCountdown {
@@ -872,21 +767,18 @@ and
 
   gap: 9px;
 
-  white-space:
-    nowrap;
+  white-space: nowrap;
 }
 
 .matchCountdown > span {
-  color:
-    var(--green);
+  color: var(--green);
 
   font-size: 7px;
   font-weight: 1000;
 }
 
 .matchCountdown > strong {
-  font-family:
-    var(--heading);
+  font-family: var(--heading);
 
   font-size: 16px;
   font-weight: 1000;
@@ -898,18 +790,15 @@ and
 .matchCountdown small {
   margin-left: 2px;
 
-  color:
-    #848c86;
+  color: #848c86;
 
   font-size: 7px;
 }
 
 .matchCountdown i {
-  margin:
-    0 6px;
+  margin: 0 6px;
 
-  color:
-    rgba(255,255,255,.25);
+  color: rgba(255,255,255,.25);
 
   font-size: 9px;
   font-style: normal;
@@ -933,19 +822,16 @@ and
     1px solid
     var(--line);
 
-  color:
-    #7c847e;
+  color: #7c847e;
 
   font-size: 8px;
   font-weight: 900;
 }
 
 .matchFoot a {
-  color:
-    var(--green);
+  color: var(--green);
 
-  text-decoration:
-    none;
+  text-decoration: none;
 
   font-weight: 1000;
 }
@@ -960,8 +846,7 @@ and
   transform:
     translateX(-50%);
 
-  color:
-    #737a74;
+  color: #737a74;
 
   font-size: 7px;
 
@@ -973,8 +858,7 @@ and
 and
 (pointer:fine) {
 
-  .matchPanel:hover
-  .clubLogo {
+  .matchPanel:hover .clubLogo {
     transform:
       scale(1.06);
 
@@ -989,8 +873,7 @@ and
       );
   }
 
-  .matchPanel:hover
-  .score {
+  .matchPanel:hover .score {
     transform:
       scale(1.04);
 
@@ -999,8 +882,7 @@ and
       rgba(255,255,255,.12);
   }
 
-  .nextPanel:hover
-  .versus {
+  .nextPanel:hover .versus {
     transform:
       scale(1.08);
 
@@ -1009,8 +891,7 @@ and
       rgba(83,242,10,.4);
   }
 
-  .nextPanel:hover
-  .matchCountdown > strong {
+  .nextPanel:hover .matchCountdown > strong {
     text-shadow:
       0 0 12px
       rgba(83,242,10,.3);
@@ -1045,8 +926,7 @@ and
 
   color: inherit;
 
-  text-decoration:
-    none;
+  text-decoration: none;
 
   background:
     radial-gradient(
@@ -1059,7 +939,6 @@ and
 
 .pomStage {
   position: absolute;
-
   inset: 0;
 }
 
@@ -1077,8 +956,7 @@ and
 
   opacity: .045;
 
-  filter:
-    grayscale(1);
+  filter: grayscale(1);
 
   transform:
     translateY(-50%);
@@ -1148,29 +1026,21 @@ and
   margin:
     0 0 11px;
 
-  font-family:
-    var(--heading);
+  font-family: var(--heading);
 
-  font-size:
-    clamp(
-      29px,
-      3vw,
-      45px
-    );
+  font-size: clamp(29px, 3vw, 45px);
 
   font-weight: 1000;
   line-height: .87;
   letter-spacing: -.05em;
 
-  text-transform:
-    uppercase;
+  text-transform: uppercase;
 }
 
 .pomCopy h3 strong {
   display: block;
 
-  color:
-    var(--green);
+  color: var(--green);
 }
 
 .pomMatchTitle {
@@ -1178,33 +1048,26 @@ and
 
   max-width: 240px;
 
-  margin-bottom:
-    18px;
+  margin-bottom: 18px;
 
   overflow: hidden;
 
-  color:
-    #d1d5d2;
+  color: #d1d5d2;
 
   font-size: 8px;
   font-weight: 900;
 
-  text-overflow:
-    ellipsis;
-
-  white-space:
-    nowrap;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .pomStats {
   display: flex;
-
   gap: 28px;
 }
 
 .pomStats div {
   display: grid;
-
   gap: 4px;
 }
 
@@ -1214,8 +1077,7 @@ and
 }
 
 .pomStats small {
-  color:
-    #7a827c;
+  color: #7a827c;
 
   font-size: 6px;
   font-weight: 1000;
@@ -1237,6 +1099,12 @@ and
   background:
     #176fc8;
 
+  color:
+    #ffffff;
+
+  font-family:
+    var(--heading);
+
   font-size: 20px;
   font-weight: 1000;
   line-height: 1;
@@ -1253,8 +1121,7 @@ and
 and
 (pointer:fine) {
 
-  .pomCard:hover
-  .pomPlayer {
+  .pomCard:hover .pomPlayer {
     transform:
       scale(1.055)
       translateY(-2px);
@@ -1295,13 +1162,11 @@ and
 
   text-decoration: none;
 
-  background:
-    #090c0a;
+  background: #090c0a;
 }
 
 .newsVisual {
   position: absolute;
-
   inset: 0;
 }
 
@@ -1346,14 +1211,11 @@ and
 .newsCopy span {
   display: inline-flex;
 
-  padding:
-    6px 8px;
+  padding: 6px 8px;
 
-  color:
-    #071006;
+  color: #071006;
 
-  background:
-    var(--green);
+  background: var(--green);
 
   font-size: 7px;
   font-weight: 1000;
@@ -1363,8 +1225,7 @@ and
   margin:
     10px 0 7px;
 
-  font-family:
-    var(--heading);
+  font-family: var(--heading);
 
   font-size: 22px;
   font-weight: 1000;
@@ -1372,8 +1233,7 @@ and
 }
 
 .newsCopy small {
-  color:
-    #838b85;
+  color: #838b85;
 
   font-size: 7px;
   font-weight: 900;
@@ -1384,10 +1244,8 @@ and
 and
 (pointer:fine) {
 
-  .newsCard:hover
-  .newsVisual img {
-    transform:
-      scale(1.06);
+  .newsCard:hover .newsVisual img {
+    transform: scale(1.06);
 
     filter:
       grayscale(.03)
@@ -1396,8 +1254,7 @@ and
 }
 
 .textLink {
-  color:
-    var(--green);
+  color: var(--green);
 
   font-size: 8px;
   font-weight: 1000;
@@ -1419,8 +1276,7 @@ and
     1px solid
     var(--line);
 
-  background:
-    #090c0a;
+  background: #090c0a;
 }
 
 .toggle button {
@@ -1429,11 +1285,9 @@ and
 
   border: 0;
 
-  color:
-    #858d87;
+  color: #858d87;
 
-  background:
-    transparent;
+  background: transparent;
 
   font-size: 8px;
   font-weight: 1000;
@@ -1442,11 +1296,8 @@ and
 }
 
 .toggle .active {
-  color:
-    #071006;
-
-  background:
-    var(--green);
+  color: #071006;
+  background: var(--green);
 }
 
 .tableCard {
@@ -1458,8 +1309,7 @@ and
     1px solid
     var(--line-strong);
 
-  background:
-    #0c100d;
+  background: #0c100d;
 }
 
 .tableHead,
@@ -1480,18 +1330,15 @@ and
 
   align-items: center;
 
-  box-sizing:
-    border-box;
+  box-sizing: border-box;
 }
 
 .tableHead {
   min-height: 45px;
 
-  padding:
-    0 20px;
+  padding: 0 20px;
 
-  color:
-    #707870;
+  color: #707870;
 
   background:
     rgba(255,255,255,.015);
@@ -1499,8 +1346,7 @@ and
   font-size: 7px;
   font-weight: 1000;
 
-  text-transform:
-    uppercase;
+  text-transform: uppercase;
 }
 
 .tableRow {
@@ -1508,15 +1354,13 @@ and
 
   min-height: 57px;
 
-  padding:
-    0 20px;
+  padding: 0 20px;
 
   border-top:
     1px solid
     rgba(255,255,255,.065);
 
-  color:
-    #b2b8b3;
+  color: #b2b8b3;
 
   font-size: 9px;
 
@@ -1543,11 +1387,9 @@ and
 
   font-size: 10px;
 
-  text-overflow:
-    ellipsis;
+  text-overflow: ellipsis;
 
-  white-space:
-    nowrap;
+  white-space: nowrap;
 }
 
 .tableRow b {
@@ -1576,15 +1418,13 @@ and
 
   content: "";
 
-  background:
-    var(--green);
+  background: var(--green);
 }
 
 .tableLink {
   min-height: 48px;
 
-  padding:
-    0 20px;
+  padding: 0 20px;
 
   display: flex;
   align-items: center;
@@ -1596,8 +1436,7 @@ and
     1px solid
     var(--line);
 
-  color:
-    var(--green);
+  color: var(--green);
 
   font-size: 8px;
   font-weight: 1000;
@@ -1689,8 +1528,7 @@ and
 
   opacity: .045;
 
-  filter:
-    grayscale(1);
+  filter: grayscale(1);
 
   transform:
     translate(-50%,-50%);
@@ -1740,8 +1578,7 @@ and
 
   inset: 0;
 
-  pointer-events:
-    none;
+  pointer-events: none;
 
   background:
     linear-gradient(
@@ -1774,7 +1611,6 @@ and
   margin-bottom: 23px;
 
   display: grid;
-
   gap: 10px;
 }
 
@@ -1788,8 +1624,7 @@ and
 .teamMenu span::after {
   content: " •";
 
-  color:
-    var(--green);
+  color: var(--green);
 }
 
 .teamCardCopy b {
@@ -1797,15 +1632,13 @@ and
 
   width: 100%;
 
-  padding:
-    13px 8px;
+  padding: 13px 8px;
 
   border:
     1px solid
     rgba(83,242,10,.45);
 
-  color:
-    var(--green);
+  color: var(--green);
 
   font-size: 7px;
   font-weight: 1000;
@@ -1818,83 +1651,66 @@ and
 and
 (pointer:fine) {
 
-  .teamCard:hover
-  .teamPlayers img {
+  .teamCard:hover .teamPlayers img {
     transform:
       translateY(-3px)
       scale(1.045);
   }
 
-  .teamCard:hover
-  .teamCardCopy b {
-    color:
-      #071006;
-
-    background:
-      var(--green);
+  .teamCard:hover .teamCardCopy b {
+    color: #071006;
+    background: var(--green);
   }
 }
 
 
 /* =========================================================
    PARTNEŘI
+   ČERNÝ PODKLAD + BÍLÁ LOGA
    ========================================================= */
 
 .partners {
   position: relative;
 
-  margin-top:
-    64px;
+  margin-top: 68px;
 
-  min-height:
-    180px;
+  min-height: 145px;
 
-  padding:
-    30px 38px;
+  padding: 28px 0;
 
   display: grid;
 
   grid-template-columns:
-    minmax(170px, .7fr)
+    minmax(150px, .65fr)
     repeat(
       2,
-      minmax(220px, 1fr)
+      minmax(190px, 250px)
     );
 
   align-items: center;
+  justify-content: start;
 
-  gap: 22px;
+  gap: 18px;
 
-  color:
-    #111511;
+  background: transparent;
 
-  background:
-    linear-gradient(
-      135deg,
-      #f6f7f6 0%,
-      #eceeec 50%,
-      #f8f9f8 100%
-    );
-
-  border:
+  border-top:
     1px solid
-    rgba(255,255,255,.12);
+    rgba(255,255,255,.08);
 
-  box-shadow:
-    0 20px 60px
-    rgba(0,0,0,.25);
-
-  overflow: hidden;
+  border-bottom:
+    1px solid
+    rgba(255,255,255,.08);
 }
 
 .partners::before {
   position: absolute;
 
-  top: 0;
+  top: -1px;
   left: 0;
 
-  width: 120px;
-  height: 3px;
+  width: 92px;
+  height: 1px;
 
   content: "";
 
@@ -1909,40 +1725,39 @@ and
 .partners::after {
   position: absolute;
 
-  right: -100px;
-  bottom: -140px;
+  top: 50%;
+  left: 20%;
 
-  width: 300px;
-  height: 300px;
+  width: 500px;
+  height: 130px;
 
   content: "";
 
-  border-radius:
-    50%;
+  pointer-events: none;
 
-  pointer-events:
-    none;
+  transform:
+    translateY(-50%);
 
   background:
     radial-gradient(
-      circle,
-      rgba(83,242,10,.14),
-      transparent 66%
+      ellipse,
+      rgba(83,242,10,.055),
+      transparent 68%
     );
 }
 
 .partners > span {
   position: relative;
-  z-index: 2;
+  z-index: 3;
 
   color:
-    #1d221e;
+    #8a928c;
 
   font-family:
     var(--heading);
 
   font-size:
-    12px;
+    10px;
 
   font-weight:
     1000;
@@ -1957,11 +1772,10 @@ and
 .partners > span::after {
   display: block;
 
-  width: 36px;
+  width: 30px;
   height: 2px;
 
-  margin-top:
-    13px;
+  margin-top: 10px;
 
   content: "";
 
@@ -1969,86 +1783,124 @@ and
     var(--green);
 }
 
+
+/* =========================================================
+   PARTNERSKÁ KARTA
+   ========================================================= */
+
 .partners a {
   position: relative;
-  z-index: 2;
+  z-index: 3;
 
-  min-height:
-    112px;
+  width: 100%;
+  height: 88px;
 
   padding:
-    18px 26px;
+    17px 22px;
 
   display: grid;
+  place-items: center;
 
-  place-items:
-    center;
+  overflow: hidden;
 
   border:
     1px solid
-    rgba(0,0,0,.08);
+    rgba(255,255,255,.09);
 
   border-radius:
     4px;
 
   background:
-    #ffffff;
+    linear-gradient(
+      145deg,
+      rgba(255,255,255,.035),
+      rgba(255,255,255,.012)
+    );
 
   box-shadow:
-    0 10px 24px
-    rgba(0,0,0,.07);
-
-  overflow:
-    hidden;
+    inset 0 1px 0
+      rgba(255,255,255,.025),
+    0 12px 32px
+      rgba(0,0,0,.2);
 
   transition:
     transform .3s ease,
-    box-shadow .3s ease,
-    border-color .3s ease;
+    border-color .3s ease,
+    background .3s ease,
+    box-shadow .3s ease;
 }
+
+
+/* světelný přejezd */
 
 .partners a::before {
   position: absolute;
 
-  top: 0;
-  left: -40%;
+  top: -20%;
+  left: -45%;
 
-  width: 28%;
-  height: 100%;
+  width: 24%;
+  height: 140%;
 
   content: "";
 
-  pointer-events:
-    none;
+  pointer-events: none;
 
   opacity: 0;
 
   background:
     linear-gradient(
-      110deg,
+      105deg,
       transparent,
-      rgba(83,242,10,.09),
-      rgba(255,255,255,.65),
+      rgba(255,255,255,.08),
+      rgba(255,255,255,.26),
+      rgba(83,242,10,.08),
       transparent
     );
 
   transform:
     skewX(-18deg);
+}
+
+
+/* malý zelený detail */
+
+.partners a::after {
+  position: absolute;
+
+  right: 10px;
+  bottom: 8px;
+
+  width: 16px;
+  height: 1px;
+
+  content: "";
+
+  background:
+    var(--green);
+
+  opacity:
+    .45;
 
   transition:
-    left .55s ease,
-    opacity .2s ease;
+    width .3s ease,
+    opacity .3s ease;
 }
+
+
+/* =========================================================
+   LOGA PARTNERŮ - ČISTĚ BÍLÁ
+   ========================================================= */
 
 .partners img {
   position: relative;
-  z-index: 2;
+  z-index: 3;
 
   max-width:
-    230px;
+    185px;
 
   max-height:
-    72px;
+    50px;
 
   width:
     auto;
@@ -2059,12 +1911,24 @@ and
   object-fit:
     contain;
 
+  opacity:
+    .9;
+
   filter:
-    none;
+    grayscale(1)
+    brightness(0)
+    invert(1);
 
   transition:
-    transform .3s ease;
+    transform .3s ease,
+    opacity .3s ease,
+    filter .3s ease;
 }
+
+
+/* =========================================================
+   PARTNEŘI HOVER
+   ========================================================= */
 
 @media
 (hover:hover)
@@ -2073,27 +1937,54 @@ and
 
   .partners a:hover {
     transform:
-      translateY(-5px);
+      translateY(-4px);
 
     border-color:
-      rgba(83,242,10,.42);
+      rgba(83,242,10,.38);
+
+    background:
+      linear-gradient(
+        145deg,
+        rgba(83,242,10,.055),
+        rgba(255,255,255,.018)
+      );
 
     box-shadow:
-      0 16px 32px
-      rgba(0,0,0,.11),
-      0 0 0 1px
-      rgba(83,242,10,.07);
+      0 15px 34px
+        rgba(0,0,0,.34),
+      0 0 25px
+        rgba(83,242,10,.055);
   }
 
   .partners a:hover::before {
-    left: 120%;
+    opacity: 1;
 
+    animation:
+      partnerSweep
+      .75s
+      ease
+      forwards;
+  }
+
+  .partners a:hover::after {
+    width: 33px;
     opacity: 1;
   }
 
   .partners a:hover img {
+    opacity: 1;
+
     transform:
       scale(1.055);
+
+    filter:
+      grayscale(1)
+      brightness(0)
+      invert(1)
+      drop-shadow(
+        0 0 9px
+        rgba(255,255,255,.13)
+      );
   }
 }
 
@@ -2103,8 +1994,7 @@ and
    ========================================================= */
 
 .social {
-  min-height:
-    120px;
+  min-height: 120px;
 
   display: flex;
   align-items: center;
@@ -2115,13 +2005,11 @@ and
 
 .social > div:first-child {
   display: grid;
-
   gap: 5px;
 }
 
 .social span {
-  color:
-    var(--green);
+  color: var(--green);
 
   font-size: 8px;
   font-weight: 1000;
@@ -2134,7 +2022,6 @@ and
 
 .social > div:last-child {
   display: flex;
-
   gap: 28px;
 }
 
@@ -2152,8 +2039,7 @@ and
 }
 
 .social a:hover {
-  color:
-    var(--green);
+  color: var(--green);
 
   transform:
     translateY(-2px);
@@ -2168,12 +2054,9 @@ and
   min-height: 160px;
 
   display: grid;
+  place-items: center;
 
-  place-items:
-    center;
-
-  color:
-    #747c76;
+  color: #747c76;
 
   font-size: 9px;
   font-weight: 900;
@@ -2200,11 +2083,20 @@ and
   }
 }
 
+@keyframes partnerSweep {
+  from {
+    left: -45%;
+  }
+
+  to {
+    left: 125%;
+  }
+}
+
 @keyframes heroSweep {
   0%,
   70% {
     left: -35%;
-
     opacity: 0;
   }
 
@@ -2214,7 +2106,6 @@ and
 
   100% {
     left: 125%;
-
     opacity: 0;
   }
 }
@@ -2223,7 +2114,6 @@ and
   0%,
   66% {
     left: -80%;
-
     opacity: 0;
   }
 
@@ -2234,7 +2124,6 @@ and
   92%,
   100% {
     left: 150%;
-
     opacity: 0;
   }
 }
@@ -2327,15 +2216,14 @@ and
 
   .partners {
     grid-template-columns:
-      1fr 1fr;
+      140px
+      repeat(
+        2,
+        minmax(0,1fr)
+      );
 
-    padding:
-      26px;
-  }
-
-  .partners > span {
-    grid-column:
-      1 / -1;
+    gap:
+      14px;
   }
 }
 
@@ -2376,7 +2264,6 @@ and
     width: 100%;
 
     display: flex;
-
     align-items: center;
 
     gap: 16px;
@@ -2411,27 +2298,22 @@ and
 
   .heroLogoShine {
     top: -5%;
-
     height: 110%;
   }
 
   .heroBrandCopy {
     flex: 1;
-
     min-width: 0;
 
-    padding-left:
-      2px;
+    padding-left: 2px;
   }
 
   .heroBrandCopy span {
     font-size: 7px;
 
-    letter-spacing:
-      .11em;
+    letter-spacing: .11em;
 
-    white-space:
-      normal;
+    white-space: normal;
   }
 
   .heroBrandCopy h1 {
@@ -2446,13 +2328,11 @@ and
 
     line-height: .9;
 
-    white-space:
-      nowrap;
+    white-space: nowrap;
   }
 
   .heroClaim {
-    margin-top:
-      32px;
+    margin-top: 32px;
 
     display: grid;
 
@@ -2461,41 +2341,33 @@ and
 
   .heroClaim strong {
     padding: 0;
-
     border: 0;
 
     font-size: 21px;
   }
 
   .heroInner > p {
-    margin-top:
-      19px;
+    margin-top: 19px;
 
     font-size: 8px;
 
-    letter-spacing:
-      .16em;
+    letter-spacing: .16em;
   }
 
   .scoreboardSection,
   .section {
-    padding-top:
-      40px;
+    padding-top: 40px;
   }
 
   .sectionHeaderRow {
-    flex-direction:
-      column;
-
-    align-items:
-      stretch;
+    flex-direction: column;
+    align-items: stretch;
 
     gap: 10px;
   }
 
   .sectionTitle {
-    min-height:
-      36px;
+    min-height: 36px;
 
     padding:
       4px 0
@@ -2503,13 +2375,11 @@ and
   }
 
   .sectionTitle h2 {
-    font-size:
-      28px;
+    font-size: 28px;
   }
 
   .teamFrame {
-    margin-top:
-      27px;
+    margin-top: 27px;
 
     padding:
       22px 8px 8px;
@@ -2517,35 +2387,29 @@ and
 
   .teamFrame +
   .teamFrame {
-    margin-top:
-      31px;
+    margin-top: 31px;
   }
 
   .teamFrameLegend {
     top: -7px;
     left: 12px;
 
-    padding:
-      0 8px;
+    padding: 0 8px;
 
-    font-size:
-      11px;
+    font-size: 11px;
   }
 
   .teamCardFrame {
-    padding-top:
-      9px;
+    padding-top: 9px;
   }
 
   .teamCardFrameLegend {
     top: -7px;
     left: 12px;
 
-    padding:
-      0 8px;
+    padding: 0 8px;
 
-    font-size:
-      11px;
+    font-size: 11px;
   }
 
   .scoreGrid {
@@ -2556,8 +2420,7 @@ and
   }
 
   .matchPanel {
-    min-height:
-      280px;
+    min-height: 280px;
 
     padding:
       17px
@@ -2570,8 +2433,7 @@ and
   }
 
   .matchMain {
-    margin-top:
-      27px;
+    margin-top: 27px;
 
     grid-template-columns:
       minmax(0,1fr)
@@ -2603,8 +2465,7 @@ and
   .club strong {
     font-size: 8px;
 
-    white-space:
-      normal;
+    white-space: normal;
   }
 
   .club small {
@@ -2690,17 +2551,18 @@ and
   }
 
   .pomRatingCorner {
-    top: 9px;
-    right: 9px;
+    top: 10px;
+    right: 10px;
 
-    min-width:
-      44px;
+    min-width: 50px;
 
-    padding:
-      7px;
+    padding: 8px;
 
     font-size:
-      16px;
+      18px;
+
+    border-radius:
+      5px;
   }
 
   .newsGrid {
@@ -2825,50 +2687,61 @@ and
 
   .partners {
     margin-top:
-      46px;
+      48px;
 
-    min-height: 0;
-
-    grid-template-columns:
-      1fr;
-
-    gap: 12px;
+    min-height:
+      0;
 
     padding:
-      24px 16px;
+      24px 0;
+
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0,1fr)
+      );
+
+    gap:
+      10px;
   }
 
   .partners > span {
     grid-column:
-      auto;
+      1 / -1;
 
     margin-bottom:
-      7px;
+      8px;
 
     font-size:
-      10px;
+      9px;
   }
 
   .partners a {
-    min-height:
-      92px;
+    height:
+      74px;
 
     padding:
-      15px 20px;
+      12px 15px;
   }
 
   .partners img {
     max-width:
-      175px;
+      125px;
 
     max-height:
-      58px;
+      42px;
+  }
+
+  .partners::after {
+    left: 0;
+
+    width: 100%;
   }
 
 
-  /* -------------------------------------------------------
+  /* =======================================================
      SOCIAL
-     ------------------------------------------------------- */
+     ======================================================= */
 
   .social {
     align-items:
@@ -2898,8 +2771,7 @@ and
     width: 82px;
     height: 82px;
 
-    flex-basis:
-      82px;
+    flex-basis: 82px;
   }
 
   .heroLogoGraphic {
@@ -2909,13 +2781,24 @@ and
   }
 
   .heroBrandCopy h1 {
-    font-size:
-      44px;
+    font-size: 44px;
   }
 
   .heroBrandCopy span {
-    font-size:
-      6px;
+    font-size: 6px;
+  }
+
+  .partners a {
+    height:
+      68px;
+  }
+
+  .partners img {
+    max-width:
+      112px;
+
+    max-height:
+      38px;
   }
 }
 
@@ -2955,6 +2838,7 @@ and
   }
 
   .partners a::before {
-    display: none;
+    display:
+      none !important;
   }
 }
