@@ -165,10 +165,6 @@
   display: grid;
   place-items: center;
 
-  /*
-   * DŮLEŽITÉ:
-   * logo se NESMÍ oříznout.
-   */
   overflow: visible;
 }
 
@@ -436,8 +432,6 @@
 
 /* =========================================================
    FRAME S PŘERUŠENÝM BORDEREM
-
-   ┌── A-TÝM ─────────────────────────────┐
    ========================================================= */
 
 .teamFrame {
@@ -500,9 +494,6 @@
 
   padding-top: 11px;
 
-  /*
-   * Border tvoří samotný rám.
-   */
   border:
     1px solid
     rgba(255,255,255,.14);
@@ -818,7 +809,6 @@ and
 
   font-weight: 1000;
   line-height: 1;
-  letter-spacing: -.08em;
 
   text-align: center;
 
@@ -828,17 +818,38 @@ and
     color .3s ease;
 }
 
+.score {
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 8px;
+
+  letter-spacing: 0;
+}
+
 .score i {
   color:
     var(--green);
 
   font-style:
     normal;
+
+  font-size: .76em;
+
+  line-height: 1;
+
+  transform:
+    translateY(-1px);
 }
 
 .versus {
   color:
     var(--green);
+
+  letter-spacing:
+    -.04em;
 }
 
 .matchCountdown {
@@ -2144,11 +2155,6 @@ and
       calc(100% - 20px);
   }
 
-
-  /* -------------------------------------------------------
-     HERO MOBILE
-     ------------------------------------------------------- */
-
   .hero,
   .heroInner {
     min-height:
@@ -2160,10 +2166,6 @@ and
 
     opacity: .025;
 
-    /*
-     * Na mobilu velké logo
-     * NEANIMUJEME.
-     */
     animation:
       none;
 
@@ -2182,11 +2184,6 @@ and
     gap: 16px;
   }
 
-  /*
-   * BOX PRO LOGO JE PEVNÝ.
-   * NIC SE NEŘEŽE.
-   */
-
   .heroLogo {
     width: 92px;
     height: 92px;
@@ -2196,12 +2193,6 @@ and
 
     overflow: visible;
   }
-
-  /*
-   * AnimatedLogo je 118px.
-   * Zmenší se UVNITŘ vlastního boxu,
-   * ne celý layout.
-   */
 
   .heroLogoGraphic {
     position: absolute;
@@ -2219,11 +2210,6 @@ and
     transform-origin:
       center center;
   }
-
-  /*
-   * Odlesk zůstává,
-   * ale velikost loga nemění.
-   */
 
   .heroLogoShine {
     top: -5%;
@@ -2293,11 +2279,6 @@ and
       .16em;
   }
 
-
-  /* -------------------------------------------------------
-     SEKCE
-     ------------------------------------------------------- */
-
   .scoreboardSection,
   .section {
     padding-top:
@@ -2327,11 +2308,6 @@ and
     font-size:
       28px;
   }
-
-
-  /* -------------------------------------------------------
-     TEAM FRAME MOBILE
-     ------------------------------------------------------- */
 
   .teamFrame {
     margin-top:
@@ -2373,11 +2349,6 @@ and
     font-size:
       11px;
   }
-
-
-  /* -------------------------------------------------------
-     ZÁPASY
-     ------------------------------------------------------- */
 
   .scoreGrid {
     grid-template-columns:
@@ -2423,6 +2394,14 @@ and
     font-size: 40px;
   }
 
+  .score {
+    gap: 5px;
+  }
+
+  .score i {
+    font-size: .74em;
+  }
+
   .club strong {
     font-size: 8px;
 
@@ -2465,11 +2444,6 @@ and
     margin:
       0 4px;
   }
-
-
-  /* -------------------------------------------------------
-     HRÁČ UTKÁNÍ
-     ------------------------------------------------------- */
 
   .playersOfMatchGrid {
     grid-template-columns:
@@ -2531,11 +2505,6 @@ and
       16px;
   }
 
-
-  /* -------------------------------------------------------
-     NOVINKY
-     ------------------------------------------------------- */
-
   .newsGrid {
     grid-template-columns:
       1fr;
@@ -2550,13 +2519,6 @@ and
     min-height:
       230px;
   }
-
-
-  /* -------------------------------------------------------
-     TABULKA MOBILE
-
-     # | TÝM | ZÁPASY | SKÓRE | BODY
-     ------------------------------------------------------- */
 
   .toggle {
     width: 100%;
@@ -2605,11 +2567,6 @@ and
     font-size:
       8px;
   }
-
-
-  /* -------------------------------------------------------
-     NAŠE TÝMY
-     ------------------------------------------------------- */
 
   .teamsGrid {
     grid-template-columns:
@@ -2662,11 +2619,6 @@ and
     font-size:
       6px;
   }
-
-
-  /* -------------------------------------------------------
-     PARTNEŘI / SOCIAL
-     ------------------------------------------------------- */
 
   .partners {
     grid-template-columns:
