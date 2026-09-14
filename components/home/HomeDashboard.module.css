@@ -38,14 +38,14 @@
 
   background:
     radial-gradient(
-      circle at 74% 38%,
-      rgba(83, 242, 10, .11),
-      transparent 34%
+      ellipse at 76% 44%,
+      rgba(255,255,255,.018),
+      transparent 30%
     ),
     linear-gradient(
       135deg,
       #050605,
-      #0a0d0b 60%,
+      #090b09 58%,
       #050605
     );
 }
@@ -186,7 +186,83 @@
 
 .heroBrandCopy {
   position: relative;
+  z-index: 2;
+
   min-width: 0;
+
+  isolation: isolate;
+}
+
+.heroBrandCopy::before,
+.heroBrandCopy::after {
+  position: absolute;
+  z-index: -1;
+
+  content: "";
+
+  pointer-events: none;
+
+  border-radius: 50%;
+
+  filter: blur(24px);
+
+  will-change:
+    transform,
+    opacity;
+}
+
+.heroBrandCopy::before {
+  left: -7%;
+  top: 32%;
+
+  width: 112%;
+  height: 78%;
+
+  opacity: .48;
+
+  background:
+    radial-gradient(
+      ellipse at 38% 52%,
+      rgba(255,255,255,.07) 0%,
+      rgba(255,255,255,.026) 30%,
+      transparent 68%
+    ),
+    radial-gradient(
+      ellipse at 72% 42%,
+      rgba(83,242,10,.07) 0%,
+      rgba(83,242,10,.018) 36%,
+      transparent 72%
+    );
+
+  animation:
+    heroTitleSmokeOne
+    11s
+    ease-in-out
+    infinite alternate;
+}
+
+.heroBrandCopy::after {
+  left: 8%;
+  top: 42%;
+
+  width: 96%;
+  height: 66%;
+
+  opacity: .32;
+
+  background:
+    radial-gradient(
+      ellipse at 55% 50%,
+      rgba(255,255,255,.055) 0%,
+      rgba(83,242,10,.02) 38%,
+      transparent 74%
+    );
+
+  animation:
+    heroTitleSmokeTwo
+    14s
+    ease-in-out
+    infinite alternate;
 }
 
 .heroBrandCopy span {
@@ -202,17 +278,63 @@
 }
 
 .heroBrandCopy h1 {
+  position: relative;
+  z-index: 2;
+
   margin: 3px 0 0;
 
-  font-family: var(--heading);
+  font-family:
+    "Arial Narrow",
+    "Roboto Condensed",
+    "Helvetica Neue",
+    Arial,
+    sans-serif;
 
   font-size: clamp(68px, 8vw, 118px);
 
-  font-weight: 1000;
+  font-weight: 900;
   line-height: .82;
-  letter-spacing: -.07em;
+  letter-spacing: -.055em;
 
   white-space: nowrap;
+
+  color: transparent;
+
+  background:
+    linear-gradient(
+      105deg,
+      #ffffff 0%,
+      #f3f5f3 30%,
+      #ffffff 43%,
+      #b6bdb7 49%,
+      #ffffff 56%,
+      #f5f7f5 100%
+    );
+
+  background-size:
+    240% 100%;
+
+  -webkit-background-clip:
+    text;
+
+  background-clip:
+    text;
+
+  text-shadow:
+    0 10px 28px
+    rgba(0,0,0,.34);
+
+  filter:
+    drop-shadow(
+      0 0 12px
+      rgba(83,242,10,.045)
+    );
+
+  animation:
+    heroTitleShine
+    8s
+    ease-in-out
+    infinite;
 }
 
 .heroClaim {
@@ -2143,6 +2265,64 @@ and
   }
 }
 
+@keyframes heroTitleSmokeOne {
+  0% {
+    transform:
+      translate3d(-18px, 7px, 0)
+      scale(.96);
+
+    opacity: .34;
+  }
+
+  50% {
+    transform:
+      translate3d(10px, -7px, 0)
+      scale(1.04);
+
+    opacity: .52;
+  }
+
+  100% {
+    transform:
+      translate3d(28px, 5px, 0)
+      scale(1);
+
+    opacity: .39;
+  }
+}
+
+@keyframes heroTitleSmokeTwo {
+  0% {
+    transform:
+      translate3d(22px, -4px, 0)
+      scale(1.05);
+
+    opacity: .24;
+  }
+
+  100% {
+    transform:
+      translate3d(-20px, 8px, 0)
+      scale(.95);
+
+    opacity: .38;
+  }
+}
+
+@keyframes heroTitleShine {
+  0%,
+  58% {
+    background-position:
+      130% center;
+  }
+
+  78%,
+  100% {
+    background-position:
+      -130% center;
+  }
+}
+
 @keyframes claimShine {
   0%,
   58% {
@@ -2306,6 +2486,30 @@ and
     min-width: 0;
 
     padding-left: 2px;
+  }
+
+  .heroBrandCopy::before {
+    left: -14%;
+    top: 37%;
+
+    width: 122%;
+    height: 68%;
+
+    opacity: .36;
+
+    filter: blur(20px);
+  }
+
+  .heroBrandCopy::after {
+    left: 1%;
+    top: 47%;
+
+    width: 106%;
+    height: 56%;
+
+    opacity: .24;
+
+    filter: blur(18px);
   }
 
   .heroBrandCopy span {
@@ -2813,7 +3017,10 @@ and
   .heroLight,
   .heroLogoShine,
   .heroLogoGhost,
-  .heroClaim strong {
+  .heroClaim strong,
+  .heroBrandCopy h1,
+  .heroBrandCopy::before,
+  .heroBrandCopy::after {
     animation:
       none !important;
   }

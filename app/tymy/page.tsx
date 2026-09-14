@@ -317,6 +317,13 @@ export default async function TeamsPage() {
     >();
 
 
+  const appPlayerByName =
+    new Map<
+      string,
+      AppPlayerRow
+    >();
+
+
   for (
     const player
     of appPlayers
@@ -337,6 +344,22 @@ export default async function TeamsPage() {
         Number(
           player.apf_player_id,
         ),
+        player,
+      );
+    }
+
+
+    const nameKey =
+      normalizePlayerNameKey(
+        player.name,
+      );
+
+
+    if (
+      nameKey
+    ) {
+      appPlayerByName.set(
+        nameKey,
         player,
       );
     }
@@ -431,28 +454,81 @@ export default async function TeamsPage() {
         (
           apfPlayerId,
         ) => {
-            const appPlayer =
+            const apfPlayer =
+              apfPlayerById.get(
+                apfPlayerId,
+              );
+
+
+            const webPlayerByApf =
+              webPlayerByApfId.get(
+                apfPlayerId,
+              );
+
+
+            let appPlayer =
               appPlayerByApfId.get(
                 apfPlayerId,
               );
 
 
+            /*
+             * Pokud v players chybí APF ID,
+             * zkusíme nejdřív explicitní propojení
+             * z web_player_profiles.app_player_id.
+             */
+            if (
+              !appPlayer &&
+              webPlayerByApf?.app_player_id
+            ) {
+              appPlayer =
+                appPlayerById.get(
+                  webPlayerByApf.app_player_id,
+                );
+            }
+
+
+            /*
+             * Poslední bezpečný fallback je jméno.
+             *
+             * Klíč je nezávislý na pořadí slov,
+             * takže spojí například:
+             * "Pejšek Karel" <-> "Karel Pejšek".
+             */
+            if (
+              !appPlayer
+            ) {
+              const candidateName =
+                webPlayerByApf?.name ??
+                apfPlayer?.name ??
+                "";
+
+
+              const nameKey =
+                normalizePlayerNameKey(
+                  candidateName,
+                );
+
+
+              if (
+                nameKey
+              ) {
+                appPlayer =
+                  appPlayerByName.get(
+                    nameKey,
+                  );
+              }
+            }
+
+
             const webPlayer =
-              webPlayerByApfId.get(
-                apfPlayerId,
-              ) ??
+              webPlayerByApf ??
               (
                 appPlayer
                   ? webPlayerByAppId.get(
                       appPlayer.id,
                     )
                   : undefined
-              );
-
-
-            const apfPlayer =
-              apfPlayerById.get(
-                apfPlayerId,
               );
 
 
@@ -1197,6 +1273,40 @@ function clean(
       " ",
     )
     .trim();
+}
+
+
+function normalizePlayerNameKey(
+  value:
+    string,
+): string {
+  const normalized =
+    normalizeText(
+      value,
+    );
+
+
+  if (
+    !normalized
+  ) {
+    return "";
+  }
+
+
+  return normalized
+    .split(" ")
+    .filter(Boolean)
+    .sort(
+      (
+        a,
+        b,
+      ) =>
+        a.localeCompare(
+          b,
+          "cs",
+        ),
+    )
+    .join(" ");
 }
 
 

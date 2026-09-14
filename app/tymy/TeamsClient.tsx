@@ -1069,52 +1069,92 @@ function PlayerImage({
   player:
     TeamsPlayer;
 }) {
-  const initial =
-    player.imageUrl ??
-    (
-      player.apfPlayerId !==
-      null
-        ? `/images/${player.apfPlayerId}.png`
-        : ""
+  const candidates =
+    Array.from(
+      new Set(
+        [
+          player.apfPlayerId !==
+            null
+            ? `/images/${player.apfPlayerId}.png`
+            : null,
+
+          player.apfPlayerId !==
+            null
+            ? `/images/${player.apfPlayerId}.jpg`
+            : null,
+
+          player.imageUrl,
+        ].filter(
+          (
+            value,
+          ): value is string =>
+            Boolean(
+              value,
+            ),
+        ),
+      ),
     );
 
-  if (!initial) {
+
+  if (
+    candidates.length ===
+    0
+  ) {
     return null;
   }
+
 
   return (
     <img
       className={
         styles.playerImage
       }
-      src={initial}
-      alt={player.name}
+      src={
+        candidates[0]
+      }
+      alt={
+        player.name
+      }
+      data-fallback-index="0"
       onError={(
         event,
       ) => {
         const image =
           event.currentTarget;
 
-        const step =
-          image.dataset
-            .fallback ??
-          "";
+
+        const currentIndex =
+          Number(
+            image.dataset
+              .fallbackIndex ??
+              "0",
+          );
+
+
+        const nextIndex =
+          currentIndex +
+          1;
+
 
         if (
-          step ===
-            "" &&
-          player.apfPlayerId !==
-            null
+          nextIndex <
+          candidates.length
         ) {
           image.dataset
-            .fallback =
-            "jpg";
+            .fallbackIndex =
+            String(
+              nextIndex,
+            );
+
 
           image.src =
-            `/images/${player.apfPlayerId}.jpg`;
+            candidates[
+              nextIndex
+            ];
 
           return;
         }
+
 
         image.style.display =
           "none";
@@ -1122,7 +1162,6 @@ function PlayerImage({
     />
   );
 }
-
 
 /* ============================================================
    STATISTIKY
