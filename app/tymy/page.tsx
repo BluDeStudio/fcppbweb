@@ -17,6 +17,62 @@ import TeamsClient, {
 
 
 /* ============================================================
+   AUTORITATIVNÍ SOUPISKA 2026/27
+   ============================================================ */
+
+const A_TEAM_IDS =
+  new Set<number>([
+    2945,
+    6703,
+    7040,
+    1385,
+    6209,
+    4397,
+    6919,
+    1562,
+    5143,
+    3746,
+    963,
+    6700,
+  ]);
+
+
+const B_TEAM_IDS =
+  new Set<number>([
+    532,
+    2024,
+    2947,
+    6917,
+    4455,
+    6615,
+    6616,
+    4637,
+    6946,
+    3389,
+    4247,
+    6959,
+    6387,
+    5161,
+    1743,
+    1744,
+    3937,
+    997,
+    3931,
+  ]);
+
+
+const LOAN_PLAYER_IDS =
+  new Set<number>([
+    1385,
+    4397,
+    963,
+    532,
+    4247,
+    3931,
+  ]);
+
+
+/* ============================================================
    TYPES
    ============================================================ */
 
@@ -149,14 +205,14 @@ export default async function TeamsPage() {
 
 
   /* ============================================================
-     1. DATA NAČTEME PARALELNĚ
+     1. DATA
      ============================================================ */
 
   const [
     webPlayersResponse,
     appPlayersResponse,
-    apfAResult,
-    apfBResult,
+    apfAPlayers,
+    apfBPlayers,
   ] =
     await Promise.all([
       supabase
@@ -164,10 +220,6 @@ export default async function TeamsPage() {
           "web_player_profiles",
         )
         .select("*")
-        .eq(
-          "active",
-          true,
-        )
         .order(
           "name",
           {
@@ -247,16 +299,8 @@ export default async function TeamsPage() {
     ) as unknown as AppPlayerRow[];
 
 
-  const apfAPlayers =
-    apfAResult;
-
-
-  const apfBPlayers =
-    apfBResult;
-
-
   /* ============================================================
-     2. MAPY HRÁČŮ Z APLIKACE
+     2. MAPY
      ============================================================ */
 
   const appPlayerById =
@@ -298,10 +342,6 @@ export default async function TeamsPage() {
     }
   }
 
-
-  /* ============================================================
-     3. MAPY WEBOVÉHO ADMINU
-     ============================================================ */
 
   const webPlayerByAppId =
     new Map<
@@ -347,26 +387,6 @@ export default async function TeamsPage() {
   }
 
 
-  /* ============================================================
-     4. APF SOUPISKA
-     ============================================================
-     APF nám automaticky říká, kdo je na soupisce A a kdo B.
-
-     Pokud je hráč na obou soupiskách APF:
-     team = "both"
-
-     WEB ADMIN je ale autorita nad APF.
-     Pokud má hráč web_player_profiles.team,
-     použije se ruční nastavení z adminu.
-     ============================================================ */
-
-  const apfMembership =
-    new Map<
-      number,
-      "a" | "b" | "both"
-    >();
-
-
   const apfPlayerById =
     new Map<
       number,
@@ -376,38 +396,11 @@ export default async function TeamsPage() {
 
   for (
     const player
-    of apfAPlayers
+    of [
+      ...apfAPlayers,
+      ...apfBPlayers,
+    ]
   ) {
-    apfMembership.set(
-      player.id,
-      "a",
-    );
-
-    apfPlayerById.set(
-      player.id,
-      player,
-    );
-  }
-
-
-  for (
-    const player
-    of apfBPlayers
-  ) {
-    const current =
-      apfMembership.get(
-        player.id,
-      );
-
-
-    apfMembership.set(
-      player.id,
-      current === "a"
-        ? "both"
-        : "b",
-    );
-
-
     if (
       !apfPlayerById.has(
         player.id,
@@ -422,334 +415,176 @@ export default async function TeamsPage() {
 
 
   /* ============================================================
-     5. SOUPISKA = UNION APF + WEB ADMIN
+     3. SOUPISKA
      ============================================================ */
 
-  const squadByKey =
-    new Map<
-      string,
-      TeamsPlayer
-    >();
+  const rosterIds =
+    [
+      ...A_TEAM_IDS,
+      ...B_TEAM_IDS,
+    ];
 
 
-  /*
-   * ------------------------------------------------------------
-   * 5A. Nejprve všichni hráči z APF.
-   * ------------------------------------------------------------
-   */
-
-  for (
-    const [
-      apfId,
-      apfPlayer,
-    ]
-    of apfPlayerById
-  ) {
-    const appPlayer =
-      appPlayerByApfId.get(
-        apfId,
-      );
-
-
-    const webPlayer =
-      webPlayerByApfId.get(
-        apfId,
-      ) ??
-      (
-        appPlayer
-          ? webPlayerByAppId.get(
-              appPlayer.id,
-            )
-          : undefined
-      );
-
-
-    /*
-     * Když existuje webový profil,
-     * jeho tým je ruční override z ADMINU.
-     *
-     * Jinak použijeme skutečnou APF soupisku.
-     */
-
-    const team =
-      webPlayer
-        ? normalizeSquadTeam(
-            webPlayer.team,
-          )
-        : (
-            apfMembership.get(
-              apfId,
-            ) ??
-            apfPlayer.team
-          );
-
-
-    const appPlayerId =
-      webPlayer?.app_player_id ??
-      appPlayer?.id ??
-      null;
-
-
-    const number =
-      webPlayer?.shirt_number ??
-      appPlayer?.number ??
-      apfPlayer.shirtNumber ??
-      null;
-
-
-    const position =
-      normalizePosition(
-        appPlayer?.position ??
-        webPlayer?.position ??
-        apfPlayer.position,
-      );
-
-
-    const imageUrl =
-      webPlayer?.image_url ??
-      `/images/${apfId}.png`;
-
-
-    const id =
-      webPlayer?.id ??
-      `apf:${apfId}`;
-
-
-    const key =
-      appPlayerId
-        ? `app:${appPlayerId}`
-        : `apf:${apfId}`;
-
-
-    squadByKey.set(
-      key,
-      {
-        id,
-
-        appPlayerId,
-
-        apfPlayerId:
-          apfId,
-
-        name:
-          webPlayer?.name ??
-          appPlayer?.name ??
-          apfPlayer.name,
-
-        team,
-
-        number,
-
-        position,
-
-        status:
-          webPlayer?.status ===
-            "loan" ||
-          apfPlayer.status ===
-            "loan"
-            ? "loan"
-            : "club",
-
-        imageUrl,
-      },
-    );
-  }
-
-
-  /*
-   * ------------------------------------------------------------
-   * 5B. Přidáme webové hráče,
-   * kteří ještě na APF soupisce nejsou.
-   *
-   * Typicky nová posila nebo hráč,
-   * kterého chceš na webu zobrazit ručně.
-   * ------------------------------------------------------------
-   */
-
-  for (
-    const webPlayer
-    of webPlayers
-  ) {
-    let appPlayer:
-      AppPlayerRow | undefined;
-
-
-    if (
-      webPlayer.app_player_id
-    ) {
-      appPlayer =
-        appPlayerById.get(
-          webPlayer.app_player_id,
-        );
-    }
-
-
-    if (
-      !appPlayer &&
-      webPlayer.apf_player_id !==
-        null &&
-      webPlayer.apf_player_id !==
-        undefined
-    ) {
-      appPlayer =
-        appPlayerByApfId.get(
-          Number(
-            webPlayer.apf_player_id,
-          ),
-        );
-    }
-
-
-    const apfId =
-      webPlayer.apf_player_id ??
-      appPlayer?.apf_player_id ??
-      null;
-
-
-    const appPlayerId =
-      webPlayer.app_player_id ??
-      appPlayer?.id ??
-      null;
-
-
-    const key =
-      appPlayerId
-        ? `app:${appPlayerId}`
-        : apfId !==
-            null
-          ? `apf:${apfId}`
-          : `web:${webPlayer.id}`;
-
-
-    /*
-     * Pokud už hráč přišel z APF,
-     * pouze případně přepíšeme webová data.
-     */
-
-    const current =
-      squadByKey.get(
-        key,
-      );
-
-
-    const merged:
-      TeamsPlayer = {
-        id:
-          webPlayer.id,
-
-        appPlayerId,
-
-        apfPlayerId:
-          apfId,
-
-        name:
-          webPlayer.name ||
-          current?.name ||
-          appPlayer?.name ||
-          "Neznámý hráč",
-
-        team:
-          normalizeSquadTeam(
-            webPlayer.team,
-          ),
-
-        number:
-          webPlayer.shirt_number ??
-          current?.number ??
-          appPlayer?.number ??
-          null,
-
-        position:
-          normalizePosition(
-            appPlayer?.position ??
-            webPlayer.position ??
-            current?.position ??
-            "Hráč",
-          ),
-
-        status:
-          webPlayer.status ===
-          "loan"
-            ? "loan"
-            : current?.status ??
-              "club",
-
-        imageUrl:
-          webPlayer.image_url ??
-          current?.imageUrl ??
+  const squad:
+    TeamsPlayer[] =
+      rosterIds
+        .map(
           (
-            apfId !==
-            null
-              ? `/images/${apfId}.png`
-              : null
-          ),
-      };
+            apfPlayerId,
+          ) => {
+            const appPlayer =
+              appPlayerByApfId.get(
+                apfPlayerId,
+              );
 
 
-    squadByKey.set(
-      key,
-      merged,
-    );
-  }
+            const webPlayer =
+              webPlayerByApfId.get(
+                apfPlayerId,
+              ) ??
+              (
+                appPlayer
+                  ? webPlayerByAppId.get(
+                      appPlayer.id,
+                    )
+                  : undefined
+              );
 
 
-  const squad =
-    Array.from(
-      squadByKey.values(),
-    )
-      .filter(
-        (
-          player,
-        ) => {
-          /*
-           * Pokud je propojen s appkou a hráč
-           * je tam explicitně neaktivní,
-           * nechceme ho ukazovat pouze tehdy,
-           * když zároveň není na APF soupisce.
-           *
-           * APF je pro aktuální soupisku silný signál.
-           */
-          if (
-            !player.appPlayerId
-          ) {
-            return true;
-          }
+            const apfPlayer =
+              apfPlayerById.get(
+                apfPlayerId,
+              );
 
 
-          const appPlayer =
-            appPlayerById.get(
-              player.appPlayerId,
+            const name =
+              clean(
+                webPlayer?.name ??
+                appPlayer?.name ??
+                apfPlayer?.name ??
+                "",
+              );
+
+
+            if (
+              !name
+            ) {
+              console.warn(
+                `TÝMY – hráč APF #${apfPlayerId} nebyl nalezen.`,
+              );
+
+              return null;
+            }
+
+
+            const position =
+              normalizePosition(
+                appPlayer?.position ??
+                webPlayer?.position ??
+                apfPlayer?.position ??
+                "Hráč",
+              );
+
+
+            const number =
+              webPlayer?.shirt_number ??
+              appPlayer?.number ??
+              apfPlayer?.shirtNumber ??
+              null;
+
+
+            const team:
+              "a" | "b" =
+                A_TEAM_IDS.has(
+                  apfPlayerId,
+                )
+                  ? "a"
+                  : "b";
+
+
+            const status:
+              "club" | "loan" =
+                LOAN_PLAYER_IDS.has(
+                  apfPlayerId,
+                ) ||
+                webPlayer?.status ===
+                  "loan" ||
+                apfPlayer?.status ===
+                  "loan"
+                  ? "loan"
+                  : "club";
+
+
+            const imageUrl =
+              webPlayer?.image_url ??
+              `/images/${apfPlayerId}.png`;
+
+
+            return {
+              id:
+                webPlayer?.id ??
+                appPlayer?.id ??
+                `apf:${apfPlayerId}`,
+
+              appPlayerId:
+                webPlayer?.app_player_id ??
+                appPlayer?.id ??
+                null,
+
+              apfPlayerId,
+
+              name,
+
+              team,
+
+              number,
+
+              position,
+
+              status,
+
+              imageUrl,
+            } satisfies TeamsPlayer;
+          },
+        )
+        .filter(
+          (
+            player,
+          ): player is TeamsPlayer =>
+            player !== null,
+        )
+        .sort(
+          (
+            a,
+            b,
+          ) => {
+            const positionDifference =
+              positionOrder(
+                a.position,
+              ) -
+              positionOrder(
+                b.position,
+              );
+
+
+            if (
+              positionDifference !==
+              0
+            ) {
+              return positionDifference;
+            }
+
+
+            return a.name.localeCompare(
+              b.name,
+              "cs",
             );
-
-
-          if (
-            appPlayer?.is_active !==
-            false
-          ) {
-            return true;
-          }
-
-
-          return (
-            player.apfPlayerId !==
-              null &&
-            apfMembership.has(
-              player.apfPlayerId,
-            )
-          );
-        },
-      )
-      .sort(
-        (a, b) =>
-          a.name.localeCompare(
-            b.name,
-            "cs",
-          ),
-      );
+          },
+        );
 
 
   /* ============================================================
-     6. CLUB ID
+     4. CLUB ID
      ============================================================ */
 
   let clubId:
@@ -803,11 +638,6 @@ export default async function TeamsPage() {
   }
 
 
-  /*
-   * Fallback:
-   * první aktivní hráč z aplikace.
-   */
-
   if (
     !clubId
   ) {
@@ -828,7 +658,7 @@ export default async function TeamsPage() {
 
 
   /* ============================================================
-     7. FINISHED MATCHES
+     5. FINISHED MATCHES
      ============================================================ */
 
   let finishedMatches:
@@ -875,7 +705,7 @@ export default async function TeamsPage() {
 
 
   /* ============================================================
-     8. AKTIVNÍ OBDOBÍ
+     6. AKTIVNÍ OBDOBÍ
      ============================================================ */
 
   let periodStart:
@@ -950,7 +780,7 @@ export default async function TeamsPage() {
 
 
   /* ============================================================
-     9. ZÁPASY AKTIVNÍHO OBDOBÍ
+     7. ZÁPASY AKTIVNÍHO OBDOBÍ
      ============================================================ */
 
   const seasonMatches =
@@ -1017,7 +847,7 @@ export default async function TeamsPage() {
 
 
   /* ============================================================
-     10. FINISHED MATCH PLAYER STATS
+     8. FINISHED MATCH PLAYER STATS
      ============================================================ */
 
   let statRows:
@@ -1065,7 +895,7 @@ export default async function TeamsPage() {
 
 
   /* ============================================================
-     11. MAPY SOUPISKY PRO STATISTIKY
+     9. SOUPISKA PODLE APP PLAYER ID
      ============================================================ */
 
   const squadByAppId =
@@ -1091,14 +921,7 @@ export default async function TeamsPage() {
 
 
   /* ============================================================
-     12. STATISTIKY
-     ============================================================
-     DŮLEŽITÉ:
-     soupiskové A/B zde vůbec nerozhoduje.
-
-     Tým statistiky určuje pouze finished_matches.team.
-
-     Identita hráče je pouze player_id.
+     10. STATISTIKY
      ============================================================ */
 
   const statsMap =
@@ -1240,10 +1063,6 @@ export default async function TeamsPage() {
     }
 
 
-    /* --------------------------------------------------------
-       STARTY
-       -------------------------------------------------------- */
-
     if (
       !row.matchIds.includes(
         stat.finished_match_id,
@@ -1258,10 +1077,6 @@ export default async function TeamsPage() {
         1;
     }
 
-
-    /* --------------------------------------------------------
-       GÓLY + ASISTENCE + BODY
-       -------------------------------------------------------- */
 
     row.goals +=
       safeNumber(
@@ -1280,10 +1095,6 @@ export default async function TeamsPage() {
       row.assists;
 
 
-    /* --------------------------------------------------------
-       HRÁČ ZÁPASU
-       -------------------------------------------------------- */
-
     if (
       stat.is_player_of_the_match ===
       true
@@ -1292,10 +1103,6 @@ export default async function TeamsPage() {
         1;
     }
 
-
-    /* --------------------------------------------------------
-       ZNÁMKA
-       -------------------------------------------------------- */
 
     const rating =
       nullableNumber(
@@ -1329,10 +1136,6 @@ export default async function TeamsPage() {
       statsMap.values(),
     );
 
-
-  /* ============================================================
-     OUTPUT
-     ============================================================ */
 
   return (
     <TeamsClient
@@ -1385,44 +1188,16 @@ async function safeGetSquad({
    HELPERS
    ============================================================ */
 
-function normalizeSquadTeam(
+function clean(
   value:
-    string | null,
-):
-  | "a"
-  | "b"
-  | "both" {
-  const normalized =
-    normalizeText(
-      value,
-    );
-
-
-  if (
-    normalized ===
-      "b" ||
-    normalized.includes(
-      "b tym",
+    string,
+): string {
+  return value
+    .replace(
+      /\s+/g,
+      " ",
     )
-  ) {
-    return "b";
-  }
-
-
-  if (
-    normalized ===
-      "both" ||
-    normalized ===
-      "a b" ||
-    normalized.includes(
-      "oba",
-    )
-  ) {
-    return "both";
-  }
-
-
-  return "a";
+    .trim();
 }
 
 
@@ -1550,6 +1325,46 @@ function normalizePosition(
 }
 
 
+function positionOrder(
+  position:
+    string,
+): number {
+  if (
+    position ===
+    "Brankář"
+  ) {
+    return 0;
+  }
+
+
+  if (
+    position ===
+    "Obránce"
+  ) {
+    return 1;
+  }
+
+
+  if (
+    position ===
+    "Záložník"
+  ) {
+    return 2;
+  }
+
+
+  if (
+    position ===
+    "Útočník"
+  ) {
+    return 3;
+  }
+
+
+  return 4;
+}
+
+
 function normalizeText(
   value:
     string | null,
@@ -1589,12 +1404,6 @@ function normalizeDate(
     value.trim();
 
 
-  /*
-   * YYYY-MM-DD
-   * YYYY-MM-DD HH:mm
-   * YYYY-MM-DDTHH:mm
-   */
-
   if (
     /^\d{4}-\d{2}-\d{2}/.test(
       trimmed,
@@ -1606,11 +1415,6 @@ function normalizeDate(
     );
   }
 
-
-  /*
-   * DD.MM.YYYY
-   * DD.MM.YYYY HH:mm
-   */
 
   const czechDate =
     trimmed.match(
