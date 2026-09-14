@@ -284,13 +284,6 @@ function Hero() {
 
       <div
         className={
-          styles.heroLight
-        }
-        aria-hidden="true"
-      />
-
-      <div
-        className={
           styles.heroLogoGhost
         }
         aria-hidden="true"
@@ -924,15 +917,21 @@ function PlayerOfMatchCard({
         className={
           styles.pomRatingCorner
         }
-        title={
-          player.ratingVotes > 0
-            ? `Hodnocení z ${player.ratingVotes} hlasů`
-            : "Hodnocení zatím není dostupné"
+        aria-label={
+          player.rating !== null
+            ? `Známka ${player.rating.toFixed(1)}`
+            : "Známka není dostupná"
         }
       >
-        {player.rating !== null
-          ? player.rating.toFixed(1)
-          : "—"}
+        <small>
+          ZNÁMKA
+        </small>
+
+        <strong>
+          {player.rating !== null
+            ? player.rating.toFixed(1)
+            : "—"}
+        </strong>
       </div>
 
       <div
