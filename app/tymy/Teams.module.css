@@ -1,0 +1,1674 @@
+.page {
+  --bg: #050605;
+  --panel: #090c0a;
+  --panel-soft: #0c100d;
+
+  --green: #53f20a;
+
+  --text: #f5f7f5;
+  --muted: #7e867f;
+
+  --line:
+    rgba(
+      255,
+      255,
+      255,
+      .1
+    );
+
+  --line-strong:
+    rgba(
+      255,
+      255,
+      255,
+      .17
+    );
+
+  --heading:
+    "Arial Narrow",
+    "Roboto Condensed",
+    "Helvetica Neue",
+    Arial,
+    sans-serif;
+
+  min-height:
+    100vh;
+
+  color:
+    var(--text);
+
+  background:
+    var(--bg);
+}
+
+
+/* =========================================================
+   SHELL
+   ========================================================= */
+
+.shell {
+  width:
+    min(
+      1440px,
+      calc(
+        100% - 48px
+      )
+    );
+
+  margin:
+    0 auto;
+
+  padding-bottom:
+    80px;
+}
+
+
+/* =========================================================
+   HERO
+   ========================================================= */
+
+.hero {
+  position:
+    relative;
+
+  min-height:
+    300px;
+
+  display:
+    flex;
+
+  align-items:
+    flex-end;
+
+  overflow:
+    hidden;
+
+  border-bottom:
+    1px solid
+    var(--line);
+
+  background:
+    radial-gradient(
+      circle
+      at 72% 30%,
+      rgba(
+        83,
+        242,
+        10,
+        .11
+      ),
+      transparent
+      34%
+    ),
+    linear-gradient(
+      135deg,
+      #050605,
+      #0b0f0c
+      70%,
+      #050605
+    );
+}
+
+.hero::after {
+  position:
+    absolute;
+
+  right:
+    5%;
+
+  bottom:
+    -220px;
+
+  width:
+    500px;
+
+  height:
+    500px;
+
+  content:
+    "";
+
+  border:
+    1px solid
+    rgba(
+      83,
+      242,
+      10,
+      .08
+    );
+
+  border-radius:
+    50%;
+}
+
+.heroGlow {
+  position:
+    absolute;
+
+  top:
+    -150px;
+
+  right:
+    10%;
+
+  width:
+    500px;
+
+  height:
+    500px;
+
+  pointer-events:
+    none;
+
+  background:
+    radial-gradient(
+      circle,
+      rgba(
+        83,
+        242,
+        10,
+        .12
+      ),
+      transparent
+      65%
+    );
+}
+
+.heroInner {
+  position:
+    relative;
+
+  z-index:
+    2;
+
+  width:
+    min(
+      1440px,
+      calc(
+        100% - 48px
+      )
+    );
+
+  margin:
+    0 auto;
+
+  padding-bottom:
+    48px;
+}
+
+.heroEyebrow {
+  display:
+    block;
+
+  margin-bottom:
+    11px;
+
+  color:
+    var(--green);
+
+  font-size:
+    9px;
+
+  font-weight:
+    1000;
+
+  letter-spacing:
+    .18em;
+}
+
+.hero h1 {
+  margin:
+    0;
+
+  font-family:
+    var(--heading);
+
+  font-size:
+    clamp(
+      74px,
+      9vw,
+      128px
+    );
+
+  font-weight:
+    1000;
+
+  line-height:
+    .78;
+
+  letter-spacing:
+    -.065em;
+}
+
+.hero p {
+  margin:
+    23px
+    0
+    0;
+
+  color:
+    #8b938d;
+
+  font-size:
+    9px;
+
+  font-weight:
+    1000;
+
+  letter-spacing:
+    .14em;
+}
+
+
+/* =========================================================
+   SECTION
+   ========================================================= */
+
+.section {
+  padding-top:
+    58px;
+}
+
+.sectionHeader {
+  margin-bottom:
+    24px;
+
+  display:
+    flex;
+
+  align-items:
+    flex-end;
+
+  justify-content:
+    space-between;
+
+  gap:
+    25px;
+}
+
+.sectionTitle {
+  position:
+    relative;
+
+  min-height:
+    46px;
+
+  padding:
+    5px
+    0
+    10px
+    28px;
+
+  display:
+    flex;
+
+  align-items:
+    flex-end;
+
+  border-bottom:
+    1px solid
+    rgba(
+      255,
+      255,
+      255,
+      .14
+    );
+}
+
+.sectionTitle::before {
+  position:
+    absolute;
+
+  top:
+    0;
+
+  left:
+    0;
+
+  width:
+    18px;
+
+  height:
+    25px;
+
+  content:
+    "";
+
+  border-left:
+    2px solid
+    var(--green);
+
+  border-top:
+    2px solid
+    var(--green);
+}
+
+.sectionTitle::after {
+  position:
+    absolute;
+
+  left:
+    17px;
+
+  bottom:
+    -1px;
+
+  width:
+    100px;
+
+  height:
+    1px;
+
+  content:
+    "";
+
+  background:
+    linear-gradient(
+      90deg,
+      var(--green),
+      transparent
+    );
+}
+
+.sectionTitle h2 {
+  margin:
+    0;
+
+  font-family:
+    var(--heading);
+
+  font-size:
+    clamp(
+      30px,
+      3vw,
+      44px
+    );
+
+  font-weight:
+    1000;
+
+  line-height:
+    .9;
+
+  letter-spacing:
+    -.045em;
+}
+
+
+/* =========================================================
+   TOGGLE
+   ========================================================= */
+
+.toggle {
+  display:
+    flex;
+
+  padding:
+    3px;
+
+  border:
+    1px solid
+    var(--line);
+
+  background:
+    #090c0a;
+}
+
+.toggle button {
+  min-width:
+    92px;
+
+  height:
+    40px;
+
+  padding:
+    0
+    16px;
+
+  border:
+    0;
+
+  color:
+    #828a84;
+
+  background:
+    transparent;
+
+  font-size:
+    8px;
+
+  font-weight:
+    1000;
+
+  cursor:
+    pointer;
+
+  transition:
+    color
+    .22s
+    ease,
+    background
+    .22s
+    ease;
+}
+
+.toggle button:hover {
+  color:
+    #fff;
+}
+
+.toggle .toggleActive {
+  color:
+    #071006;
+
+  background:
+    var(--green);
+}
+
+
+/* =========================================================
+   SOUPISKA GRID
+   ========================================================= */
+
+.squadGrid {
+  display:
+    grid;
+
+  grid-template-columns:
+    repeat(
+      4,
+      minmax(
+        0,
+        1fr
+      )
+    );
+
+  gap:
+    14px;
+}
+
+
+/* =========================================================
+   PLAYER CARD
+   ========================================================= */
+
+.playerCard {
+  position:
+    relative;
+
+  min-height:
+    390px;
+
+  overflow:
+    hidden;
+
+  border:
+    1px solid
+    var(--line-strong);
+
+  color:
+    inherit;
+
+  background:
+    radial-gradient(
+      circle
+      at 60% 35%,
+      rgba(
+        83,
+        242,
+        10,
+        .055
+      ),
+      transparent
+      38%
+    ),
+    var(--panel);
+
+  text-decoration:
+    none;
+
+  transition:
+    transform
+    .3s
+    ease,
+    border-color
+    .3s
+    ease,
+    box-shadow
+    .3s
+    ease;
+}
+
+.playerCard::after {
+  position:
+    absolute;
+
+  inset:
+    0;
+
+  z-index:
+    4;
+
+  content:
+    "";
+
+  pointer-events:
+    none;
+
+  background:
+    linear-gradient(
+      0deg,
+      rgba(
+        5,
+        6,
+        5,
+        .98
+      )
+      0%,
+      rgba(
+        5,
+        6,
+        5,
+        .72
+      )
+      24%,
+      transparent
+      55%
+    );
+}
+
+.playerCardGlow {
+  position:
+    absolute;
+
+  top:
+    -80%;
+
+  left:
+    -50%;
+
+  z-index:
+    8;
+
+  width:
+    30%;
+
+  height:
+    250%;
+
+  pointer-events:
+    none;
+
+  opacity:
+    0;
+
+  background:
+    linear-gradient(
+      105deg,
+      transparent,
+      rgba(
+        255,
+        255,
+        255,
+        .13
+      ),
+      rgba(
+        83,
+        242,
+        10,
+        .1
+      ),
+      transparent
+    );
+
+  transform:
+    skewX(
+      -18deg
+    );
+}
+
+.playerWatermark {
+  position:
+    absolute;
+
+  top:
+    12%;
+
+  right:
+    -7%;
+
+  z-index:
+    1;
+
+  width:
+    70%;
+
+  height:
+    64%;
+
+  object-fit:
+    contain;
+
+  opacity:
+    .035;
+
+  filter:
+    grayscale(
+      1
+    );
+}
+
+.playerImage {
+  position:
+    absolute;
+
+  z-index:
+    3;
+
+  right:
+    -8%;
+
+  bottom:
+    0;
+
+  width:
+    116%;
+
+  height:
+    92%;
+
+  object-fit:
+    contain;
+
+  object-position:
+    center
+    bottom;
+
+  filter:
+    drop-shadow(
+      0
+      18px
+      24px
+      rgba(
+        0,
+        0,
+        0,
+        .45
+      )
+    );
+
+  transition:
+    transform
+    .35s
+    ease;
+}
+
+.playerCardCopy {
+  position:
+    absolute;
+
+  z-index:
+    7;
+
+  right:
+    18px;
+
+  bottom:
+    18px;
+
+  left:
+    18px;
+}
+
+.playerCardCopy > span {
+  display:
+    block;
+
+  margin-bottom:
+    7px;
+
+  color:
+    var(--green);
+
+  font-size:
+    7px;
+
+  font-weight:
+    1000;
+
+  letter-spacing:
+    .11em;
+}
+
+.playerCardCopy h3 {
+  margin:
+    0;
+
+  font-family:
+    var(--heading);
+
+  font-size:
+    clamp(
+      24px,
+      2vw,
+      32px
+    );
+
+  font-weight:
+    1000;
+
+  line-height:
+    .86;
+
+  letter-spacing:
+    -.045em;
+
+  text-transform:
+    uppercase;
+}
+
+.playerCardCopy h3 strong {
+  display:
+    block;
+
+  color:
+    var(--green);
+}
+
+.playerCardCopy small {
+  display:
+    block;
+
+  margin-top:
+    12px;
+
+  color:
+    #737b75;
+
+  font-size:
+    6px;
+
+  font-weight:
+    1000;
+
+  letter-spacing:
+    .12em;
+}
+
+.playerArrow {
+  position:
+    absolute;
+
+  z-index:
+    9;
+
+  top:
+    13px;
+
+  right:
+    15px;
+
+  color:
+    rgba(
+      255,
+      255,
+      255,
+      .35
+    );
+
+  font-size:
+    20px;
+
+  transition:
+    color
+    .25s
+    ease,
+    transform
+    .25s
+    ease;
+}
+
+@media
+(hover:hover)
+and
+(pointer:fine) {
+
+  .playerCard:hover {
+    transform:
+      translateY(
+        -5px
+      );
+
+    border-color:
+      rgba(
+        83,
+        242,
+        10,
+        .4
+      );
+
+    box-shadow:
+      0
+      20px
+      40px
+      rgba(
+        0,
+        0,
+        0,
+        .36
+      ),
+      0
+      0
+      26px
+      rgba(
+        83,
+        242,
+        10,
+        .055
+      );
+  }
+
+  .playerCard:hover
+  .playerImage {
+    transform:
+      scale(
+        1.045
+      )
+      translateY(
+        -3px
+      );
+  }
+
+  .playerCard:hover
+  .playerArrow {
+    color:
+      var(--green);
+
+    transform:
+      translateX(
+        3px
+      );
+  }
+
+  .playerCard:hover
+  .playerCardGlow {
+    opacity:
+      1;
+
+    animation:
+      playerSweep
+      .8s
+      ease
+      forwards;
+  }
+}
+
+
+/* =========================================================
+   STATS CARD
+   ========================================================= */
+
+.statsCard {
+  overflow:
+    hidden;
+
+  border:
+    1px solid
+    var(--line-strong);
+
+  background:
+    var(--panel-soft);
+}
+
+.statsHeader,
+.statsRow {
+  display:
+    grid;
+
+  grid-template-columns:
+    46px
+    minmax(
+      230px,
+      1fr
+    )
+    82px
+    82px
+    82px
+    95px
+    82px
+    110px;
+
+  align-items:
+    center;
+
+  box-sizing:
+    border-box;
+}
+
+.statsHeader {
+  min-height:
+    48px;
+
+  padding:
+    0
+    18px;
+
+  background:
+    rgba(
+      255,
+      255,
+      255,
+      .018
+    );
+
+  color:
+    #747c76;
+
+  font-size:
+    7px;
+
+  font-weight:
+    1000;
+}
+
+.statsHeader >
+* {
+  min-width:
+    0;
+}
+
+.statsHeader >
+*:not(
+  .playerColumn
+):not(
+  .positionColumn
+) {
+  text-align:
+    center;
+}
+
+.statsRow {
+  position:
+    relative;
+
+  min-height:
+    68px;
+
+  padding:
+    0
+    18px;
+
+  border-top:
+    1px solid
+    rgba(
+      255,
+      255,
+      255,
+      .06
+    );
+
+  color:
+    #afb6b0;
+
+  font-size:
+    9px;
+
+  transition:
+    background
+    .2s
+    ease;
+}
+
+.statsRow >
+span:not(
+  .positionColumn
+),
+.statsRow >
+b,
+.statsRow >
+strong.rating {
+  text-align:
+    center;
+}
+
+.positionColumn {
+  color:
+    #707871;
+
+  font-size:
+    8px;
+}
+
+.playerColumn {
+  text-align:
+    left;
+}
+
+
+/* =========================================================
+   STAT PLAYER
+   ========================================================= */
+
+.statsPlayer {
+  min-width:
+    0;
+
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  gap:
+    12px;
+
+  color:
+    inherit;
+
+  text-decoration:
+    none;
+}
+
+.statsPlayer >
+div:last-child {
+  min-width:
+    0;
+
+  display:
+    grid;
+
+  gap:
+    4px;
+}
+
+.statsPlayer strong {
+  overflow:
+    hidden;
+
+  color:
+    #fff;
+
+  font-size:
+    10px;
+
+  text-overflow:
+    ellipsis;
+
+  white-space:
+    nowrap;
+}
+
+.statsPlayer small {
+  color:
+    var(--green);
+
+  font-size:
+    5px;
+
+  font-weight:
+    1000;
+}
+
+.playerThumb {
+  position:
+    relative;
+
+  width:
+    40px;
+
+  height:
+    40px;
+
+  flex:
+    0 0
+    40px;
+
+  overflow:
+    hidden;
+
+  display:
+    grid;
+
+  place-items:
+    center;
+
+  border:
+    1px solid
+    rgba(
+      255,
+      255,
+      255,
+      .08
+    );
+
+  background:
+    #070907;
+}
+
+.playerThumb img {
+  position:
+    absolute;
+
+  z-index:
+    2;
+
+  width:
+    100%;
+
+  height:
+    100%;
+
+  object-fit:
+    contain;
+
+  object-position:
+    center
+    bottom;
+}
+
+.playerThumb span {
+  position:
+    relative;
+
+  z-index:
+    1;
+
+  color:
+    #6f7771;
+
+  font-size:
+    7px;
+
+  font-weight:
+    1000;
+}
+
+
+/* =========================================================
+   STATS VALUES
+   ========================================================= */
+
+.statsRow b {
+  color:
+    #fff;
+
+  font-size:
+    12px;
+}
+
+.rating {
+  color:
+    #fff;
+
+  font-size:
+    11px;
+}
+
+.topRow {
+  background:
+    linear-gradient(
+      90deg,
+      rgba(
+        83,
+        242,
+        10,
+        .07
+      ),
+      transparent
+      55%
+    );
+}
+
+.topRow::before {
+  position:
+    absolute;
+
+  top:
+    0;
+
+  bottom:
+    0;
+
+  left:
+    0;
+
+  width:
+    2px;
+
+  content:
+    "";
+
+  background:
+    var(--green);
+
+  opacity:
+    .65;
+}
+
+.statsRow:hover {
+  background:
+    linear-gradient(
+      90deg,
+      rgba(
+        83,
+        242,
+        10,
+        .11
+      ),
+      rgba(
+        83,
+        242,
+        10,
+        .02
+      )
+    );
+}
+
+
+/* =========================================================
+   SORT BUTTON
+   ========================================================= */
+
+.sortButton {
+  height:
+    48px;
+
+  padding:
+    0;
+
+  border:
+    0;
+
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    center;
+
+  gap:
+    5px;
+
+  color:
+    #747c76;
+
+  background:
+    transparent;
+
+  font-size:
+    7px;
+
+  font-weight:
+    1000;
+
+  cursor:
+    pointer;
+}
+
+.sortButton:hover {
+  color:
+    #fff;
+}
+
+.sortButton i {
+  color:
+    var(--green);
+
+  font-size:
+    9px;
+
+  font-style:
+    normal;
+}
+
+.sortActive {
+  color:
+    #fff;
+}
+
+
+/* =========================================================
+   ANIMATIONS
+   ========================================================= */
+
+@keyframes playerSweep {
+
+  from {
+    left:
+      -50%;
+  }
+
+  to {
+    left:
+      130%;
+  }
+}
+
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media
+(max-width: 1100px) {
+
+  .squadGrid {
+    grid-template-columns:
+      repeat(
+        3,
+        minmax(
+          0,
+          1fr
+        )
+      );
+  }
+
+  .statsHeader,
+  .statsRow {
+    grid-template-columns:
+      40px
+      minmax(
+        190px,
+        1fr
+      )
+      65px
+      65px
+      65px
+      76px
+      65px
+      90px;
+  }
+}
+
+
+@media
+(max-width: 820px) {
+
+  .squadGrid {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(
+          0,
+          1fr
+        )
+      );
+  }
+
+  .statsCard {
+    overflow-x:
+      auto;
+
+    -webkit-overflow-scrolling:
+      touch;
+  }
+
+  .statsHeader,
+  .statsRow {
+    min-width:
+      780px;
+  }
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media
+(max-width: 650px) {
+
+  .shell,
+  .heroInner {
+    width:
+      calc(
+        100% - 20px
+      );
+  }
+
+  .shell {
+    padding-bottom:
+      50px;
+  }
+
+  .hero {
+    min-height:
+      235px;
+  }
+
+  .heroInner {
+    padding-bottom:
+      31px;
+  }
+
+  .heroEyebrow {
+    font-size:
+      7px;
+  }
+
+  .hero h1 {
+    font-size:
+      64px;
+  }
+
+  .hero p {
+    margin-top:
+      17px;
+
+    font-size:
+      7px;
+
+    letter-spacing:
+      .1em;
+  }
+
+  .section {
+    padding-top:
+      42px;
+  }
+
+  .sectionHeader {
+    margin-bottom:
+      18px;
+
+    flex-direction:
+      column;
+
+    align-items:
+      stretch;
+
+    gap:
+      13px;
+  }
+
+  .sectionTitle {
+    min-height:
+      38px;
+
+    padding:
+      4px
+      0
+      8px
+      23px;
+  }
+
+  .sectionTitle h2 {
+    font-size:
+      28px;
+  }
+
+  .toggle {
+    width:
+      100%;
+  }
+
+  .toggle button {
+    min-width:
+      0;
+
+    flex:
+      1;
+
+    height:
+      38px;
+
+    padding:
+      0
+      8px;
+
+    font-size:
+      7px;
+  }
+
+  .squadGrid {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(
+          0,
+          1fr
+        )
+      );
+
+    gap:
+      8px;
+  }
+
+  .playerCard {
+    min-height:
+      260px;
+  }
+
+  .playerImage {
+    right:
+      -14%;
+
+    width:
+      128%;
+
+    height:
+      89%;
+  }
+
+  .playerWatermark {
+    top:
+      14%;
+
+    right:
+      -15%;
+
+    width:
+      83%;
+  }
+
+  .playerCardCopy {
+    right:
+      11px;
+
+    bottom:
+      12px;
+
+    left:
+      11px;
+  }
+
+  .playerCardCopy >
+  span {
+    margin-bottom:
+      5px;
+
+    font-size:
+      5px;
+  }
+
+  .playerCardCopy h3 {
+    font-size:
+      19px;
+  }
+
+  .playerCardCopy small {
+    margin-top:
+      8px;
+
+    font-size:
+      5px;
+  }
+
+  .playerArrow {
+    top:
+      8px;
+
+    right:
+      9px;
+
+    font-size:
+      15px;
+  }
+
+  .statsCard {
+    margin-right:
+      -10px;
+
+    margin-left:
+      -10px;
+  }
+
+  .statsHeader,
+  .statsRow {
+    min-width:
+      700px;
+  }
+}
+
+
+/* =========================================================
+   EXTRA SMALL
+   ========================================================= */
+
+@media
+(max-width: 390px) {
+
+  .squadGrid {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(
+          0,
+          1fr
+        )
+      );
+  }
+
+  .playerCard {
+    min-height:
+      235px;
+  }
+
+  .playerCardCopy h3 {
+    font-size:
+      17px;
+  }
+}
+
+
+/* =========================================================
+   REDUCED MOTION
+   ========================================================= */
+
+@media
+(prefers-reduced-motion: reduce) {
+
+  .playerCard,
+  .playerImage,
+  .playerArrow {
+    transition:
+      none !important;
+  }
+
+  .playerCardGlow {
+    display:
+      none;
+  }
+}
