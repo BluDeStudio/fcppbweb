@@ -1,1319 +1,1380 @@
-"use client";
+import { supabase } from "@/lib/supabase";
 
-import Link from "next/link";
-import {
-  useMemo,
-  useState,
-} from "react";
+import TeamsClient, {
+  type TeamsPlayer,
+  type TeamsStatRow,
+} from "./TeamsClient";
 
-import styles from "./Teams.module.css";
 
-type TeamKey =
-  | "a"
-  | "b"
-  | "all";
+/* ============================================================
+   TYPES
+   ============================================================ */
 
-type SquadTeam =
-  | "a"
-  | "b";
-
-type SortKey =
-  | "matches"
-  | "goals"
-  | "assists"
-  | "points"
-  | "playerOfMatch"
-  | "rating";
-
-type SortDirection =
-  | "asc"
-  | "desc";
-
-type Player = {
-  id: number;
+type WebPlayerRow = {
+  id: string;
   name: string;
-  number: number | null;
-  position: string;
-  team: SquadTeam;
-  imageUrl?: string | null;
+
+  team:
+    | "a"
+    | "b"
+    | "both";
+
+  position:
+    | "player"
+    | "goalkeeper"
+    | string;
+
+  status:
+    | "club"
+    | "loan";
+
+  shirt_number:
+    number | null;
+
+  image_url:
+    string | null;
+
+  apf_player_id:
+    number | null;
+
+  app_player_id:
+    string | null;
+
+  active:
+    boolean | null;
 };
 
-type PlayerStats = {
-  playerId: number;
-  team: SquadTeam;
 
-  matches: number;
-  goals: number;
-  assists: number;
-  playerOfMatch: number;
+type AppPlayerRow = {
+  id: string;
 
-  rating: number | null;
+  club_id:
+    string;
+
+  name:
+    string;
+
+  number:
+    number | null;
+
+  position:
+    string | null;
+
+  apf_player_id:
+    number | null;
+
+  is_active:
+    boolean | null;
 };
 
-const PLAYERS: Player[] = [
-  {
-    id: 2945,
-    name: "Radim Červeňák",
-    number: null,
-    position: "HRÁČ",
-    team: "a",
-  },
-  {
-    id: 6703,
-    name: "Michal Himmer",
-    number: null,
-    position: "HRÁČ",
-    team: "a",
-  },
-  {
-    id: 7040,
-    name: "David Chlupáč",
-    number: null,
-    position: "HRÁČ",
-    team: "a",
-  },
-  {
-    id: 1385,
-    name: "Jan Jebas",
-    number: null,
-    position: "BRANKÁŘ",
-    team: "a",
-  },
-  {
-    id: 6209,
-    name: "Petr Jelínek",
-    number: null,
-    position: "HRÁČ",
-    team: "a",
-  },
-  {
-    id: 4397,
-    name: "Martin Kopřiva",
-    number: null,
-    position: "HRÁČ",
-    team: "a",
-  },
-  {
-    id: 6919,
-    name: "Jan Koutecki",
-    number: null,
-    position: "HRÁČ",
-    team: "a",
-  },
-  {
-    id: 1562,
-    name: "Petr Porada",
-    number: null,
-    position: "HRÁČ",
-    team: "a",
-  },
-  {
-    id: 5143,
-    name: "Aleš Psohlavec",
-    number: null,
-    position: "HRÁČ",
-    team: "a",
-  },
-  {
-    id: 3746,
-    name: "Vojtěch Suchý",
-    number: null,
-    position: "HRÁČ",
-    team: "a",
-  },
-  {
-    id: 963,
-    name: "Jan Šebek",
-    number: null,
-    position: "HRÁČ",
-    team: "a",
-  },
-  {
-    id: 6700,
-    name: "Jan Vlček",
-    number: null,
-    position: "HRÁČ",
-    team: "a",
-  },
 
-  {
-    id: 532,
-    name: "David Bass",
-    number: null,
-    position: "HRÁČ",
-    team: "b",
-  },
-  {
-    id: 2024,
-    name: "Jiří Bešta",
-    number: null,
-    position: "HRÁČ",
-    team: "b",
-  },
-  {
-    id: 2947,
-    name: "Radek Červeňák",
-    number: null,
-    position: "HRÁČ",
-    team: "b",
-  },
-  {
-    id: 6917,
-    name: "František Husák",
-    number: null,
-    position: "HRÁČ",
-    team: "b",
-  },
-  {
-    id: 4455,
-    name: "David Kolářský",
-    number: null,
-    position: "HRÁČ",
-    team: "b",
-  },
-  {
-    id: 6615,
-    name: "Peter Kotlár",
-    number: null,
-    position: "HRÁČ",
-    team: "b",
-  },
-  {
-    id: 6616,
-    name: "Vojtěch Kselík",
-    number: null,
-    position: "HRÁČ",
-    team: "b",
-  },
-  {
-    id: 4637,
-    name: "Maxim Negru",
-    number: null,
-    position: "HRÁČ",
-    team: "b",
-  },
-  {
-    id: 6946,
-    name: "Adam Nekola",
-    number: null,
-    position: "BRANKÁŘ",
-    team: "b",
-  },
-  {
-    id: 3389,
-    name: "Jakub Onody",
-    number: null,
-    position: "BRANKÁŘ",
-    team: "b",
-  },
-  {
-    id: 4247,
-    name: "Michaela Onody Šloufová",
-    number: null,
-    position: "HRÁČ",
-    team: "b",
-  },
-  {
-    id: 6959,
-    name: "Karel Pejšek",
-    number: null,
-    position: "HRÁČ",
-    team: "b",
-  },
-  {
-    id: 6387,
-    name: "David Pelikán",
-    number: null,
-    position: "HRÁČ",
-    team: "b",
-  },
-  {
-    id: 5161,
-    name: "Vojtěch Plaček",
-    number: null,
-    position: "HRÁČ",
-    team: "b",
-  },
-  {
-    id: 1743,
-    name: "Jiří Rajtolar",
-    number: null,
-    position: "HRÁČ",
-    team: "b",
-  },
-  {
-    id: 1744,
-    name: "Stanislav Rajtolar",
-    number: null,
-    position: "HRÁČ",
-    team: "b",
-  },
-  {
-    id: 3937,
-    name: "David Schmirler",
-    number: null,
-    position: "HRÁČ",
-    team: "b",
-  },
-  {
-    id: 997,
-    name: "Jiří Stehlík",
-    number: null,
-    position: "HRÁČ",
-    team: "b",
-  },
-  {
-    id: 3931,
-    name: "Lukáš Tintěra",
-    number: null,
-    position: "HRÁČ",
-    team: "b",
-  },
-];
+type FinishedMatchRow = {
+  id: string;
 
-/*
-  DOČASNÉ STATISTIKY
+  club_id:
+    string;
 
-  Až napojíme data z aplikace / Supabase,
-  tahle konstanta zmizí a nahradí ji fetch/service.
+  team:
+    string;
 
-  Struktura už je ale připravená.
-*/
+  date:
+    string;
+};
 
-const PLAYER_STATS: PlayerStats[] = [
-  {
-    playerId: 1385,
-    team: "a",
-    matches: 2,
-    goals: 0,
-    assists: 0,
-    playerOfMatch: 1,
-    rating: 9.5,
-  },
-  {
-    playerId: 7040,
-    team: "a",
-    matches: 2,
-    goals: 3,
-    assists: 0,
-    playerOfMatch: 1,
-    rating: 9.6,
-  },
-  {
-    playerId: 3746,
-    team: "a",
-    matches: 2,
-    goals: 1,
-    assists: 0,
-    playerOfMatch: 1,
-    rating: 9.5,
-  },
-  {
-    playerId: 6616,
-    team: "b",
-    matches: 2,
-    goals: 0,
-    assists: 0,
-    playerOfMatch: 1,
-    rating: 8.8,
-  },
-];
 
-export default function TeamsPage() {
-  const [
-    squadTeam,
-    setSquadTeam,
-  ] =
-    useState<SquadTeam>("a");
+type FinishedStatRow = {
+  finished_match_id:
+    string;
 
-  const [
-    statsTeam,
-    setStatsTeam,
-  ] =
-    useState<TeamKey>("a");
+  player_id:
+    string | null;
 
-  const [
-    sortKey,
-    setSortKey,
-  ] =
-    useState<SortKey>(
-      "points",
-    );
+  player_number:
+    number | null;
 
-  const [
-    sortDirection,
-    setSortDirection,
-  ] =
-    useState<SortDirection>(
-      "desc",
-    );
+  goals:
+    number | null;
 
-  const squadPlayers =
-    useMemo(() => {
-      return PLAYERS.filter(
-        (player) =>
-          player.team ===
-          squadTeam,
-      );
-    }, [squadTeam]);
+  assists:
+    number | null;
 
-  const statsRows =
-    useMemo(() => {
-      const map =
-        new Map<
-          number,
-          {
-            player: Player;
-            matches: number;
-            goals: number;
-            assists: number;
-            points: number;
-            playerOfMatch: number;
-            rating: number | null;
-            ratingCount: number;
-          }
-        >();
+  average_rating:
+    number | null;
 
-      for (
-        const player of PLAYERS
-      ) {
-        map.set(
-          player.id,
-          {
-            player,
-            matches: 0,
-            goals: 0,
-            assists: 0,
-            points: 0,
-            playerOfMatch: 0,
-            rating: null,
-            ratingCount: 0,
-          },
-        );
-      }
+  is_player_of_the_match:
+    boolean | null;
+};
 
-      for (
-        const stat of PLAYER_STATS
-      ) {
-        const row =
-          map.get(
-            stat.playerId,
-          );
 
-        if (!row) {
-          continue;
-        }
+type PeriodRow = {
+  start_date:
+    string | null;
 
-        if (
-          statsTeam !==
-            "all" &&
-          stat.team !==
-            statsTeam
-        ) {
-          continue;
-        }
+  end_date:
+    string | null;
 
-        row.matches +=
-          stat.matches;
+  is_active:
+    boolean | null;
 
-        row.goals +=
-          stat.goals;
+  club_id:
+    string | null;
+};
 
-        row.assists +=
-          stat.assists;
 
-        row.points =
-          row.goals +
-          row.assists;
+/* ============================================================
+   PAGE
+   ============================================================ */
 
-        row.playerOfMatch +=
-          stat.playerOfMatch;
+export default async function TeamsPage() {
 
-        if (
-          stat.rating !==
-          null
-        ) {
-          const previousSum =
-            row.rating !==
-            null
-              ? row.rating *
-                row.ratingCount
-              : 0;
+  /* ============================================================
+     1. WEB PLAYER PROFILES
+     ============================================================ */
 
-          row.ratingCount +=
-            1;
-
-          row.rating =
-            (
-              previousSum +
-              stat.rating
-            ) /
-            row.ratingCount;
-        }
-      }
-
-      let result =
-        Array.from(
-          map.values(),
-        );
-
-      if (
-        statsTeam !==
-        "all"
-      ) {
-        result =
-          result.filter(
-            (row) =>
-              row.player
-                .team ===
-              statsTeam,
-          );
-      }
-
-      result.sort(
-        (
-          first,
-          second,
-        ) => {
-          const firstValue =
-            getSortValue(
-              first,
-              sortKey,
-            );
-
-          const secondValue =
-            getSortValue(
-              second,
-              sortKey,
-            );
-
-          if (
-            firstValue ===
-            secondValue
-          ) {
-            return first.player.name.localeCompare(
-              second.player.name,
-              "cs",
-            );
-          }
-
-          if (
-            sortDirection ===
-            "desc"
-          ) {
-            return (
-              secondValue -
-              firstValue
-            );
-          }
-
-          return (
-            firstValue -
-            secondValue
-          );
+  const {
+    data:
+      rawWebPlayers,
+    error:
+      webPlayersError,
+  } =
+    await supabase
+      .from(
+        "web_player_profiles",
+      )
+      .select("*")
+      .eq(
+        "active",
+        true,
+      )
+      .order(
+        "name",
+        {
+          ascending:
+            true,
         },
       );
 
-      return result;
-    }, [
-      statsTeam,
-      sortKey,
-      sortDirection,
-    ]);
 
-  function handleSort(
-    key: SortKey,
+  if (
+    webPlayersError
   ) {
-    if (
-      sortKey === key
-    ) {
-      setSortDirection(
-        (current) =>
-          current ===
-          "desc"
-            ? "asc"
-            : "desc",
-      );
-
-      return;
-    }
-
-    setSortKey(key);
-    setSortDirection(
-      "desc",
+    console.error(
+      "TÝMY – web_player_profiles:",
+      webPlayersError,
     );
   }
 
-  return (
-    <main
-      className={
-        styles.page
+
+  const webPlayers =
+    (
+      rawWebPlayers ??
+      []
+    ) as unknown as WebPlayerRow[];
+
+
+  /* ============================================================
+     2. PLAYERS Z APLIKACE
+     ============================================================ */
+
+  const {
+    data:
+      rawAppPlayers,
+    error:
+      appPlayersError,
+  } =
+    await supabase
+      .from(
+        "players",
+      )
+      .select("*")
+      .order(
+        "name",
+        {
+          ascending:
+            true,
+        },
+      );
+
+
+  if (
+    appPlayersError
+  ) {
+    console.error(
+      "TÝMY – players:",
+      appPlayersError,
+    );
+  }
+
+
+  const appPlayers =
+    (
+      rawAppPlayers ??
+      []
+    ) as unknown as AppPlayerRow[];
+
+
+  /* ============================================================
+     PLAYER MAPS
+     ============================================================ */
+
+  const appPlayerById =
+    new Map<
+      string,
+      AppPlayerRow
+    >();
+
+
+  const appPlayerByApfId =
+    new Map<
+      number,
+      AppPlayerRow
+    >();
+
+
+  for (
+    const player
+    of appPlayers
+  ) {
+    appPlayerById.set(
+      player.id,
+      player,
+    );
+
+
+    if (
+      player.apf_player_id !==
+      null &&
+      player.apf_player_id !==
+      undefined
+    ) {
+      appPlayerByApfId.set(
+        Number(
+          player.apf_player_id,
+        ),
+        player,
+      );
+    }
+  }
+
+
+  /* ============================================================
+     3. CLUB ID
+     ============================================================ */
+
+  let clubId:
+    string | null =
+      null;
+
+
+  for (
+    const webPlayer
+    of webPlayers
+  ) {
+
+    if (
+      webPlayer.app_player_id
+    ) {
+      const appPlayer =
+        appPlayerById.get(
+          webPlayer.app_player_id,
+        );
+
+
+      if (
+        appPlayer?.club_id
+      ) {
+        clubId =
+          appPlayer.club_id;
+
+        break;
       }
-    >
-      <section
-        className={
-          styles.hero
-        }
-      >
-        <div
-          className={
-            styles.heroGlow
+    }
+
+
+    if (
+      webPlayer.apf_player_id !==
+      null &&
+      webPlayer.apf_player_id !==
+      undefined
+    ) {
+      const appPlayer =
+        appPlayerByApfId.get(
+          Number(
+            webPlayer.apf_player_id,
+          ),
+        );
+
+
+      if (
+        appPlayer?.club_id
+      ) {
+        clubId =
+          appPlayer.club_id;
+
+        break;
+      }
+    }
+  }
+
+
+  /*
+   * Fallback:
+   * první aktivní hráč.
+   */
+
+  if (
+    !clubId
+  ) {
+    const firstActivePlayer =
+      appPlayers.find(
+        (
+          player,
+        ) =>
+          player.is_active !==
+          false,
+      );
+
+
+    clubId =
+      firstActivePlayer?.club_id ??
+      null;
+  }
+
+
+  /* ============================================================
+     4. SOUPISKA
+     ============================================================ */
+
+  const squad:
+    TeamsPlayer[] =
+      webPlayers.map(
+        (
+          webPlayer,
+        ) => {
+
+          let appPlayer:
+            AppPlayerRow | undefined;
+
+
+          if (
+            webPlayer.app_player_id
+          ) {
+            appPlayer =
+              appPlayerById.get(
+                webPlayer.app_player_id,
+              );
           }
-        />
 
-        <div
-          className={
-            styles.heroInner
+
+          if (
+            !appPlayer &&
+            webPlayer.apf_player_id !==
+              null &&
+            webPlayer.apf_player_id !==
+              undefined
+          ) {
+            appPlayer =
+              appPlayerByApfId.get(
+                Number(
+                  webPlayer.apf_player_id,
+                ),
+              );
           }
-        >
-          <span
-            className={
-              styles.heroEyebrow
-            }
-          >
-            FC PPB · FUTSAL PLZEŇ
-          </span>
 
-          <h1>
-            TÝMY.
-          </h1>
 
-          <p>
-            SOUPISKA · STATISTIKY · VÝKONY
-          </p>
-        </div>
-      </section>
+          const apfId =
+            webPlayer.apf_player_id ??
+            appPlayer?.apf_player_id ??
+            null;
 
-      <div
-        className={
-          styles.shell
-        }
-      >
-        {/* =================================================
-            SOUPISKA
-        ================================================= */}
 
-        <section
-          className={
-            styles.section
-          }
-        >
-          <div
-            className={
-              styles.sectionHeader
-            }
-          >
-            <SectionTitle
-              title="SOUPISKA HRÁČŮ."
-            />
+          const imageUrl =
+            webPlayer.image_url ??
+            (
+              apfId !==
+              null
+                ? `/images/${apfId}.png`
+                : null
+            );
 
-            <TeamToggle
-              value={
-                squadTeam
-              }
-              options={[
-                {
-                  value: "a",
-                  label: "A-TÝM",
-                },
-                {
-                  value: "b",
-                  label: "B-TÝM",
-                },
-              ]}
-              onChange={(
-                value,
-              ) =>
-                setSquadTeam(
-                  value as SquadTeam,
-                )
-              }
-            />
-          </div>
 
-          <div
-            className={
-              styles.squadGrid
-            }
-          >
-            {squadPlayers.map(
-              (player) => (
-                <PlayerCard
-                  key={
-                    player.id
-                  }
-                  player={
-                    player
-                  }
-                />
+          return {
+            id:
+              webPlayer.id,
+
+            appPlayerId:
+              webPlayer.app_player_id ??
+              appPlayer?.id ??
+              null,
+
+            apfPlayerId:
+              apfId,
+
+            name:
+              webPlayer.name,
+
+            team:
+              normalizeSquadTeam(
+                webPlayer.team,
               ),
-            )}
-          </div>
-        </section>
 
-        {/* =================================================
-            STATISTIKY
-        ================================================= */}
+            number:
+              webPlayer.shirt_number ??
+              appPlayer?.number ??
+              null,
 
-        <section
-          className={
-            styles.section
-          }
-        >
-          <div
-            className={
-              styles.sectionHeader
-            }
-          >
-            <SectionTitle
-              title="STATISTIKY."
-            />
-
-            <TeamToggle
-              value={
-                statsTeam
-              }
-              options={[
-                {
-                  value: "a",
-                  label: "A-TÝM",
-                },
-                {
-                  value: "b",
-                  label: "B-TÝM",
-                },
-                {
-                  value: "all",
-                  label: "CELKOVĚ",
-                },
-              ]}
-              onChange={(
-                value,
-              ) =>
-                setStatsTeam(
-                  value as TeamKey,
-                )
-              }
-            />
-          </div>
-
-          <div
-            className={
-              styles.statsCard
-            }
-          >
-            <div
-              className={
-                styles.statsHeader
-              }
-            >
-              <span
-                className={
-                  styles.positionColumn
-                }
-              >
-                #
-              </span>
-
-              <span
-                className={
-                  styles.playerColumn
-                }
-              >
-                HRÁČ
-              </span>
-
-              <SortButton
-                label="Z"
-                sortKey="matches"
-                currentKey={
-                  sortKey
-                }
-                direction={
-                  sortDirection
-                }
-                onClick={
-                  handleSort
-                }
-              />
-
-              <SortButton
-                label="G"
-                sortKey="goals"
-                currentKey={
-                  sortKey
-                }
-                direction={
-                  sortDirection
-                }
-                onClick={
-                  handleSort
-                }
-              />
-
-              <SortButton
-                label="A"
-                sortKey="assists"
-                currentKey={
-                  sortKey
-                }
-                direction={
-                  sortDirection
-                }
-                onClick={
-                  handleSort
-                }
-              />
-
-              <SortButton
-                label="BODY"
-                sortKey="points"
-                currentKey={
-                  sortKey
-                }
-                direction={
-                  sortDirection
-                }
-                onClick={
-                  handleSort
-                }
-              />
-
-              <SortButton
-                label="HZ"
-                sortKey="playerOfMatch"
-                currentKey={
-                  sortKey
-                }
-                direction={
-                  sortDirection
-                }
-                onClick={
-                  handleSort
-                }
-              />
-
-              <SortButton
-                label="ZNÁMKA"
-                sortKey="rating"
-                currentKey={
-                  sortKey
-                }
-                direction={
-                  sortDirection
-                }
-                onClick={
-                  handleSort
-                }
-              />
-            </div>
-
-            {statsRows.map(
-              (
-                row,
-                index,
-              ) => (
-                <div
-                  key={
-                    row.player.id
-                  }
-                  className={`${styles.statsRow} ${
-                    index <
-                    3
-                      ? styles.topRow
-                      : ""
-                  }`}
-                >
-                  <span
-                    className={
-                      styles.positionColumn
-                    }
-                  >
-                    {index +
-                      1}.
-                  </span>
-
-                  <Link
-                    href={`/hrac/${row.player.id}`}
-                    className={
-                      styles.statsPlayer
-                    }
-                  >
-                    <PlayerThumb
-                      player={
-                        row.player
-                      }
-                    />
-
-                    <div>
-                      <strong>
-                        {
-                          row
-                            .player
-                            .name
-                        }
-                      </strong>
-
-                      <small>
-                        {row
-                          .player
-                          .team ===
-                        "a"
-                          ? "A-TÝM"
-                          : "B-TÝM"}
-                      </small>
-                    </div>
-                  </Link>
-
-                  <span>
-                    {
-                      row.matches
-                    }
-                  </span>
-
-                  <span>
-                    {
-                      row.goals
-                    }
-                  </span>
-
-                  <span>
-                    {
-                      row.assists
-                    }
-                  </span>
-
-                  <b>
-                    {
-                      row.points
-                    }
-                  </b>
-
-                  <span>
-                    {
-                      row.playerOfMatch
-                    }
-                  </span>
-
-                  <strong
-                    className={
-                      styles.rating
-                    }
-                  >
-                    {row.rating !==
-                    null
-                      ? row.rating.toFixed(
-                          1,
-                        )
-                      : "–"}
-                  </strong>
-                </div>
+            position:
+              normalizePosition(
+                appPlayer?.position ??
+                  webPlayer.position,
               ),
-            )}
-          </div>
-        </section>
-      </div>
-    </main>
-  );
-}
+
+            status:
+              webPlayer.status ===
+              "loan"
+                ? "loan"
+                : "club",
+
+            imageUrl,
+          };
+        },
+      );
 
 
-/* =========================================================
-   PLAYER CARD
-   ========================================================= */
+  /* ============================================================
+     5. FINISHED MATCHES
+     ============================================================ */
 
-function PlayerCard({
-  player,
-}: {
-  player: Player;
-}) {
-  return (
-    <Link
-      href={`/hrac/${player.id}`}
-      className={
-        styles.playerCard
-      }
-    >
-      <div
-        className={
-          styles.playerCardGlow
-        }
-      />
-
-      <img
-        className={
-          styles.playerWatermark
-        }
-        src="/images/fc-ppb-logo.png"
-        alt=""
-        aria-hidden="true"
-      />
-
-      <PlayerImage
-        player={player}
-      />
-
-      <div
-        className={
-          styles.playerCardCopy
-        }
-      >
-        <span>
-          {player.position}
-        </span>
-
-        <h3>
-          {formatPlayerName(
-            player.name,
-          )}
-        </h3>
-
-        <small>
-          {player.team ===
-          "a"
-            ? "A-TÝM"
-            : "B-TÝM"}
-        </small>
-      </div>
-
-      <div
-        className={
-          styles.playerArrow
-        }
-      >
-        →
-      </div>
-    </Link>
-  );
-}
+  let finishedMatches:
+    FinishedMatchRow[] =
+      [];
 
 
-/* =========================================================
-   PLAYER IMAGE
-   ========================================================= */
+  if (
+    clubId
+  ) {
+    const {
+      data:
+        rawMatches,
+      error:
+        matchesError,
+    } =
+      await supabase
+        .from(
+          "finished_matches",
+        )
+        .select("*")
+        .eq(
+          "club_id",
+          clubId,
+        );
 
-function PlayerImage({
-  player,
-}: {
-  player: Player;
-}) {
-  return (
-    <img
-      className={
-        styles.playerImage
-      }
-      src={`/images/${player.id}.png`}
-      alt={player.name}
-      onError={(
-        event,
+
+    if (
+      matchesError
+    ) {
+      console.error(
+        "TÝMY – finished_matches:",
+        matchesError,
+      );
+    }
+
+
+    finishedMatches =
+      (
+        rawMatches ??
+        []
+      ) as unknown as FinishedMatchRow[];
+  }
+
+
+  /* ============================================================
+     6. AKTIVNÍ OBDOBÍ
+     ============================================================ */
+
+  let periodStart:
+    string | null =
+      null;
+
+
+  let periodEnd:
+    string | null =
+      null;
+
+
+  if (
+    clubId
+  ) {
+    const {
+      data:
+        rawPeriod,
+      error:
+        periodError,
+    } =
+      await supabase
+        .from(
+          "periods",
+        )
+        .select("*")
+        .eq(
+          "club_id",
+          clubId,
+        )
+        .eq(
+          "is_active",
+          true,
+        )
+        .limit(1)
+        .maybeSingle();
+
+
+    if (
+      periodError
+    ) {
+      console.error(
+        "TÝMY – periods:",
+        periodError,
+      );
+    }
+
+
+    const period =
+      rawPeriod
+        ? (
+            rawPeriod as unknown as PeriodRow
+          )
+        : null;
+
+
+    if (
+      period
+    ) {
+      periodStart =
+        normalizeDate(
+          period.start_date,
+        );
+
+
+      periodEnd =
+        normalizeDate(
+          period.end_date,
+        );
+    }
+  }
+
+
+  /* ============================================================
+     7. ZÁPASY AKTIVNÍHO OBDOBÍ
+     ============================================================ */
+
+  const seasonMatches =
+    finishedMatches.filter(
+      (
+        match,
       ) => {
-        const image =
-          event.currentTarget;
 
-        const fallback =
-          image.dataset
-            .fallback ??
-          "";
+        /*
+         * Když není období nastavené,
+         * použijeme všechny zápasy.
+         */
 
         if (
-          fallback ===
-          ""
+          !periodStart ||
+          !periodEnd
         ) {
-          image.dataset
-            .fallback =
-            "jpg";
-
-          image.src =
-            `/images/${player.id}.jpg`;
-
-          return;
+          return true;
         }
+
+
+        const matchDate =
+          normalizeDate(
+            match.date,
+          );
+
 
         if (
-          fallback ===
-            "jpg" &&
-          player.imageUrl
+          !matchDate
         ) {
-          image.dataset
-            .fallback =
-            "remote";
-
-          image.src =
-            player.imageUrl;
-
-          return;
+          return false;
         }
 
-        image.style.display =
-          "none";
-      }}
+
+        return (
+          matchDate >=
+            periodStart &&
+          matchDate <=
+            periodEnd
+        );
+      },
+    );
+
+
+  const matchById =
+    new Map<
+      string,
+      FinishedMatchRow
+    >();
+
+
+  for (
+    const match
+    of seasonMatches
+  ) {
+    matchById.set(
+      match.id,
+      match,
+    );
+  }
+
+
+  const matchIds =
+    seasonMatches.map(
+      (
+        match,
+      ) =>
+        match.id,
+    );
+
+
+  /* ============================================================
+     8. FINISHED MATCH PLAYER STATS
+     ============================================================ */
+
+  let statRows:
+    FinishedStatRow[] =
+      [];
+
+
+  if (
+    matchIds.length >
+    0
+  ) {
+    const {
+      data:
+        rawStats,
+      error:
+        statsError,
+    } =
+      await supabase
+        .from(
+          "finished_match_player_stats",
+        )
+        .select("*")
+        .in(
+          "finished_match_id",
+          matchIds,
+        );
+
+
+    if (
+      statsError
+    ) {
+      console.error(
+        "TÝMY – finished_match_player_stats:",
+        statsError,
+      );
+    }
+
+
+    statRows =
+      (
+        rawStats ??
+        []
+      ) as unknown as FinishedStatRow[];
+  }
+
+
+  /* ============================================================
+     9. SOUPISKA PODLE APP PLAYER ID
+     ============================================================ */
+
+  const squadByAppId =
+    new Map<
+      string,
+      TeamsPlayer
+    >();
+
+
+  for (
+    const player
+    of squad
+  ) {
+    if (
+      player.appPlayerId
+    ) {
+      squadByAppId.set(
+        player.appPlayerId,
+        player,
+      );
+    }
+  }
+
+
+  /* ============================================================
+     10. STATISTIKY
+     ============================================================ */
+
+  const statsMap =
+    new Map<
+      string,
+      TeamsStatRow
+    >();
+
+
+  for (
+    const stat
+    of statRows
+  ) {
+
+    /*
+     * Identita hráče JE player_id.
+     *
+     * Číslo dresu nepoužíváme
+     * pro identifikaci.
+     */
+
+    if (
+      !stat.player_id
+    ) {
+      continue;
+    }
+
+
+    const match =
+      matchById.get(
+        stat.finished_match_id,
+      );
+
+
+    if (
+      !match
+    ) {
+      continue;
+    }
+
+
+    /*
+     * Tým určuje ZÁPAS,
+     * nikoliv kmen hráče.
+     *
+     * Takže B hráč může normálně
+     * figurovat ve statistikách A.
+     */
+
+    const team =
+      normalizeStatsTeam(
+        match.team,
+      );
+
+
+    if (
+      !team
+    ) {
+      continue;
+    }
+
+
+    const appPlayer =
+      appPlayerById.get(
+        stat.player_id,
+      );
+
+
+    const squadPlayer =
+      squadByAppId.get(
+        stat.player_id,
+      );
+
+
+    const playerName =
+      squadPlayer?.name ??
+      appPlayer?.name ??
+      "Neznámý hráč";
+
+
+    const apfPlayerId =
+      squadPlayer?.apfPlayerId ??
+      appPlayer?.apf_player_id ??
+      null;
+
+
+    /*
+     * Jeden hráč může mít:
+     *
+     * a:UUID
+     * b:UUID
+     *
+     * takže A/B statistiky
+     * vedeme samostatně.
+     */
+
+    const key =
+      `${team}:${stat.player_id}`;
+
+
+    let row =
+      statsMap.get(
+        key,
+      );
+
+
+    if (
+      !row
+    ) {
+      row = {
+        playerId:
+          stat.player_id,
+
+        apfPlayerId,
+
+        name:
+          playerName,
+
+        position:
+          normalizePosition(
+            appPlayer?.position ??
+              squadPlayer?.position ??
+              "Hráč",
+          ),
+
+        squadTeam:
+          squadPlayer?.team ??
+          null,
+
+        team,
+
+        matches:
+          0,
+
+        goals:
+          0,
+
+        assists:
+          0,
+
+        points:
+          0,
+
+        motm:
+          0,
+
+        rating:
+          null,
+
+        ratingSum:
+          0,
+
+        ratingCount:
+          0,
+
+        matchIds:
+          [],
+      };
+
+
+      statsMap.set(
+        key,
+        row,
+      );
+    }
+
+
+    /* ========================================================
+       STARTY
+       ======================================================== */
+
+    if (
+      !row.matchIds.includes(
+        stat.finished_match_id,
+      )
+    ) {
+      row.matchIds.push(
+        stat.finished_match_id,
+      );
+
+
+      row.matches +=
+        1;
+    }
+
+
+    /* ========================================================
+       GÓLY
+       ======================================================== */
+
+    row.goals +=
+      safeNumber(
+        stat.goals,
+      );
+
+
+    /* ========================================================
+       ASISTENCE
+       ======================================================== */
+
+    row.assists +=
+      safeNumber(
+        stat.assists,
+      );
+
+
+    /* ========================================================
+       BODY
+       ======================================================== */
+
+    row.points =
+      row.goals +
+      row.assists;
+
+
+    /* ========================================================
+       HRÁČ ZÁPASU
+       ======================================================== */
+
+    if (
+      stat.is_player_of_the_match ===
+      true
+    ) {
+      row.motm +=
+        1;
+    }
+
+
+    /* ========================================================
+       ZNÁMKA
+       ======================================================== */
+
+    const rating =
+      nullableNumber(
+        stat.average_rating,
+      );
+
+
+    if (
+      rating !==
+      null
+    ) {
+      row.ratingSum +=
+        rating;
+
+
+      row.ratingCount +=
+        1;
+
+
+      row.rating =
+        roundOne(
+          row.ratingSum /
+            row.ratingCount,
+        );
+    }
+  }
+
+
+  const stats =
+    Array.from(
+      statsMap.values(),
+    );
+
+
+  /* ============================================================
+     OUTPUT
+     ============================================================ */
+
+  return (
+    <TeamsClient
+      squad={
+        squad
+      }
+      stats={
+        stats
+      }
     />
   );
 }
 
-function PlayerThumb({
-  player,
-}: {
-  player: Player;
-}) {
-  return (
-    <div
-      className={
-        styles.playerThumb
-      }
-    >
-      <img
-        src={`/images/${player.id}.png`}
-        alt=""
-        onError={(
-          event,
-        ) => {
-          const image =
-            event.currentTarget;
 
-          if (
-            image.dataset
-              .fallback !==
-            "jpg"
-          ) {
-            image.dataset
-              .fallback =
-              "jpg";
-
-            image.src =
-              `/images/${player.id}.jpg`;
-
-            return;
-          }
-
-          image.style.display =
-            "none";
-        }}
-      />
-
-      <span>
-        {initials(
-          player.name,
-        )}
-      </span>
-    </div>
-  );
-}
-
-
-/* =========================================================
-   SECTION TITLE
-   ========================================================= */
-
-function SectionTitle({
-  title,
-}: {
-  title: string;
-}) {
-  return (
-    <div
-      className={
-        styles.sectionTitle
-      }
-    >
-      <h2>
-        {title}
-      </h2>
-    </div>
-  );
-}
-
-
-/* =========================================================
-   TEAM TOGGLE
-   ========================================================= */
-
-function TeamToggle({
-  value,
-  options,
-  onChange,
-}: {
-  value: string;
-
-  options: Array<{
-    value: string;
-    label: string;
-  }>;
-
-  onChange: (
-    value: string,
-  ) => void;
-}) {
-  return (
-    <div
-      className={
-        styles.toggle
-      }
-    >
-      {options.map(
-        (option) => (
-          <button
-            key={
-              option.value
-            }
-            type="button"
-            className={
-              value ===
-              option.value
-                ? styles.toggleActive
-                : ""
-            }
-            onClick={() =>
-              onChange(
-                option.value,
-              )
-            }
-          >
-            {
-              option.label
-            }
-          </button>
-        ),
-      )}
-    </div>
-  );
-}
-
-
-/* =========================================================
-   SORT
-   ========================================================= */
-
-function SortButton({
-  label,
-  sortKey,
-  currentKey,
-  direction,
-  onClick,
-}: {
-  label: string;
-  sortKey: SortKey;
-  currentKey: SortKey;
-  direction: SortDirection;
-
-  onClick: (
-    key: SortKey,
-  ) => void;
-}) {
-  const active =
-    sortKey ===
-    currentKey;
-
-  return (
-    <button
-      type="button"
-      className={`${styles.sortButton} ${
-        active
-          ? styles.sortActive
-          : ""
-      }`}
-      onClick={() =>
-        onClick(
-          sortKey,
-        )
-      }
-    >
-      <span>
-        {label}
-      </span>
-
-      {active ? (
-        <i>
-          {direction ===
-          "desc"
-            ? "↓"
-            : "↑"}
-        </i>
-      ) : null}
-    </button>
-  );
-}
-
-
-/* =========================================================
+/* ============================================================
    HELPERS
-   ========================================================= */
+   ============================================================ */
 
-function getSortValue(
-  row: {
-    matches: number;
-    goals: number;
-    assists: number;
-    points: number;
-    playerOfMatch: number;
-    rating: number | null;
-  },
-  key: SortKey,
-): number {
-  switch (key) {
-    case "matches":
-      return row.matches;
+function normalizeSquadTeam(
+  value:
+    string | null,
+):
+  | "a"
+  | "b"
+  | "both" {
 
-    case "goals":
-      return row.goals;
+  const normalized =
+    normalizeText(
+      value,
+    );
 
-    case "assists":
-      return row.assists;
-
-    case "points":
-      return row.points;
-
-    case "playerOfMatch":
-      return row.playerOfMatch;
-
-    case "rating":
-      return row.rating ?? -1;
-  }
-}
-
-function formatPlayerName(
-  name: string,
-) {
-  const parts =
-    name
-      .trim()
-      .split(/\s+/);
 
   if (
-    parts.length <
-    2
+    normalized ===
+      "b" ||
+    normalized.includes(
+      "b tym",
+    )
   ) {
-    return name;
+    return "b";
   }
 
-  const last =
-    parts.pop();
 
-  return (
-    <>
-      {parts.join(
-        " ",
-      )}
+  if (
+    normalized ===
+      "both" ||
+    normalized ===
+      "a b" ||
+    normalized.includes(
+      "oba",
+    )
+  ) {
+    return "both";
+  }
 
-      <strong>
-        {last}
-      </strong>
-    </>
-  );
+
+  return "a";
 }
 
-function initials(
-  value: string,
+
+function normalizeStatsTeam(
+  value:
+    string | null,
+):
+  | "a"
+  | "b"
+  | null {
+
+  const normalized =
+    normalizeText(
+      value,
+    );
+
+
+  if (
+    normalized ===
+      "a" ||
+    normalized ===
+      "a tym" ||
+    normalized ===
+      "ateam"
+  ) {
+    return "a";
+  }
+
+
+  if (
+    normalized ===
+      "b" ||
+    normalized ===
+      "b tym" ||
+    normalized ===
+      "bteam"
+  ) {
+    return "b";
+  }
+
+
+  return null;
+}
+
+
+function normalizePosition(
+  value:
+    string | null,
 ): string {
-  return value
-    .split(/\s+/)
-    .filter(Boolean)
-    .slice(0, 2)
-    .map(
-      (word) =>
-        word[0]
-          ?.toUpperCase() ??
-        "",
+
+  const original =
+    (
+      value ??
+      ""
+    ).trim();
+
+
+  const normalized =
+    normalizeText(
+      original,
+    );
+
+
+  if (
+    normalized.includes(
+      "brankar",
+    ) ||
+    normalized.includes(
+      "goalkeeper",
+    ) ||
+    normalized ===
+      "gk"
+  ) {
+    return "Brankář";
+  }
+
+
+  if (
+    normalized.includes(
+      "obrance",
+    ) ||
+    normalized.includes(
+      "defender",
     )
-    .join("");
+  ) {
+    return "Obránce";
+  }
+
+
+  if (
+    normalized.includes(
+      "zaloznik",
+    ) ||
+    normalized.includes(
+      "midfielder",
+    )
+  ) {
+    return "Záložník";
+  }
+
+
+  if (
+    normalized.includes(
+      "utocnik",
+    ) ||
+    normalized.includes(
+      "forward",
+    )
+  ) {
+    return "Útočník";
+  }
+
+
+  if (
+    normalized ===
+      "player" ||
+    normalized ===
+      "hrac" ||
+    !normalized
+  ) {
+    return "Hráč";
+  }
+
+
+  return original ||
+    "Hráč";
+}
+
+
+function normalizeText(
+  value:
+    string | null,
+): string {
+
+  return (
+    value ??
+    ""
+  )
+    .normalize(
+      "NFD",
+    )
+    .replace(
+      /[\u0300-\u036f]/g,
+      "",
+    )
+    .toLowerCase()
+    .replace(
+      /[^a-z0-9]+/g,
+      " ",
+    )
+    .trim();
+}
+
+
+function normalizeDate(
+  value:
+    string | null,
+): string {
+
+  if (
+    !value
+  ) {
+    return "";
+  }
+
+
+  const trimmed =
+    value.trim();
+
+
+  /*
+   * YYYY-MM-DD
+   */
+
+  if (
+    /^\d{4}-\d{2}-\d{2}/.test(
+      trimmed,
+    )
+  ) {
+    return trimmed.slice(
+      0,
+      10,
+    );
+  }
+
+
+  /*
+   * DD.MM.YYYY
+   * DD.MM.YYYY HH:mm
+   */
+
+  const czechDate =
+    trimmed.match(
+      /^(\d{1,2})\.(\d{1,2})\.(\d{4})/,
+    );
+
+
+  if (
+    czechDate
+  ) {
+    const day =
+      czechDate[1].padStart(
+        2,
+        "0",
+      );
+
+
+    const month =
+      czechDate[2].padStart(
+        2,
+        "0",
+      );
+
+
+    const year =
+      czechDate[3];
+
+
+    return `${year}-${month}-${day}`;
+  }
+
+
+  /*
+   * Fallback JS date
+   */
+
+  const parsed =
+    new Date(
+      trimmed,
+    );
+
+
+  if (
+    Number.isNaN(
+      parsed.getTime(),
+    )
+  ) {
+    return "";
+  }
+
+
+  const year =
+    parsed.getFullYear();
+
+
+  const month =
+    String(
+      parsed.getMonth() +
+        1,
+    ).padStart(
+      2,
+      "0",
+    );
+
+
+  const day =
+    String(
+      parsed.getDate(),
+    ).padStart(
+      2,
+      "0",
+    );
+
+
+  return `${year}-${month}-${day}`;
+}
+
+
+function safeNumber(
+  value:
+    unknown,
+): number {
+
+  const parsed =
+    Number(
+      value,
+    );
+
+
+  if (
+    !Number.isFinite(
+      parsed,
+    )
+  ) {
+    return 0;
+  }
+
+
+  return parsed;
+}
+
+
+function nullableNumber(
+  value:
+    unknown,
+): number | null {
+
+  if (
+    value ===
+      null ||
+    value ===
+      undefined ||
+    value ===
+      ""
+  ) {
+    return null;
+  }
+
+
+  const parsed =
+    Number(
+      value,
+    );
+
+
+  if (
+    !Number.isFinite(
+      parsed,
+    )
+  ) {
+    return null;
+  }
+
+
+  return parsed;
+}
+
+
+function roundOne(
+  value:
+    number,
+): number {
+
+  return (
+    Math.round(
+      value *
+        10,
+    ) /
+    10
+  );
 }

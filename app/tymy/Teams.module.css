@@ -1,28 +1,15 @@
 .page {
   --bg: #050605;
-  --panel: #090c0a;
-  --panel-soft: #0c100d;
+  --panel: #0a0c0a;
+  --panel-2: #101310;
 
   --green: #53f20a;
 
-  --text: #f5f7f5;
-  --muted: #7e867f;
+  --text: #f6f7f6;
+  --muted: #707871;
 
-  --line:
-    rgba(
-      255,
-      255,
-      255,
-      .1
-    );
-
-  --line-strong:
-    rgba(
-      255,
-      255,
-      255,
-      .17
-    );
+  --line: rgba(255,255,255,.09);
+  --line-strong: rgba(255,255,255,.15);
 
   --heading:
     "Arial Narrow",
@@ -31,14 +18,155 @@
     Arial,
     sans-serif;
 
-  min-height:
-    100vh;
+  min-height: 100vh;
 
-  color:
-    var(--text);
+  color: var(--text);
 
   background:
     var(--bg);
+}
+
+
+/* =========================================================
+   HERO
+   ========================================================= */
+
+.hero {
+  position: relative;
+
+  min-height: 300px;
+
+  overflow: hidden;
+
+  display: flex;
+
+  align-items: flex-end;
+
+  border-bottom:
+    1px solid
+    var(--line);
+
+  background:
+    radial-gradient(
+      circle at 77% 40%,
+      rgba(83,242,10,.11),
+      transparent 32%
+    ),
+    linear-gradient(
+      135deg,
+      #050605,
+      #090d09 65%,
+      #050605
+    );
+}
+
+.heroGlow {
+  position: absolute;
+
+  right: 10%;
+  bottom: -220px;
+
+  width: 600px;
+  height: 600px;
+
+  border-radius: 50%;
+
+  pointer-events: none;
+
+  background:
+    radial-gradient(
+      circle,
+      rgba(83,242,10,.1),
+      transparent 66%
+    );
+}
+
+.heroLogo {
+  position: absolute;
+
+  right: 6%;
+  top: 50%;
+
+  width: 300px;
+  height: 300px;
+
+  object-fit: contain;
+
+  opacity: .035;
+
+  filter:
+    grayscale(1);
+
+  transform:
+    translateY(-50%);
+}
+
+.heroInner {
+  position: relative;
+
+  z-index: 2;
+
+  width:
+    min(
+      1440px,
+      calc(100% - 48px)
+    );
+
+  margin:
+    0 auto;
+
+  padding-bottom:
+    46px;
+}
+
+.heroInner > span {
+  display: block;
+
+  margin-bottom: 9px;
+
+  color: var(--green);
+
+  font-size: 9px;
+  font-weight: 1000;
+
+  letter-spacing: .18em;
+}
+
+.heroInner h1 {
+  margin: 0;
+
+  font-family:
+    var(--heading);
+
+  font-size:
+    clamp(
+      76px,
+      9vw,
+      128px
+    );
+
+  font-weight: 1000;
+
+  line-height: .78;
+
+  letter-spacing: -.065em;
+}
+
+.heroInner p {
+  margin:
+    22px 0 0;
+
+  color:
+    #848b85;
+
+  font-size:
+    8px;
+
+  font-weight:
+    1000;
+
+  letter-spacing:
+    .16em;
 }
 
 
@@ -50,345 +178,167 @@
   width:
     min(
       1440px,
-      calc(
-        100% - 48px
-      )
+      calc(100% - 48px)
     );
 
   margin:
     0 auto;
 
   padding-bottom:
-    80px;
+    90px;
 }
 
 
 /* =========================================================
-   HERO
+   MAIN TABS
    ========================================================= */
 
-.hero {
-  position:
-    relative;
+.viewTabs {
+  min-height: 72px;
 
-  min-height:
-    300px;
+  display: flex;
 
-  display:
-    flex;
+  align-items: flex-end;
 
-  align-items:
-    flex-end;
-
-  overflow:
-    hidden;
+  gap: 38px;
 
   border-bottom:
     1px solid
     var(--line);
-
-  background:
-    radial-gradient(
-      circle
-      at 72% 30%,
-      rgba(
-        83,
-        242,
-        10,
-        .11
-      ),
-      transparent
-      34%
-    ),
-    linear-gradient(
-      135deg,
-      #050605,
-      #0b0f0c
-      70%,
-      #050605
-    );
 }
 
-.hero::after {
-  position:
-    absolute;
+.viewTabs button {
+  position: relative;
 
-  right:
-    5%;
+  height: 72px;
 
-  bottom:
-    -220px;
+  padding: 0;
 
-  width:
-    500px;
-
-  height:
-    500px;
-
-  content:
-    "";
-
-  border:
-    1px solid
-    rgba(
-      83,
-      242,
-      10,
-      .08
-    );
-
-  border-radius:
-    50%;
-}
-
-.heroGlow {
-  position:
-    absolute;
-
-  top:
-    -150px;
-
-  right:
-    10%;
-
-  width:
-    500px;
-
-  height:
-    500px;
-
-  pointer-events:
-    none;
-
-  background:
-    radial-gradient(
-      circle,
-      rgba(
-        83,
-        242,
-        10,
-        .12
-      ),
-      transparent
-      65%
-    );
-}
-
-.heroInner {
-  position:
-    relative;
-
-  z-index:
-    2;
-
-  width:
-    min(
-      1440px,
-      calc(
-        100% - 48px
-      )
-    );
-
-  margin:
-    0 auto;
-
-  padding-bottom:
-    48px;
-}
-
-.heroEyebrow {
-  display:
-    block;
-
-  margin-bottom:
-    11px;
+  border: 0;
 
   color:
-    var(--green);
+    #606760;
 
-  font-size:
-    9px;
-
-  font-weight:
-    1000;
-
-  letter-spacing:
-    .18em;
-}
-
-.hero h1 {
-  margin:
-    0;
+  background:
+    transparent;
 
   font-family:
     var(--heading);
 
   font-size:
-    clamp(
-      74px,
-      9vw,
-      128px
-    );
+    15px;
 
   font-weight:
     1000;
 
-  line-height:
-    .78;
-
   letter-spacing:
-    -.065em;
+    .04em;
+
+  cursor:
+    pointer;
+
+  transition:
+    color .25s ease;
 }
 
-.hero p {
-  margin:
-    23px
-    0
-    0;
+.viewTabs button::after {
+  position: absolute;
 
-  color:
-    #8b938d;
+  right: 0;
+  bottom: -1px;
+  left: 0;
 
-  font-size:
-    9px;
+  height: 2px;
 
-  font-weight:
-    1000;
+  content: "";
 
-  letter-spacing:
-    .14em;
+  opacity: 0;
+
+  background:
+    var(--green);
+
+  transform:
+    scaleX(.4);
+
+  transition:
+    opacity .25s ease,
+    transform .25s ease;
+}
+
+.viewTabs button:hover {
+  color: #fff;
+}
+
+.viewTabs .viewTabActive {
+  color: #fff;
+}
+
+.viewTabs .viewTabActive::after {
+  opacity: 1;
+
+  transform:
+    scaleX(1);
 }
 
 
 /* =========================================================
-   SECTION
+   CONTENT
    ========================================================= */
 
-.section {
+.contentSection {
   padding-top:
-    58px;
+    52px;
 }
 
 .sectionHeader {
-  margin-bottom:
-    24px;
+  display: flex;
 
-  display:
-    flex;
+  align-items: flex-end;
 
-  align-items:
-    flex-end;
-
-  justify-content:
-    space-between;
+  justify-content: space-between;
 
   gap:
-    25px;
+    30px;
+
+  margin-bottom:
+    32px;
 }
 
-.sectionTitle {
-  position:
-    relative;
+.sectionTitle > span {
+  display: block;
 
-  min-height:
-    46px;
+  margin-bottom:
+    8px;
 
-  padding:
-    5px
-    0
-    10px
-    28px;
-
-  display:
-    flex;
-
-  align-items:
-    flex-end;
-
-  border-bottom:
-    1px solid
-    rgba(
-      255,
-      255,
-      255,
-      .14
-    );
-}
-
-.sectionTitle::before {
-  position:
-    absolute;
-
-  top:
-    0;
-
-  left:
-    0;
-
-  width:
-    18px;
-
-  height:
-    25px;
-
-  content:
-    "";
-
-  border-left:
-    2px solid
+  color:
     var(--green);
 
-  border-top:
-    2px solid
-    var(--green);
-}
+  font-size:
+    7px;
 
-.sectionTitle::after {
-  position:
-    absolute;
+  font-weight:
+    1000;
 
-  left:
-    17px;
-
-  bottom:
-    -1px;
-
-  width:
-    100px;
-
-  height:
-    1px;
-
-  content:
-    "";
-
-  background:
-    linear-gradient(
-      90deg,
-      var(--green),
-      transparent
-    );
+  letter-spacing:
+    .15em;
 }
 
 .sectionTitle h2 {
-  margin:
-    0;
+  margin: 0;
 
   font-family:
     var(--heading);
 
   font-size:
     clamp(
-      30px,
-      3vw,
-      44px
+      34px,
+      4vw,
+      55px
     );
 
-  font-weight:
-    1000;
+  line-height: .88;
 
-  line-height:
-    .9;
+  font-weight: 1000;
 
   letter-spacing:
     -.045em;
@@ -396,68 +346,56 @@
 
 
 /* =========================================================
-   TOGGLE
+   TEAM TABS
    ========================================================= */
 
-.toggle {
-  display:
-    flex;
+.teamTabs {
+  display: flex;
 
-  padding:
-    3px;
+  padding: 3px;
 
   border:
     1px solid
     var(--line);
 
   background:
-    #090c0a;
+    #090b09;
 }
 
-.toggle button {
+.teamTabs button {
   min-width:
-    92px;
+    95px;
 
   height:
     40px;
 
   padding:
-    0
-    16px;
+    0 15px;
 
   border:
     0;
 
   color:
-    #828a84;
+    #737b74;
 
   background:
     transparent;
 
   font-size:
-    8px;
+    7px;
 
   font-weight:
     1000;
 
   cursor:
     pointer;
-
-  transition:
-    color
-    .22s
-    ease,
-    background
-    .22s
-    ease;
 }
 
-.toggle button:hover {
-  color:
-    #fff;
+.teamTabs button:hover {
+  color: #fff;
 }
 
-.toggle .toggleActive {
+.teamTabs .teamTabActive {
   color:
     #071006;
 
@@ -467,24 +405,51 @@
 
 
 /* =========================================================
-   SOUPISKA GRID
+   GROUPS
    ========================================================= */
 
-.squadGrid {
-  display:
-    grid;
+.groups {
+  display: grid;
+
+  gap: 52px;
+}
+
+.playerGroup h2 {
+  margin:
+    0 0 18px;
+
+  color:
+    #f6f7f6;
+
+  font-family:
+    var(--heading);
+
+  font-size:
+    15px;
+
+  font-weight:
+    1000;
+
+  letter-spacing:
+    .03em;
+}
+
+
+/* =========================================================
+   PLAYER GRID
+   ========================================================= */
+
+.playerGrid {
+  display: grid;
 
   grid-template-columns:
     repeat(
       4,
-      minmax(
-        0,
-        1fr
-      )
+      minmax(0,1fr)
     );
 
   gap:
-    14px;
+    12px;
 }
 
 
@@ -493,339 +458,254 @@
    ========================================================= */
 
 .playerCard {
-  position:
-    relative;
+  position: relative;
 
   min-height:
-    390px;
+    212px;
 
   overflow:
     hidden;
 
   border:
     1px solid
-    var(--line-strong);
+    rgba(255,255,255,.035);
 
   color:
     inherit;
 
-  background:
-    radial-gradient(
-      circle
-      at 60% 35%,
-      rgba(
-        83,
-        242,
-        10,
-        .055
-      ),
-      transparent
-      38%
-    ),
-    var(--panel);
-
   text-decoration:
     none;
 
+  background:
+    linear-gradient(
+      135deg,
+      #181a18,
+      #111311
+    );
+
   transition:
-    transform
-    .3s
-    ease,
-    border-color
-    .3s
-    ease,
-    box-shadow
-    .3s
-    ease;
+    transform .3s ease,
+    border-color .3s ease,
+    box-shadow .3s ease,
+    background .3s ease;
 }
 
-.playerCard::after {
-  position:
-    absolute;
-
-  inset:
-    0;
-
-  z-index:
-    4;
-
-  content:
-    "";
-
-  pointer-events:
-    none;
-
+.playerCard:nth-child(odd) {
   background:
     linear-gradient(
-      0deg,
-      rgba(
-        5,
-        6,
-        5,
-        .98
-      )
-      0%,
-      rgba(
-        5,
-        6,
-        5,
-        .72
-      )
-      24%,
-      transparent
-      55%
+      135deg,
+      #151815,
+      #0d100e
     );
 }
 
-.playerCardGlow {
-  position:
-    absolute;
+.playerNumber {
+  position: absolute;
 
-  top:
-    -80%;
+  z-index: 6;
 
-  left:
-    -50%;
+  top: 26px;
+  left: 18px;
 
-  z-index:
-    8;
+  color:
+    rgba(255,255,255,.13);
 
-  width:
-    30%;
+  font-family:
+    var(--heading);
 
-  height:
-    250%;
+  font-size:
+    18px;
 
-  pointer-events:
-    none;
+  font-weight:
+    1000;
 
-  opacity:
-    0;
-
-  background:
-    linear-gradient(
-      105deg,
-      transparent,
-      rgba(
-        255,
-        255,
-        255,
-        .13
-      ),
-      rgba(
-        83,
-        242,
-        10,
-        .1
-      ),
-      transparent
-    );
-
-  transform:
-    skewX(
-      -18deg
-    );
+  line-height: 1;
 }
 
-.playerWatermark {
-  position:
-    absolute;
+.cardGhost {
+  position: absolute;
 
-  top:
-    12%;
+  z-index: 1;
 
-  right:
-    -7%;
+  right: 0;
+  top: 50%;
 
-  z-index:
-    1;
-
-  width:
-    70%;
-
-  height:
-    64%;
+  width: 55%;
+  height: 80%;
 
   object-fit:
     contain;
 
-  opacity:
-    .035;
+  opacity: .025;
 
   filter:
-    grayscale(
-      1
-    );
+    grayscale(1);
+
+  transform:
+    translateY(-50%);
 }
 
 .playerImage {
-  position:
-    absolute;
+  position: absolute;
 
-  z-index:
-    3;
+  z-index: 3;
 
-  right:
-    -8%;
+  right: -4%;
+  bottom: 0;
 
-  bottom:
-    0;
-
-  width:
-    116%;
-
-  height:
-    92%;
+  width: 57%;
+  height: 96%;
 
   object-fit:
     contain;
 
   object-position:
-    center
-    bottom;
+    center bottom;
 
   filter:
     drop-shadow(
-      0
-      18px
-      24px
-      rgba(
-        0,
-        0,
-        0,
-        .45
-      )
+      -10px 8px 20px
+      rgba(0,0,0,.45)
     );
 
   transition:
-    transform
-    .35s
-    ease;
+    transform .35s ease,
+    filter .35s ease;
 }
 
-.playerCardCopy {
-  position:
-    absolute;
+.playerShade {
+  position: absolute;
 
-  z-index:
-    7;
+  z-index: 4;
 
-  right:
-    18px;
+  inset: 0;
 
-  bottom:
-    18px;
+  pointer-events: none;
 
-  left:
-    18px;
+  background:
+    linear-gradient(
+      90deg,
+      rgba(9,10,9,.96) 0%,
+      rgba(9,10,9,.74) 38%,
+      rgba(9,10,9,.1) 70%,
+      transparent 100%
+    ),
+    linear-gradient(
+      0deg,
+      rgba(5,6,5,.7),
+      transparent 45%
+    );
 }
 
-.playerCardCopy > span {
-  display:
-    block;
+.playerCopy {
+  position: absolute;
 
-  margin-bottom:
-    7px;
+  z-index: 7;
 
-  color:
-    var(--green);
+  left: 18px;
+  bottom: 18px;
 
-  font-size:
-    7px;
-
-  font-weight:
-    1000;
-
-  letter-spacing:
-    .11em;
+  max-width:
+    48%;
 }
 
-.playerCardCopy h3 {
-  margin:
-    0;
+.playerCopy h3 {
+  margin: 0;
 
   font-family:
     var(--heading);
 
   font-size:
     clamp(
-      24px,
+      21px,
       2vw,
-      32px
+      29px
     );
 
   font-weight:
     1000;
 
-  line-height:
-    .86;
+  line-height: .91;
 
   letter-spacing:
-    -.045em;
+    -.035em;
 
   text-transform:
     uppercase;
 }
 
-.playerCardCopy h3 strong {
-  display:
-    block;
+.playerCopy h3 > span,
+.playerCopy h3 > strong {
+  display: block;
+}
+
+.playerCopy h3 > strong {
+  color:
+    #fff;
+}
+
+.playerCopy > span {
+  display: block;
+
+  margin-top:
+    11px;
+
+  color:
+    #777f78;
+
+  font-size:
+    7px;
+
+  font-weight:
+    900;
+}
+
+.playerCopy small {
+  display: block;
+
+  margin-top:
+    5px;
 
   color:
     var(--green);
-}
-
-.playerCardCopy small {
-  display:
-    block;
-
-  margin-top:
-    12px;
-
-  color:
-    #737b75;
 
   font-size:
     6px;
 
   font-weight:
     1000;
-
-  letter-spacing:
-    .12em;
 }
 
-.playerArrow {
-  position:
-    absolute;
+.cardLight {
+  position: absolute;
 
-  z-index:
-    9;
+  z-index: 10;
 
-  top:
-    13px;
+  top: -50%;
+  left: -50%;
 
-  right:
-    15px;
+  width:
+    24%;
 
-  color:
-    rgba(
-      255,
-      255,
-      255,
-      .35
+  height:
+    200%;
+
+  opacity: 0;
+
+  pointer-events:
+    none;
+
+  background:
+    linear-gradient(
+      105deg,
+      transparent,
+      rgba(255,255,255,.09),
+      rgba(83,242,10,.08),
+      transparent
     );
 
-  font-size:
-    20px;
-
-  transition:
-    color
-    .25s
-    ease,
-    transform
-    .25s
-    ease;
+  transform:
+    skewX(-17deg);
 }
 
 @media
@@ -834,66 +714,44 @@ and
 (pointer:fine) {
 
   .playerCard:hover {
+    z-index: 5;
+
     transform:
-      translateY(
-        -5px
-      );
+      translateY(-5px);
 
     border-color:
-      rgba(
-        83,
-        242,
-        10,
-        .4
+      rgba(83,242,10,.32);
+
+    background:
+      linear-gradient(
+        135deg,
+        #1a201a,
+        #101410
       );
 
     box-shadow:
-      0
-      20px
-      40px
-      rgba(
-        0,
-        0,
-        0,
-        .36
-      ),
-      0
-      0
-      26px
-      rgba(
-        83,
-        242,
-        10,
-        .055
-      );
+      0 18px 38px
+        rgba(0,0,0,.35),
+      0 0 24px
+        rgba(83,242,10,.045);
   }
 
   .playerCard:hover
   .playerImage {
     transform:
-      scale(
-        1.045
-      )
-      translateY(
-        -3px
+      scale(1.06)
+      translateY(-2px);
+
+    filter:
+      drop-shadow(
+        -13px 12px 25px
+        rgba(0,0,0,.55)
       );
   }
 
   .playerCard:hover
-  .playerArrow {
-    color:
-      var(--green);
-
-    transform:
-      translateX(
-        3px
-      );
-  }
-
-  .playerCard:hover
-  .playerCardGlow {
-    opacity:
-      1;
+  .cardLight {
+    opacity: 1;
 
     animation:
       playerSweep
@@ -901,14 +759,33 @@ and
       ease
       forwards;
   }
+
+  .playerCard:hover
+  .playerNumber {
+    color:
+      rgba(83,242,10,.28);
+  }
 }
 
 
 /* =========================================================
-   STATS CARD
+   STATS
    ========================================================= */
 
-.statsCard {
+.statsWrap {
+  width: 100%;
+
+  overflow-x:
+    auto;
+
+  -webkit-overflow-scrolling:
+    touch;
+}
+
+.statsTable {
+  min-width:
+    850px;
+
   overflow:
     hidden;
 
@@ -917,26 +794,22 @@ and
     var(--line-strong);
 
   background:
-    var(--panel-soft);
+    #0a0d0a;
 }
 
-.statsHeader,
+.statsHead,
 .statsRow {
-  display:
-    grid;
+  display: grid;
 
   grid-template-columns:
-    46px
-    minmax(
-      230px,
-      1fr
-    )
+    48px
+    minmax(260px,1fr)
     82px
     82px
     82px
-    95px
+    96px
     82px
-    110px;
+    108px;
 
   align-items:
     center;
@@ -945,24 +818,18 @@ and
     border-box;
 }
 
-.statsHeader {
+.statsHead {
   min-height:
-    48px;
+    51px;
 
   padding:
-    0
-    18px;
-
-  background:
-    rgba(
-      255,
-      255,
-      255,
-      .018
-    );
+    0 17px;
 
   color:
-    #747c76;
+    #697069;
+
+  background:
+    rgba(255,255,255,.018);
 
   font-size:
     7px;
@@ -971,96 +838,133 @@ and
     1000;
 }
 
-.statsHeader >
-* {
-  min-width:
-    0;
-}
-
-.statsHeader >
-*:not(
-  .playerColumn
-):not(
-  .positionColumn
-) {
+.statsHead > span:nth-child(n+3) {
   text-align:
     center;
 }
 
+
+/* =========================================================
+   SORT
+   ========================================================= */
+
+.sortHead {
+  height:
+    51px;
+
+  padding: 0;
+
+  border: 0;
+
+  display: flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    center;
+
+  gap:
+    5px;
+
+  color:
+    #697069;
+
+  background:
+    transparent;
+
+  font-size:
+    7px;
+
+  font-weight:
+    1000;
+
+  cursor:
+    pointer;
+
+  transition:
+    color .2s ease,
+    background .2s ease;
+}
+
+.sortHead:hover {
+  color:
+    #fff;
+}
+
+.sortHead i {
+  color:
+    var(--green);
+
+  font-size:
+    10px;
+
+  font-style:
+    normal;
+}
+
+.sortHeadActive {
+  color:
+    var(--green);
+
+  background:
+    rgba(83,242,10,.035);
+}
+
+
+/* =========================================================
+   STAT ROW
+   ========================================================= */
+
 .statsRow {
-  position:
-    relative;
+  position: relative;
 
   min-height:
-    68px;
+    70px;
 
   padding:
-    0
-    18px;
+    0 17px;
 
   border-top:
     1px solid
-    rgba(
-      255,
-      255,
-      255,
-      .06
-    );
-
-  color:
-    #afb6b0;
-
-  font-size:
-    9px;
+    rgba(255,255,255,.055);
 
   transition:
-    background
-    .2s
-    ease;
+    background .2s ease;
 }
 
-.statsRow >
-span:not(
-  .positionColumn
-),
-.statsRow >
-b,
-.statsRow >
-strong.rating {
-  text-align:
-    center;
+.statsRow:hover {
+  background:
+    linear-gradient(
+      90deg,
+      rgba(83,242,10,.07),
+      transparent 70%
+    );
 }
 
-.positionColumn {
+.rank {
   color:
-    #707871;
+    #545b55;
 
   font-size:
     8px;
 }
 
-.playerColumn {
-  text-align:
-    left;
-}
-
 
 /* =========================================================
-   STAT PLAYER
+   STATS PLAYER
    ========================================================= */
 
 .statsPlayer {
-  min-width:
-    0;
+  min-width: 0;
 
-  display:
-    flex;
+  display: flex;
 
   align-items:
     center;
 
   gap:
-    12px;
+    13px;
 
   color:
     inherit;
@@ -1069,19 +973,14 @@ strong.rating {
     none;
 }
 
-.statsPlayer >
-div:last-child {
+.statsPlayer > div:last-child {
   min-width:
     0;
-
-  display:
-    grid;
-
-  gap:
-    4px;
 }
 
 .statsPlayer strong {
+  display: block;
+
   overflow:
     hidden;
 
@@ -1091,6 +990,9 @@ div:last-child {
   font-size:
     10px;
 
+  font-weight:
+    1000;
+
   text-overflow:
     ellipsis;
 
@@ -1099,29 +1001,39 @@ div:last-child {
 }
 
 .statsPlayer small {
+  display: block;
+
+  margin-top:
+    4px;
+
   color:
-    var(--green);
+    #686f69;
 
   font-size:
-    5px;
+    6px;
 
   font-weight:
-    1000;
+    900;
 }
+
+
+/* =========================================================
+   THUMB
+   ========================================================= */
 
 .playerThumb {
   position:
     relative;
 
   width:
-    40px;
+    42px;
 
   height:
-    40px;
+    48px;
 
   flex:
     0 0
-    40px;
+    42px;
 
   overflow:
     hidden;
@@ -1132,25 +1044,18 @@ div:last-child {
   place-items:
     center;
 
-  border:
-    1px solid
-    rgba(
-      255,
-      255,
-      255,
-      .08
-    );
-
   background:
-    #070907;
+    rgba(255,255,255,.025);
 }
 
 .playerThumb img {
   position:
     absolute;
 
-  z-index:
-    2;
+  z-index: 2;
+
+  right: 0;
+  bottom: 0;
 
   width:
     100%;
@@ -1162,19 +1067,17 @@ div:last-child {
     contain;
 
   object-position:
-    center
-    bottom;
+    center bottom;
 }
 
 .playerThumb span {
   position:
     relative;
 
-  z-index:
-    1;
+  z-index: 1;
 
   color:
-    #6f7771;
+    #555d56;
 
   font-size:
     7px;
@@ -1185,100 +1088,10 @@ div:last-child {
 
 
 /* =========================================================
-   STATS VALUES
+   STAT VALUES
    ========================================================= */
 
-.statsRow b {
-  color:
-    #fff;
-
-  font-size:
-    12px;
-}
-
-.rating {
-  color:
-    #fff;
-
-  font-size:
-    11px;
-}
-
-.topRow {
-  background:
-    linear-gradient(
-      90deg,
-      rgba(
-        83,
-        242,
-        10,
-        .07
-      ),
-      transparent
-      55%
-    );
-}
-
-.topRow::before {
-  position:
-    absolute;
-
-  top:
-    0;
-
-  bottom:
-    0;
-
-  left:
-    0;
-
-  width:
-    2px;
-
-  content:
-    "";
-
-  background:
-    var(--green);
-
-  opacity:
-    .65;
-}
-
-.statsRow:hover {
-  background:
-    linear-gradient(
-      90deg,
-      rgba(
-        83,
-        242,
-        10,
-        .11
-      ),
-      rgba(
-        83,
-        242,
-        10,
-        .02
-      )
-    );
-}
-
-
-/* =========================================================
-   SORT BUTTON
-   ========================================================= */
-
-.sortButton {
-  height:
-    48px;
-
-  padding:
-    0;
-
-  border:
-    0;
-
+.statValue {
   display:
     flex;
 
@@ -1288,53 +1101,93 @@ div:last-child {
   justify-content:
     center;
 
-  gap:
-    5px;
+  min-height:
+    70px;
 
   color:
-    #747c76;
-
-  background:
-    transparent;
+    #a4aba5;
 
   font-size:
-    7px;
+    10px;
+
+  font-weight:
+    700;
+
+  transition:
+    color .2s ease,
+    font-weight .2s ease,
+    background .2s ease;
+}
+
+
+/*
+   Přesně podle zadání:
+
+   BODY nejsou automaticky tučně.
+
+   Zvýrazní se vždy JEN hodnoty
+   sloupce, podle kterého se právě řadí.
+*/
+
+.statValueActive {
+  color:
+    #fff;
 
   font-weight:
     1000;
 
-  cursor:
-    pointer;
-}
-
-.sortButton:hover {
-  color:
-    #fff;
-}
-
-.sortButton i {
-  color:
-    var(--green);
-
-  font-size:
-    9px;
-
-  font-style:
-    normal;
-}
-
-.sortActive {
-  color:
-    #fff;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(83,242,10,.055),
+      transparent
+    );
 }
 
 
 /* =========================================================
-   ANIMATIONS
+   EMPTY
+   ========================================================= */
+
+.empty {
+  min-height:
+    190px;
+
+  display:
+    grid;
+
+  place-items:
+    center;
+
+  border:
+    1px solid
+    var(--line);
+
+  color:
+    #626a63;
+
+  background:
+    #090b09;
+
+  font-size:
+    8px;
+
+  font-weight:
+    1000;
+
+  letter-spacing:
+    .08em;
+
+  text-align:
+    center;
+}
+
+
+/* =========================================================
+   ANIMATION
    ========================================================= */
 
 @keyframes playerSweep {
-
   from {
     left:
       -50%;
@@ -1342,7 +1195,24 @@ div:last-child {
 
   to {
     left:
-      130%;
+      125%;
+  }
+}
+
+
+/* =========================================================
+   DESKTOP MEDIUM
+   ========================================================= */
+
+@media
+(max-width: 1150px) {
+
+  .playerGrid {
+    grid-template-columns:
+      repeat(
+        3,
+        minmax(0,1fr)
+      );
   }
 }
 
@@ -1352,63 +1222,38 @@ div:last-child {
    ========================================================= */
 
 @media
-(max-width: 1100px) {
+(max-width: 850px) {
 
-  .squadGrid {
-    grid-template-columns:
-      repeat(
-        3,
-        minmax(
-          0,
-          1fr
-        )
-      );
+  .heroInner,
+  .shell {
+    width:
+      calc(100% - 28px);
   }
 
-  .statsHeader,
-  .statsRow {
-    grid-template-columns:
-      40px
-      minmax(
-        190px,
-        1fr
-      )
-      65px
-      65px
-      65px
-      76px
-      65px
-      90px;
-  }
-}
-
-
-@media
-(max-width: 820px) {
-
-  .squadGrid {
+  .playerGrid {
     grid-template-columns:
       repeat(
         2,
-        minmax(
-          0,
-          1fr
-        )
+        minmax(0,1fr)
       );
   }
 
-  .statsCard {
-    overflow-x:
-      auto;
+  .sectionHeader {
+    flex-direction:
+      column;
 
-    -webkit-overflow-scrolling:
-      touch;
+    align-items:
+      stretch;
   }
 
-  .statsHeader,
-  .statsRow {
-    min-width:
-      780px;
+  .teamTabs {
+    width:
+      100%;
+  }
+
+  .teamTabs button {
+    flex:
+      1;
   }
 }
 
@@ -1420,117 +1265,142 @@ div:last-child {
 @media
 (max-width: 650px) {
 
-  .shell,
-  .heroInner {
-    width:
-      calc(
-        100% - 20px
-      );
-  }
-
+  .heroInner,
   .shell {
-    padding-bottom:
-      50px;
+    width:
+      calc(100% - 20px);
   }
 
   .hero {
     min-height:
-      235px;
+      220px;
   }
 
   .heroInner {
     padding-bottom:
-      31px;
+      28px;
   }
 
-  .heroEyebrow {
+  .heroInner > span {
     font-size:
       7px;
   }
 
-  .hero h1 {
+  .heroInner h1 {
     font-size:
-      64px;
+      61px;
   }
 
-  .hero p {
+  .heroInner p {
     margin-top:
-      17px;
+      16px;
 
     font-size:
-      7px;
+      6px;
 
     letter-spacing:
-      .1em;
+      .11em;
   }
 
-  .section {
+  .heroLogo {
+    right:
+      -25%;
+
+    width:
+      250px;
+
+    opacity:
+      .025;
+  }
+
+
+  /* -------------------------------------------------------
+     VIEW TABS
+     ------------------------------------------------------- */
+
+  .viewTabs {
+    min-height:
+      61px;
+
+    gap:
+      28px;
+  }
+
+  .viewTabs button {
+    height:
+      61px;
+
+    font-size:
+      12px;
+  }
+
+
+  /* -------------------------------------------------------
+     CONTENT
+     ------------------------------------------------------- */
+
+  .contentSection {
     padding-top:
-      42px;
+      37px;
   }
 
   .sectionHeader {
     margin-bottom:
-      18px;
-
-    flex-direction:
-      column;
-
-    align-items:
-      stretch;
+      24px;
 
     gap:
-      13px;
-  }
-
-  .sectionTitle {
-    min-height:
-      38px;
-
-    padding:
-      4px
-      0
-      8px
-      23px;
+      18px;
   }
 
   .sectionTitle h2 {
     font-size:
-      28px;
+      35px;
   }
 
-  .toggle {
-    width:
-      100%;
-  }
 
-  .toggle button {
-    min-width:
-      0;
+  /* -------------------------------------------------------
+     TEAM TABS
+     ------------------------------------------------------- */
 
-    flex:
-      1;
+  .teamTabs button {
+    min-width: 0;
 
     height:
       38px;
 
     padding:
-      0
-      8px;
+      0 8px;
 
     font-size:
       7px;
   }
 
-  .squadGrid {
+
+  /* -------------------------------------------------------
+     GROUPS
+     ------------------------------------------------------- */
+
+  .groups {
+    gap:
+      39px;
+  }
+
+  .playerGroup h2 {
+    margin-bottom:
+      12px;
+
+    font-size:
+      12px;
+  }
+
+
+  /* -------------------------------------------------------
+     KARTY
+     ------------------------------------------------------- */
+
+  .playerGrid {
     grid-template-columns:
-      repeat(
-        2,
-        minmax(
-          0,
-          1fr
-        )
-      );
+      1fr;
 
     gap:
       8px;
@@ -1538,117 +1408,129 @@ div:last-child {
 
   .playerCard {
     min-height:
-      260px;
+      190px;
   }
 
   .playerImage {
     right:
-      -14%;
+      -1%;
 
     width:
-      128%;
+      52%;
 
     height:
-      89%;
+      97%;
   }
 
-  .playerWatermark {
-    top:
-      14%;
-
-    right:
-      -15%;
-
-    width:
-      83%;
-  }
-
-  .playerCardCopy {
-    right:
-      11px;
+  .playerCopy {
+    left:
+      16px;
 
     bottom:
-      12px;
+      16px;
+
+    max-width:
+      53%;
+  }
+
+  .playerCopy h3 {
+    font-size:
+      24px;
+  }
+
+  .playerNumber {
+    top:
+      19px;
 
     left:
-      11px;
-  }
-
-  .playerCardCopy >
-  span {
-    margin-bottom:
-      5px;
+      16px;
 
     font-size:
-      5px;
+      16px;
   }
 
-  .playerCardCopy h3 {
-    font-size:
-      19px;
-  }
 
-  .playerCardCopy small {
-    margin-top:
-      8px;
+  /* -------------------------------------------------------
+     STATISTIKY
+     ------------------------------------------------------- */
 
-    font-size:
-      5px;
-  }
-
-  .playerArrow {
-    top:
-      8px;
-
-    right:
-      9px;
-
-    font-size:
-      15px;
-  }
-
-  .statsCard {
-    margin-right:
-      -10px;
+  .statsWrap {
+    width:
+      calc(100% + 20px);
 
     margin-left:
       -10px;
   }
 
-  .statsHeader,
-  .statsRow {
+  .statsTable {
     min-width:
-      700px;
+      720px;
+  }
+
+  .statsHead,
+  .statsRow {
+    grid-template-columns:
+      38px
+      minmax(205px,1fr)
+      62px
+      62px
+      62px
+      75px
+      62px
+      85px;
+
+    padding:
+      0 11px;
+  }
+
+  .statsRow {
+    min-height:
+      64px;
+  }
+
+  .statValue {
+    min-height:
+      64px;
+  }
+
+  .statsPlayer strong {
+    font-size:
+      9px;
+  }
+
+  .playerThumb {
+    width:
+      36px;
+
+    height:
+      42px;
+
+    flex-basis:
+      36px;
   }
 }
 
 
 /* =========================================================
-   EXTRA SMALL
+   SMALL MOBILE
    ========================================================= */
 
 @media
 (max-width: 390px) {
 
-  .squadGrid {
-    grid-template-columns:
-      repeat(
-        2,
-        minmax(
-          0,
-          1fr
-        )
-      );
-  }
-
   .playerCard {
     min-height:
-      235px;
+      175px;
   }
 
-  .playerCardCopy h3 {
+  .playerCopy h3 {
     font-size:
-      17px;
+      21px;
+  }
+
+  .playerImage {
+    width:
+      55%;
   }
 }
 
@@ -1662,13 +1544,14 @@ div:last-child {
 
   .playerCard,
   .playerImage,
-  .playerArrow {
+  .cardLight,
+  .statValue {
     transition:
       none !important;
   }
 
-  .playerCardGlow {
+  .cardLight {
     display:
-      none;
+      none !important;
   }
 }
