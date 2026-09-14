@@ -13,7 +13,6 @@ import { fetchApfPage } from "./fetchApfPage";
 type SquadConfig = {
   teamId: number;
   teamSlug: string;
-
   team: "a" | "b";
 };
 
@@ -119,9 +118,10 @@ export async function getSquad({
     return [];
   }
 
-  const table = squadTable as ReturnType<
-    typeof $
-  >;
+  const table =
+    squadTable as ReturnType<
+      typeof $
+    >;
 
   const headerCells =
     table
@@ -359,8 +359,14 @@ export async function getSquad({
           position:
             meta.position,
 
-          team:
-            meta.team,
+          /*
+           * DŮLEŽITÉ:
+           * tým už nebereme z playerMeta.
+           *
+           * Hráč je A/B podle APF stránky,
+           * ze které byl právě načten.
+           */
+          team,
 
           status:
             apfSaysLoan ||
