@@ -196,7 +196,41 @@ type ApfSquadPlayer = Awaited<
    PAGE
    ============================================================ */
 
-export default async function TeamsPage() {
+type TeamsPageProps = {
+  searchParams?:
+    | Promise<{
+        team?:
+          | string
+          | string[];
+      }>
+    | {
+        team?:
+          | string
+          | string[];
+      };
+};
+
+
+export default async function TeamsPage({
+  searchParams,
+}: TeamsPageProps) {
+  const resolvedSearchParams =
+    searchParams
+      ? await searchParams
+      : undefined;
+
+  const requestedTeam =
+    Array.isArray(
+      resolvedSearchParams?.team,
+    )
+      ? resolvedSearchParams?.team[0]
+      : resolvedSearchParams?.team;
+
+  const initialSquadTeam:
+    "a" | "b" =
+      requestedTeam === "b"
+        ? "b"
+        : "a";
   const aTeam =
     clubConfig.teams.aTeam;
 
@@ -1219,6 +1253,9 @@ export default async function TeamsPage() {
       }
       stats={
         stats
+      }
+      initialSquadTeam={
+        initialSquadTeam
       }
     />
   );

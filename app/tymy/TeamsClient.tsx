@@ -118,6 +118,9 @@ type Props = {
 
   stats:
     TeamsStatRow[];
+
+  initialSquadTeam:
+    "a" | "b";
 };
 
 type DisplayStatRow = {
@@ -173,6 +176,7 @@ const POSITION_ORDER =
 export default function TeamsClient({
   squad,
   stats,
+  initialSquadTeam,
 }: Props) {
   const [
     view,
@@ -188,7 +192,9 @@ export default function TeamsClient({
   ] =
     useState<
       "a" | "b"
-    >("a");
+    >(
+      initialSquadTeam,
+    );
 
   const [
     statsTeam,
