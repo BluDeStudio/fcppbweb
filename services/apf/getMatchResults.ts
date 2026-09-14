@@ -11,7 +11,9 @@ type MatchResultsConfig = {
   teamName: string;
 };
 
-function clean(value: string): string {
+function clean(
+  value: string,
+): string {
   return value
     .replace(/\s+/g, " ")
     .trim();
@@ -22,13 +24,15 @@ function getResult(
   awayScore: number,
   isHome: boolean,
 ): MatchResult["result"] {
-  const ourScore = isHome
-    ? homeScore
-    : awayScore;
+  const ourScore =
+    isHome
+      ? homeScore
+      : awayScore;
 
-  const opponentScore = isHome
-    ? awayScore
-    : homeScore;
+  const opponentScore =
+    isHome
+      ? awayScore
+      : homeScore;
 
   if (ourScore > opponentScore) {
     return "win";
@@ -41,6 +45,49 @@ function getResult(
   return "draw";
 }
 
+/*
+ * ============================================================
+ * APF TEAM ID Z ODKAZU
+ * ============================================================
+ *
+ * APF:
+ *
+ * /tym/14/fc-blizzard
+ * /tym/269/fc-ppb
+ *
+ *        ↓
+ *
+ * 14
+ * 269
+ * ============================================================
+ */
+
+function getTeamIdFromHref(
+  href: string | undefined,
+): number | null {
+  if (!href) {
+    return null;
+  }
+
+  const match =
+    href.match(
+      /\/tym\/(\d+)(?:\/|$)/,
+    );
+
+  if (!match) {
+    return null;
+  }
+
+  const id =
+    Number(
+      match[1],
+    );
+
+  return Number.isFinite(id)
+    ? id
+    : null;
+}
+
 export async function getMatchResults({
   competitionId,
   competitionSlug,
@@ -50,45 +97,93 @@ export async function getMatchResults({
     `/soutez/${competitionId}` +
     `/${competitionSlug}/vysledky`;
 
-  const html = await fetchApfPage(path);
+  const html =
+    await fetchApfPage(path);
 
-  const $ = cheerio.load(html);
+  const $ =
+    cheerio.load(html);
 
-  const matches: MatchResult[] = [];
+  const matches:
+    MatchResult[] = [];
 
   $('a[href^="/zapas/"]').each(
     (_, element) => {
-      const link = $(element);
+      const link =
+        $(element);
 
-      const row = link.closest("tr");
+      const row =
+        link.closest("tr");
 
-      const cells = row.find("td");
+      const cells =
+        row.find("td");
 
       if (cells.length < 4) {
         return;
       }
 
-      const href = link.attr("href");
+      const href =
+        link.attr("href");
 
       if (!href) {
         return;
       }
 
-      const matchId = href.match(
-        /\/zapas\/(\d+)/,
-      );
+      const matchId =
+        href.match(
+          /\/zapas\/(\d+)/,
+        );
 
       if (!matchId) {
         return;
       }
 
-      const homeTeam = clean(
-        $(cells[1]).text(),
-      );
+      const homeCell =
+        $(cells[1]);
 
-      const awayTeam = clean(
-        $(cells[3]).text(),
-      );
+      const awayCell =
+        $(cells[3]);
+
+      const homeTeam =
+        clean(
+          homeCell.text(),
+        );
+
+      const awayTeam =
+        clean(
+          awayCell.text(),
+        );
+
+      /*
+       * --------------------------------------------------------
+       * APF ID TÝMŮ
+       * --------------------------------------------------------
+       */
+
+      const homeTeamHref =
+        homeCell
+          .find(
+            'a[href*="/tym/"]',
+          )
+          .first()
+          .attr("href");
+
+      const awayTeamHref =
+        awayCell
+          .find(
+            'a[href*="/tym/"]',
+          )
+          .first()
+          .attr("href");
+
+      const homeTeamId =
+        getTeamIdFromHref(
+          homeTeamHref,
+        );
+
+      const awayTeamId =
+        getTeamIdFromHref(
+          awayTeamHref,
+        );
 
       const normalizedTeamName =
         teamName.toLowerCase();
@@ -103,55 +198,68 @@ export async function getMatchResults({
         return;
       }
 
-      const scoreText = clean(
-        link.text(),
-      );
+      const scoreText =
+        clean(
+          link.text(),
+        );
 
-      const score = scoreText.match(
-        /(\d+)\s*:\s*(\d+)/,
-      );
+      const score =
+        scoreText.match(
+          /(\d+)\s*:\s*(\d+)/,
+        );
 
       if (!score) {
         return;
       }
 
-      const homeScore = Number(
-        score[1],
-      );
+      const homeScore =
+        Number(
+          score[1],
+        );
 
-      const awayScore = Number(
-        score[2],
-      );
+      const awayScore =
+        Number(
+          score[2],
+        );
 
       const isHome =
         homeTeam.toLowerCase() ===
         normalizedTeamName;
 
       matches.push({
-        id: Number(matchId[1]),
+        id:
+          Number(
+            matchId[1],
+          ),
 
-        date: clean(
-          $(cells[0]).text(),
-        ),
+        date:
+          clean(
+            $(cells[0]).text(),
+          ),
 
         homeTeam,
         awayTeam,
 
+        homeTeamId,
+        awayTeamId,
+
         homeScore,
         awayScore,
 
-        halfTimeScore: null,
+        halfTimeScore:
+          null,
 
         detailUrl:
           `${clubConfig.apf.baseUrl}${href}`,
 
         isHome,
 
-        result: getResult(
-          homeScore,
-          awayScore,
-          isHome,
-        ),
+        result:
+          getResult(
+            homeScore,
+            awayScore,
+            isHome,
+          ),
       });
     },
   );

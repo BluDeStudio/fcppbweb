@@ -1,8 +1,13 @@
 export type MatchResult = {
   id: number;
+
   date: string;
+
   homeTeam: string;
   awayTeam: string;
+
+  homeTeamId: number | null;
+  awayTeamId: number | null;
 
   homeScore: number;
   awayScore: number;

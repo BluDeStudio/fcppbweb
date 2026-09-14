@@ -864,3 +864,223 @@
     display: none;
   }
 }
+
+/* =========================================================
+   FC PPB — ZÁPASY / A-TÝM + B-TÝM
+   ========================================================= */
+
+.matchTeamBlock {
+  margin-top: 26px;
+}
+
+.matchTeamBlock:first-of-type {
+  margin-top: 4px;
+}
+
+.matchTeamHeading {
+  min-height: 34px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.matchTeamHeading strong {
+  flex: 0 0 auto;
+  color: var(--green);
+  font-family:
+    "Arial Narrow",
+    "Roboto Condensed",
+    "Helvetica Neue",
+    Arial,
+    sans-serif;
+  font-size: 14px;
+  font-weight: 1000;
+  line-height: 1;
+  letter-spacing: .055em;
+}
+
+.matchTeamHeading span {
+  width: 100%;
+  height: 1px;
+  display: block;
+  background:
+    linear-gradient(
+      90deg,
+      rgba(83,242,10,.42),
+      rgba(255,255,255,.09) 16%,
+      rgba(255,255,255,.09)
+    );
+}
+
+/* =========================================================
+   FC PPB — NÁSLEDUJÍCÍ ZÁPAS / ODPOČET
+   ========================================================= */
+
+.nextPanel {
+  padding-bottom: 72px;
+}
+
+.matchCountdown {
+  position: absolute;
+  z-index: 7;
+  left: 50%;
+  bottom: 49px;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 11px;
+  white-space: nowrap;
+}
+
+.matchCountdown > span {
+  color: var(--green);
+  font-family:
+    "Arial Narrow",
+    "Roboto Condensed",
+    "Helvetica Neue",
+    Arial,
+    sans-serif;
+  font-size: 7px;
+  font-weight: 1000;
+  line-height: 1;
+  letter-spacing: .11em;
+}
+
+.matchCountdown > strong {
+  color: #fff;
+  font-family:
+    "Arial Narrow",
+    "Roboto Condensed",
+    "Helvetica Neue",
+    Arial,
+    sans-serif;
+  font-size: 17px;
+  font-weight: 1000;
+  line-height: 1;
+  letter-spacing: -.015em;
+}
+
+.matchCountdown > strong small {
+  color: #8b938c;
+  font-size: 8px;
+  font-weight: 1000;
+  text-transform: lowercase;
+}
+
+.matchCountdown > strong i {
+  margin: 0 7px;
+  color: rgba(255,255,255,.24);
+  font-size: 11px;
+  font-style: normal;
+}
+
+.nextPanel .matchFoot {
+  bottom: 16px;
+}
+
+.nextPanel .venue {
+  bottom: 73px;
+}
+
+/* =========================================================
+   FC PPB — MATCH LOGA
+   ========================================================= */
+
+.clubLogo {
+  width: 88px;
+  height: 88px;
+  object-fit: contain;
+  object-position: center;
+  filter:
+    drop-shadow(
+      0 8px 12px
+      rgba(0,0,0,.28)
+    );
+}
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 980px) {
+  .matchTeamBlock {
+    margin-top: 24px;
+  }
+
+  .matchTeamHeading {
+    margin-bottom: 9px;
+  }
+
+  .matchCountdown {
+    bottom: 48px;
+  }
+}
+
+/* =========================================================
+   MOBIL
+   ========================================================= */
+
+@media (max-width: 650px) {
+  .matchTeamBlock {
+    margin-top: 22px;
+  }
+
+  .matchTeamHeading {
+    min-height: 27px;
+    margin-bottom: 7px;
+    gap: 10px;
+  }
+
+  .matchTeamHeading strong {
+    font-size: 11px;
+  }
+
+  .matchTeamBlock .scoreGrid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .nextPanel {
+    min-height: 282px;
+    padding-bottom: 76px;
+  }
+
+  .matchCountdown {
+    bottom: 45px;
+    width: calc(100% - 26px);
+    gap: 7px;
+  }
+
+  .matchCountdown > span {
+    font-size: 6px;
+  }
+
+  .matchCountdown > strong {
+    font-size: 14px;
+  }
+
+  .matchCountdown > strong small {
+    font-size: 6px;
+  }
+
+  .matchCountdown > strong i {
+    margin: 0 4px;
+    font-size: 8px;
+  }
+
+  .nextPanel .matchFoot {
+    bottom: 11px;
+  }
+
+  .nextPanel .venue {
+    bottom: 67px;
+  }
+
+  .clubLogo {
+    width: 58px;
+    height: 58px;
+  }
+}
