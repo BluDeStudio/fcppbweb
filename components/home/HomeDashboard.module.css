@@ -795,6 +795,11 @@ and
   font-weight: 1000;
 }
 
+
+/* =========================================================
+   SKÓRE
+   ========================================================= */
+
 .score,
 .versus {
   font-family:
@@ -1836,61 +1841,226 @@ and
    ========================================================= */
 
 .partners {
+  position: relative;
+
   margin-top:
-    58px;
+    64px;
 
   min-height:
-    130px;
+    180px;
+
+  padding:
+    30px 38px;
 
   display: grid;
 
   grid-template-columns:
-    1fr 1fr 1fr;
+    minmax(170px, .7fr)
+    repeat(
+      2,
+      minmax(220px, 1fr)
+    );
 
   align-items: center;
 
-  gap: 35px;
+  gap: 22px;
 
-  border-top:
-    1px solid
-    var(--line);
+  color:
+    #111511;
 
-  border-bottom:
+  background:
+    linear-gradient(
+      135deg,
+      #f6f7f6 0%,
+      #eceeec 50%,
+      #f8f9f8 100%
+    );
+
+  border:
     1px solid
-    var(--line);
+    rgba(255,255,255,.12);
+
+  box-shadow:
+    0 20px 60px
+    rgba(0,0,0,.25);
+
+  overflow: hidden;
+}
+
+.partners::before {
+  position: absolute;
+
+  top: 0;
+  left: 0;
+
+  width: 120px;
+  height: 3px;
+
+  content: "";
+
+  background:
+    linear-gradient(
+      90deg,
+      var(--green),
+      transparent
+    );
+}
+
+.partners::after {
+  position: absolute;
+
+  right: -100px;
+  bottom: -140px;
+
+  width: 300px;
+  height: 300px;
+
+  content: "";
+
+  border-radius:
+    50%;
+
+  pointer-events:
+    none;
+
+  background:
+    radial-gradient(
+      circle,
+      rgba(83,242,10,.14),
+      transparent 66%
+    );
 }
 
 .partners > span {
-  color:
-    #707870;
+  position: relative;
+  z-index: 2;
 
-  font-size: 8px;
-  font-weight: 1000;
-  letter-spacing: .15em;
+  color:
+    #1d221e;
+
+  font-family:
+    var(--heading);
+
+  font-size:
+    12px;
+
+  font-weight:
+    1000;
+
+  letter-spacing:
+    .16em;
+
+  line-height:
+    1.2;
+}
+
+.partners > span::after {
+  display: block;
+
+  width: 36px;
+  height: 2px;
+
+  margin-top:
+    13px;
+
+  content: "";
+
+  background:
+    var(--green);
 }
 
 .partners a {
+  position: relative;
+  z-index: 2;
+
   min-height:
-    100px;
+    112px;
+
+  padding:
+    18px 26px;
 
   display: grid;
 
   place-items:
     center;
 
+  border:
+    1px solid
+    rgba(0,0,0,.08);
+
+  border-radius:
+    4px;
+
+  background:
+    #ffffff;
+
+  box-shadow:
+    0 10px 24px
+    rgba(0,0,0,.07);
+
+  overflow:
+    hidden;
+
   transition:
-    transform .3s ease;
+    transform .3s ease,
+    box-shadow .3s ease,
+    border-color .3s ease;
+}
+
+.partners a::before {
+  position: absolute;
+
+  top: 0;
+  left: -40%;
+
+  width: 28%;
+  height: 100%;
+
+  content: "";
+
+  pointer-events:
+    none;
+
+  opacity: 0;
+
+  background:
+    linear-gradient(
+      110deg,
+      transparent,
+      rgba(83,242,10,.09),
+      rgba(255,255,255,.65),
+      transparent
+    );
+
+  transform:
+    skewX(-18deg);
+
+  transition:
+    left .55s ease,
+    opacity .2s ease;
 }
 
 .partners img {
+  position: relative;
+  z-index: 2;
+
   max-width:
-    220px;
+    230px;
 
   max-height:
-    65px;
+    72px;
+
+  width:
+    auto;
+
+  height:
+    auto;
 
   object-fit:
     contain;
+
+  filter:
+    none;
 
   transition:
     transform .3s ease;
@@ -1903,12 +2073,27 @@ and
 
   .partners a:hover {
     transform:
-      translateY(-3px);
+      translateY(-5px);
+
+    border-color:
+      rgba(83,242,10,.42);
+
+    box-shadow:
+      0 16px 32px
+      rgba(0,0,0,.11),
+      0 0 0 1px
+      rgba(83,242,10,.07);
+  }
+
+  .partners a:hover::before {
+    left: 120%;
+
+    opacity: 1;
   }
 
   .partners a:hover img {
     transform:
-      scale(1.045);
+      scale(1.055);
   }
 }
 
@@ -2138,6 +2323,19 @@ and
   .teamCard {
     min-height:
       380px;
+  }
+
+  .partners {
+    grid-template-columns:
+      1fr 1fr;
+
+    padding:
+      26px;
+  }
+
+  .partners > span {
+    grid-column:
+      1 / -1;
   }
 }
 
@@ -2620,25 +2818,57 @@ and
       6px;
   }
 
-  .partners {
-    grid-template-columns:
-      1fr 1fr;
 
-    gap: 14px;
+  /* =======================================================
+     PARTNEŘI MOBILE
+     ======================================================= */
+
+  .partners {
+    margin-top:
+      46px;
+
+    min-height: 0;
+
+    grid-template-columns:
+      1fr;
+
+    gap: 12px;
 
     padding:
-      20px 0;
+      24px 16px;
   }
 
   .partners > span {
     grid-column:
-      1 / -1;
+      auto;
+
+    margin-bottom:
+      7px;
+
+    font-size:
+      10px;
+  }
+
+  .partners a {
+    min-height:
+      92px;
+
+    padding:
+      15px 20px;
   }
 
   .partners img {
     max-width:
-      135px;
+      175px;
+
+    max-height:
+      58px;
   }
+
+
+  /* -------------------------------------------------------
+     SOCIAL
+     ------------------------------------------------------- */
 
   .social {
     align-items:
@@ -2717,8 +2947,14 @@ and
   .clubLogo,
   .pomPlayer,
   .newsVisual img,
-  .teamPlayers img {
+  .teamPlayers img,
+  .partners a,
+  .partners img {
     transition:
       none !important;
+  }
+
+  .partners a::before {
+    display: none;
   }
 }
