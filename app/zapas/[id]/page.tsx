@@ -1337,13 +1337,7 @@ function EventRow({
           }
         >
           {isGoal ? (
-            <span
-              className={
-                styles.goalIcon
-              }
-            >
-              ⚽
-            </span>
+            <GoalBallIcon />
           ) : null}
 
           {isYellow ? (
@@ -1470,6 +1464,68 @@ function PlayerOfMatchContent({
   );
 }
 
+function GoalBallIcon() {
+  return (
+    <span
+      className={
+        styles.goalIcon
+      }
+      aria-hidden="true"
+    >
+      <svg
+        viewBox="0 0 64 64"
+        role="presentation"
+      >
+        <circle
+          cx="32"
+          cy="32"
+          r="29"
+          fill="#ffffff"
+        />
+
+        <path
+          d="M32 16.5 42.2 24 38.3 36H25.7L21.8 24 32 16.5Z"
+          fill="#111111"
+        />
+
+        <path
+          d="M12.2 19.7 21.8 24 18.1 35.8 7.6 37.3 4.8 27.1Z"
+          fill="#111111"
+        />
+
+        <path
+          d="M51.8 19.7 42.2 24 45.9 35.8 56.4 37.3 59.2 27.1Z"
+          fill="#111111"
+        />
+
+        <path
+          d="M18.1 35.8 25.7 36 30.2 46.7 22.2 55.4 12.7 48.5Z"
+          fill="#111111"
+        />
+
+        <path
+          d="M45.9 35.8 38.3 36 33.8 46.7 41.8 55.4 51.3 48.5Z"
+          fill="#111111"
+        />
+
+        <path
+          d="M32 16.5 26.1 5.8 37.9 5.8Z"
+          fill="#111111"
+        />
+
+        <circle
+          cx="32"
+          cy="32"
+          r="29"
+          fill="none"
+          stroke="#111111"
+          strokeWidth="3.5"
+        />
+      </svg>
+    </span>
+  );
+}
+
 function PlayerRatingRow({
   player,
   position,
@@ -1539,36 +1595,26 @@ function PlayerRatingRow({
         }
       >
         <span>
-          <b>
-            {
-              player.goals
-            }
-          </b>
-          G
+          <b>{player.goals}</b>
+          <small>G</small>
         </span>
 
         <span>
-          <b>
-            {
-              player.assists
-            }
-          </b>
-          A
+          <b>{player.assists}</b>
+          <small>A</small>
         </span>
 
-        {player.yellowCards > 0 ? (
-          <span className={styles.cardStat}>
-            <i className={styles.yellowCardMini} />
-            <b>{player.yellowCards}</b>
-          </span>
-        ) : null}
+        <span className={styles.cardStat}>
+          <i className={styles.yellowCardMini} />
+          <b>{player.yellowCards}</b>
+          <small>ŽK</small>
+        </span>
 
-        {player.redCards > 0 ? (
-          <span className={styles.cardStat}>
-            <i className={styles.redCardMini} />
-            <b>{player.redCards}</b>
-          </span>
-        ) : null}
+        <span className={styles.cardStat}>
+          <i className={styles.redCardMini} />
+          <b>{player.redCards}</b>
+          <small>ČK</small>
+        </span>
       </div>
 
       <div
