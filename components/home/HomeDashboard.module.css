@@ -796,6 +796,20 @@ and
   font-weight: 1000;
 }
 
+
+.matchPanelLink {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.matchDetailLabel {
+  color: var(--green);
+  font-weight: 1000;
+}
+
+
 .venue {
   position: absolute;
   z-index: 6;

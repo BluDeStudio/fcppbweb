@@ -459,12 +459,8 @@ function LastMatchPanel({
   matchId:
     string | null;
 }) {
-  return (
-    <article
-      className={
-        styles.matchPanel
-      }
-    >
+  const content = (
+    <>
       <CardSweep />
 
       <div
@@ -527,11 +523,13 @@ function LastMatchPanel({
             </span>
 
             {matchId ? (
-              <Link
-                href={`/zapas/${matchId}`}
+              <span
+                className={
+                  styles.matchDetailLabel
+                }
               >
                 DETAIL →
-              </Link>
+              </span>
             ) : match.detailUrl ? (
               <a
                 href={
@@ -550,6 +548,27 @@ function LastMatchPanel({
           text="Bez odehraného zápasu."
         />
       )}
+    </>
+  );
+
+  if (match && matchId) {
+    return (
+      <Link
+        href={`/zapas/${matchId}`}
+        className={`${styles.matchPanel} ${styles.matchPanelLink}`}
+      >
+        {content}
+      </Link>
+    );
+  }
+
+  return (
+    <article
+      className={
+        styles.matchPanel
+      }
+    >
+      {content}
     </article>
   );
 }
