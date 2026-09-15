@@ -514,6 +514,7 @@
 
   display: grid;
   grid-template-columns:
+    28px
     100px
     minmax(0,1fr)
     auto;
@@ -527,6 +528,56 @@
       transparent 48%
     );
 }
+
+
+.motmRank {
+  color: var(--green);
+  font-family: "Arial Narrow", Arial, sans-serif;
+  font-size: 26px;
+  font-weight: 1000;
+  line-height: 1;
+  text-align: center;
+}
+
+.eventRowFor .eventContent {
+  border-color: rgba(83,242,10,.16);
+  background: linear-gradient(90deg, rgba(83,242,10,.055), rgba(255,255,255,.012));
+}
+
+.eventRowAgainst .eventContent {
+  border-color: rgba(230,58,58,.28);
+  background: linear-gradient(90deg, rgba(230,58,58,.11), rgba(255,255,255,.012));
+}
+
+.eventRowAgainst .eventText strong,
+.eventRowAgainst .eventBadge b,
+.eventRowAgainst .minute strong {
+  color: #ff7777;
+}
+
+.cardStat {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 3px !important;
+}
+
+.yellowCardMini,
+.redCardMini {
+  width: 7px;
+  height: 10px;
+  display: inline-block;
+  border-radius: 1px;
+  transform: rotate(2deg);
+}
+
+.yellowCardMini {
+  background: #f0ca2d;
+}
+
+.redCardMini {
+  background: #e23a3a;
+}
+
 
 .playerAvatar {
   width: 48px;
@@ -992,6 +1043,7 @@ a.playerRow:hover {
 
   .motmBody {
     grid-template-columns:
+      22px
       78px
       minmax(0,1fr)
       auto;
@@ -1005,6 +1057,10 @@ a.playerRow:hover {
   .playerAvatarLarge {
     width: 76px;
     height: 92px;
+  }
+
+  .motmRank {
+    font-size: 20px;
   }
 
   .motmCopy > strong {

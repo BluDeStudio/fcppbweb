@@ -2,6 +2,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { supabase } from "@/lib/supabase";
+import { clubConfig } from "@/config/club";
+import { getMatches } from "@/services/apf/getMatches";
 
 import PlayerAvatar from "./PlayerAvatar";
 import styles from "./MatchDetail.module.css";
@@ -824,6 +826,91 @@ export default async function MatchDetailPage({
     ratedPlayers[0] ??
     null;
 
+  const rankedPlayers =
+    ratedPlayers.filter(
+      (player) =>
+        player !==
+        playerOfTheMatch,
+    );
+
+  let homeTeamId:
+    number | null =
+      homeIsOurs
+        ? match.team === "B"
+          ? clubConfig.teams.bTeam.teamId
+          : clubConfig.teams.aTeam.teamId
+        : null;
+
+  let awayTeamId:
+    number | null =
+      awayIsOurs
+        ? match.team === "B"
+          ? clubConfig.teams.bTeam.teamId
+          : clubConfig.teams.aTeam.teamId
+        : null;
+
+  try {
+    const teamConfig =
+      match.team === "B"
+        ? clubConfig.teams.bTeam
+        : clubConfig.teams.aTeam;
+
+    const apfMatches =
+      await getMatches({
+        competitionId:
+          teamConfig.competition.id,
+        competitionSlug:
+          teamConfig.competition.slug,
+        teamId:
+          teamConfig.teamId,
+        teamSlug:
+          teamConfig.teamSlug,
+      });
+
+    const normalizedHome =
+      normalize(homeTeam);
+
+    const normalizedAway =
+      normalize(awayTeam);
+
+    const matchingApfMatch =
+      apfMatches.find(
+        (apfMatch) =>
+          normalize(
+            apfMatch.homeTeam,
+          ) ===
+            normalizedHome &&
+          normalize(
+            apfMatch.awayTeam,
+          ) ===
+            normalizedAway,
+      ) ??
+      apfMatches.find(
+        (apfMatch) =>
+          apfMatch.homeScore ===
+            homeScore &&
+          apfMatch.awayScore ===
+            awayScore,
+      );
+
+    if (
+      matchingApfMatch
+    ) {
+      homeTeamId =
+        matchingApfMatch.homeTeamId ??
+        homeTeamId;
+
+      awayTeamId =
+        matchingApfMatch.awayTeamId ??
+        awayTeamId;
+    }
+  } catch (error) {
+    console.error(
+      "Detail zápasu – APF logo soupeře:",
+      error,
+    );
+  }
+
   return (
     <main
       className={
@@ -897,6 +984,9 @@ export default async function MatchDetailPage({
               ours={
                 homeIsOurs
               }
+              teamId={
+                homeTeamId
+              }
             />
 
             <div
@@ -929,6 +1019,9 @@ export default async function MatchDetailPage({
               }
               ours={
                 awayIsOurs
+              }
+              teamId={
+                awayTeamId
               }
             />
           </div>
@@ -1001,6 +1094,14 @@ export default async function MatchDetailPage({
                     styles.motmBody
                   }
                 >
+                  <div
+                    className={
+                      styles.motmRank
+                    }
+                  >
+                    1.
+                  </div>
+
                   <PlayerAvatar
                     apfPlayerId={
                       playerOfTheMatch.apfPlayerId
@@ -1090,9 +1191,9 @@ export default async function MatchDetailPage({
                   styles.ranking
                 }
               >
-                {ratedPlayers.length >
+                {rankedPlayers.length >
                 0 ? (
-                  ratedPlayers.map(
+                  rankedPlayers.map(
                     (
                       player,
                       index,
@@ -1107,7 +1208,7 @@ export default async function MatchDetailPage({
                         }
                         position={
                           index +
-                          1
+                          2
                         }
                       />
                     ),
@@ -1134,9 +1235,11 @@ export default async function MatchDetailPage({
 function TeamBlock({
   name,
   ours,
+  teamId,
 }: {
   name: string;
   ours: boolean;
+  teamId: number | null;
 }) {
   const initials =
     name
@@ -1150,6 +1253,13 @@ function TeamBlock({
       )
       .join("");
 
+  const logoSrc =
+    ours
+      ? "/images/fc-ppb-logo.png"
+      : teamId
+        ? `/teams/${teamId}.png`
+        : null;
+
   return (
     <div
       className={
@@ -1161,10 +1271,10 @@ function TeamBlock({
           styles.teamLogo
         }
       >
-        {ours ? (
+        {logoSrc ? (
           <img
-            src="/images/fc-ppb-logo.png"
-            alt="FC PPB"
+            src={logoSrc}
+            alt={`Logo ${name}`}
           />
         ) : (
           <span>
@@ -1230,9 +1340,13 @@ function EventRow({
 
   return (
     <div
-      className={
-        styles.eventRow
-      }
+      className={`${styles.eventRow} ${
+        event.type === "goal_against"
+          ? styles.eventRowAgainst
+          : event.type === "goal_for"
+            ? styles.eventRowFor
+            : ""
+      }`}
     >
       <div
         className={`${styles.eventContent} ${
@@ -1400,6 +1514,20 @@ function PlayerRatingRow({
           </b>
           A
         </span>
+
+        {player.yellowCards > 0 ? (
+          <span className={styles.cardStat}>
+            <i className={styles.yellowCardMini} />
+            <b>{player.yellowCards}</b>
+          </span>
+        ) : null}
+
+        {player.redCards > 0 ? (
+          <span className={styles.cardStat}>
+            <i className={styles.redCardMini} />
+            <b>{player.redCards}</b>
+          </span>
+        ) : null}
       </div>
 
       <div
