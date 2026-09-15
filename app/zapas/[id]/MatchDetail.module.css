@@ -554,8 +554,8 @@
 .playerAvatar {
   position: relative;
 
-  width: 64px;
-  height: 64px;
+  width: 72px;
+  height: 78px;
 
   overflow: visible;
 
@@ -570,62 +570,7 @@
   background: transparent;
 }
 
-.playerAvatar::after {
-  position: absolute;
-  left: 5%;
-  right: 5%;
-  bottom: -3px;
-
-  height: 2px;
-
-  content: "";
-
-  pointer-events: none;
-
-  background:
-    linear-gradient(
-      90deg,
-      transparent,
-      rgba(83,242,10,.18) 10%,
-      rgba(83,242,10,.95) 42%,
-      rgba(83,242,10,.3) 72%,
-      transparent
-    );
-
-  box-shadow:
-    0 0 12px rgba(83,242,10,.22);
-}
-
-.playerAvatarLarge {
-  width: 118px;
-  height: 138px;
-}
-
-.playerAvatarLarge::after {
-  left: 0;
-  right: 0;
-  bottom: -2px;
-
-  height: 3px;
-
-  background:
-    linear-gradient(
-      90deg,
-      transparent,
-      rgba(83,242,10,.32) 12%,
-      var(--green) 45%,
-      rgba(83,242,10,.38) 76%,
-      transparent
-    );
-
-  box-shadow:
-    0 0 18px rgba(83,242,10,.3);
-}
-
-.playerAvatar img {
-  position: relative;
-  z-index: 1;
-
+.playerAvatarHasImage img {
   width: 100%;
   height: 100%;
 
@@ -634,33 +579,89 @@
   object-fit: contain;
   object-position: bottom center;
 
+  -webkit-mask-image:
+    linear-gradient(
+      to bottom,
+      #000 0%,
+      #000 76%,
+      rgba(0,0,0,.92) 84%,
+      rgba(0,0,0,.5) 93%,
+      transparent 100%
+    );
+
+  mask-image:
+    linear-gradient(
+      to bottom,
+      #000 0%,
+      #000 76%,
+      rgba(0,0,0,.92) 84%,
+      rgba(0,0,0,.5) 93%,
+      transparent 100%
+    );
+
   filter:
     drop-shadow(
-      0 8px 10px
-      rgba(0,0,0,.42)
+      0 8px 12px
+      rgba(0,0,0,.34)
     );
 }
 
-.playerAvatar span {
-  position: relative;
-  z-index: 1;
+.playerAvatarLarge {
+  width: 126px;
+  height: 142px;
+}
 
-  width: 48px;
-  height: 48px;
+.playerAvatarLarge.playerAvatarHasImage img {
+  -webkit-mask-image:
+    linear-gradient(
+      to bottom,
+      #000 0%,
+      #000 78%,
+      rgba(0,0,0,.9) 86%,
+      rgba(0,0,0,.4) 94%,
+      transparent 100%
+    );
 
+  mask-image:
+    linear-gradient(
+      to bottom,
+      #000 0%,
+      #000 78%,
+      rgba(0,0,0,.9) 86%,
+      rgba(0,0,0,.4) 94%,
+      transparent 100%
+    );
+}
+
+.playerAvatarFallback {
   display: grid;
   place-items: center;
+}
 
-  margin-bottom: 6px;
+.playerAvatarFallback span {
+  width: auto;
+  height: auto;
 
-  border: 1px solid rgba(83,242,10,.22);
-  border-radius: 50%;
+  display: block;
 
-  color: rgba(255,255,255,.55);
-  background: #101411;
+  margin: 0;
 
-  font-size: 13px;
+  border: 0;
+  border-radius: 0;
+
+  color: rgba(255,255,255,.18);
+  background: transparent;
+
+  font-size: 23px;
   font-weight: 1000;
+  letter-spacing: -.04em;
+
+  text-shadow:
+    0 0 18px rgba(83,242,10,.16);
+}
+
+.playerAvatarLarge.playerAvatarFallback span {
+  font-size: 34px;
 }
 
 .motmCopy {
@@ -763,8 +764,8 @@
 
   display: grid;
   grid-template-columns:
-    32px
-    64px
+    34px
+    72px
     minmax(0,1fr)
     auto
     58px;
@@ -1154,6 +1155,7 @@ a.playerRow:hover {
 }
 
 
+
 /* =========================================================
    FINAL MATCH DETAIL VISUAL TUNING
    ========================================================= */
@@ -1169,8 +1171,8 @@ a.playerRow:hover {
   }
 
   .teamLogo {
-    width: 106px;
-    height: 106px;
+    width: 102px;
+    height: 102px;
     align-self: end;
   }
 
@@ -1186,22 +1188,77 @@ a.playerRow:hover {
     padding-top: 2px;
   }
 
-  .playerRow {
+  .motmBody {
     grid-template-columns:
-      24px
-      54px
+      26px
+      92px
       minmax(0,1fr)
-      50px;
-  }
+      58px;
 
-  .playerRow .playerAvatar {
-    width: 54px;
-    height: 58px;
+    gap: 10px;
+
+    padding:
+      14px
+      12px
+      8px;
   }
 
   .playerAvatarLarge {
-    width: 96px;
-    height: 116px;
+    width: 92px;
+    height: 112px;
+  }
+
+  .motmCopy > strong {
+    font-size: clamp(17px, 4.7vw, 21px);
+    line-height: .94;
+  }
+
+  .motmStats {
+    gap: 8px;
+  }
+
+  .motmStats b {
+    font-size: 15px;
+  }
+
+  .playerRow {
+    min-height: 76px;
+
+    grid-template-columns:
+      24px
+      60px
+      minmax(0,1fr)
+      50px;
+
+    gap: 8px;
+
+    padding:
+      2px
+      10px;
+  }
+
+  .playerRow .playerAvatar {
+    width: 60px;
+    height: 70px;
+  }
+
+  .playerInfo {
+    align-self: center;
+  }
+
+  .playerNameLine strong {
+    font-size: 12px;
+    line-height: 1;
+  }
+
+  .playerMeta {
+    margin-top: 5px;
+  }
+
+  .playerRating {
+    min-width: 48px;
+    padding: 8px 5px;
+    font-size: 16px;
   }
 }
 
@@ -1211,25 +1268,54 @@ a.playerRow:hover {
   }
 
   .teamLogo {
-    width: 92px;
-    height: 92px;
+    width: 90px;
+    height: 90px;
+  }
+
+  .motmBody {
+    grid-template-columns:
+      22px
+      78px
+      minmax(0,1fr)
+      52px;
+
+    gap: 7px;
+
+    padding-inline: 8px;
+  }
+
+  .playerAvatarLarge {
+    width: 78px;
+    height: 100px;
+  }
+
+  .motmCopy > strong {
+    font-size: 16px;
   }
 
   .playerRow {
     grid-template-columns:
       21px
-      50px
+      54px
       minmax(0,1fr)
       46px;
+
+    gap: 6px;
+
+    padding-inline: 7px;
   }
 
   .playerRow .playerAvatar {
-    width: 50px;
-    height: 54px;
+    width: 54px;
+    height: 66px;
   }
 
-  .playerAvatarLarge {
-    width: 86px;
-    height: 104px;
+  .playerNameLine strong {
+    font-size: 11px;
+  }
+
+  .playerRating {
+    min-width: 44px;
+    font-size: 15px;
   }
 }

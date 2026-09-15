@@ -60,11 +60,17 @@ export default function PlayerAvatar({
 
   return (
     <div
-      className={`${styles.playerAvatar} ${
+      className={[
+        styles.playerAvatar,
         size === "large"
           ? styles.playerAvatarLarge
-          : ""
-      }`}
+          : "",
+        src
+          ? styles.playerAvatarHasImage
+          : styles.playerAvatarFallback,
+      ]
+        .filter(Boolean)
+        .join(" ")}
     >
       {src ? (
         <img
