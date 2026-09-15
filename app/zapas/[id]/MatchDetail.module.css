@@ -1844,3 +1844,155 @@ a.motmBody:hover {
     width: 14px;
   }
 }
+
+
+/* =========================================================
+   TIMELINE — MINUTA VLEVO PŘED UDÁLOSTÍ
+   ========================================================= */
+
+.timeline {
+  position: relative;
+  padding: 22px 24px 28px;
+}
+
+/* Svislá osa hned za sloupcem s minutou */
+.timeline::before {
+  left: 76px;
+  right: auto;
+  top: 24px;
+  bottom: 28px;
+}
+
+.eventRow {
+  min-height: 68px;
+
+  grid-template-columns:
+    76px
+    minmax(0, 1fr);
+}
+
+/* Minuta je vždy první */
+.minute {
+  grid-column: 1;
+  grid-row: 1;
+
+  justify-items: start;
+  padding-left: 6px;
+}
+
+/* Bod časové osy */
+.minute::before {
+  left: auto;
+  right: -5px;
+  top: 50%;
+
+  transform: translate(50%, -50%);
+}
+
+/* Samotná událost následuje až za minutou */
+.eventContent {
+  grid-column: 2;
+  grid-row: 1;
+
+  margin-left: 22px;
+  margin-right: 0;
+
+  padding:
+    12px
+    4px
+    12px
+    14px;
+}
+
+/* Krátké propojení osy s událostí */
+.eventContent::after {
+  left: -22px;
+  right: auto;
+
+  width: 22px;
+}
+
+.eventHome,
+.eventAway {
+  margin-left: 22px;
+  margin-right: 0;
+}
+
+@media (max-width: 650px) {
+  .timeline {
+    padding:
+      14px
+      12px
+      20px;
+  }
+
+  .timeline::before {
+    left: 58px;
+    right: auto;
+  }
+
+  .eventRow {
+    grid-template-columns:
+      58px
+      minmax(0, 1fr);
+  }
+
+  .minute {
+    padding-left: 2px;
+  }
+
+  .eventContent {
+    margin-left: 16px;
+
+    padding:
+      11px
+      4px
+      11px
+      12px;
+  }
+
+  .eventHome,
+  .eventAway {
+    margin-left: 16px;
+  }
+
+  .eventContent::after {
+    left: -16px;
+    width: 16px;
+  }
+}
+
+@media (max-width: 390px) {
+  .timeline {
+    padding-inline: 8px;
+  }
+
+  .timeline::before {
+    left: 52px;
+  }
+
+  .eventRow {
+    grid-template-columns:
+      52px
+      minmax(0, 1fr);
+  }
+
+  .minute {
+    padding-left: 0;
+  }
+
+  .eventContent {
+    margin-left: 13px;
+    padding-left: 9px;
+  }
+
+  .eventHome,
+  .eventAway {
+    margin-left: 13px;
+  }
+
+  .eventContent::after {
+    left: -13px;
+    width: 13px;
+  }
+}
