@@ -867,244 +867,114 @@ a.playerRow:hover {
 
 @media
 (max-width: 900px) {
-
   .scoreboard {
-    grid-template-columns:
-      minmax(0,1fr)
-      auto
-      minmax(0,1fr);
-
-    gap: 15px;
-
-    padding:
-      32px 18px;
+    grid-template-columns: minmax(0,1fr) minmax(112px,auto) minmax(0,1fr);
+    gap: 18px;
+    padding: 34px 20px;
   }
-
-  .teamLogo {
-    width: 86px;
-    height: 86px;
-  }
-
-  .contentGrid {
-    grid-template-columns:
-      1fr;
-  }
+  .teamLogo { width:108px; height:108px; }
+  .teamLogo img { width:100%; height:100%; object-fit:contain; }
+  .contentGrid { grid-template-columns:1fr; }
 }
 
 @media
 (max-width: 650px) {
-
-  .shell {
-    width:
-      min(
-        100% - 20px,
-        1220px
-      );
-
-    padding-top: 20px;
-  }
+  .page { width:100%; max-width:100%; overflow-x:hidden; }
+  .shell { width:calc(100% - 24px); max-width:100%; margin-inline:auto; padding:20px 0 64px; }
+  .backLink { margin-left:2px; }
+  .hero,.card,.contentGrid,.sideColumn { width:100%; max-width:100%; min-width:0; }
+  .heroWatermark { display:none; }
 
   .heroTop {
-    align-items:
-      flex-start;
-
-    padding:
-      13px
-      14px;
-
-    flex-direction:
-      column;
-
-    gap: 6px;
+    min-height:58px;
+    padding:13px 16px;
+    align-items:flex-start;
+    flex-direction:column;
+    justify-content:center;
+    gap:6px;
   }
-
-  .heroTop > div {
-    text-align: left;
-  }
+  .heroTop > div { text-align:left; }
 
   .scoreboard {
-    min-height: 245px;
-
-    grid-template-columns:
-      minmax(0,1fr)
-      auto
-      minmax(0,1fr);
-
-    gap: 9px;
-
-    padding:
-      27px
-      10px;
+    width:100%;
+    min-height:290px;
+    box-sizing:border-box;
+    grid-template-columns:minmax(0,1fr) minmax(104px,auto) minmax(0,1fr);
+    align-items:center;
+    justify-content:center;
+    gap:7px;
+    padding:30px 10px 34px;
   }
-
-  .team {
-    gap: 11px;
-  }
-
-  .teamLogo {
-    width: 62px;
-    height: 62px;
-  }
-
+  .team { width:100%; min-width:0; gap:14px; }
+  .teamLogo { width:clamp(86px,24vw,104px); height:clamp(86px,24vw,104px); }
+  .teamLogo img { width:100%; height:100%; object-fit:contain; }
   .team > strong {
-    font-size:
-      clamp(
-        14px,
-        4.3vw,
-        19px
-      );
+    width:100%; max-width:150px;
+    font-size:clamp(15px,4.4vw,20px);
+    line-height:.95; text-align:center; overflow-wrap:anywhere;
   }
+  .scoreBlock { min-width:104px; gap:8px; }
+  .scoreBlock small { font-size:5px; letter-spacing:.12em; white-space:nowrap; }
+  .scoreBlock > strong { gap:6px; font-size:clamp(48px,14vw,68px); white-space:nowrap; }
 
-  .scoreBlock {
-    gap: 7px;
-  }
+  .contentGrid { margin-top:18px; gap:18px; }
+  .sectionHeading { min-height:66px; padding:14px 16px; }
+  .sectionHeading h2 { font-size:25px; }
 
-  .scoreBlock small {
-    font-size: 5px;
-  }
-
-  .scoreBlock > strong {
-    gap: 6px;
-
-    font-size:
-      clamp(
-        43px,
-        14vw,
-        66px
-      );
-  }
-
-  .sectionHeading {
-    min-height: 62px;
-
-    padding:
-      14px
-      15px;
-  }
-
-  .sectionHeading h2 {
-    font-size: 23px;
-  }
-
-  .timeline {
-    padding:
-      13px
-      10px
-      18px;
-  }
-
-  .timeline::before {
-    left: 55px;
-  }
-
-  .eventRow {
-    min-height: 70px;
-
-    grid-template-columns:
-      70px
-      minmax(0,1fr);
-  }
-
-  .eventContent {
-    grid-column: 2;
-    grid-row: 1;
-
-    margin-right: 0;
-
-    padding:
-      9px
-      10px;
-  }
-
-  .minute {
-    grid-column: 1;
-    grid-row: 1;
-  }
-
-  .minute::before {
-    left: auto;
-    right: 0;
-  }
-
-  .eventText strong {
-    font-size: 11px;
-  }
-
-  .eventBadge b {
-    font-size: 13px;
-  }
+  .timeline { width:100%; box-sizing:border-box; padding:14px 10px 20px; }
+  .timeline::before { left:58px; }
+  .eventRow { width:100%; min-width:0; min-height:74px; grid-template-columns:72px minmax(0,1fr); }
+  .eventContent { min-width:0; grid-column:2; grid-row:1; margin-right:0; padding:10px 11px; }
+  .minute { grid-column:1; grid-row:1; }
+  .minute::before { left:auto; right:0; }
+  .eventText strong { font-size:11px; }
+  .eventText span { font-size:8px; }
+  .eventBadge { flex:0 0 auto; gap:6px; }
+  .eventBadge b { min-width:34px; font-size:13px; }
+  .goalIcon { font-size:15px; }
 
   .motmBody {
-    grid-template-columns:
-      22px
-      78px
-      minmax(0,1fr)
-      auto;
-
-    gap: 10px;
-
-    padding:
-      14px;
+    width:100%; box-sizing:border-box;
+    grid-template-columns:20px 72px minmax(0,1fr) 58px;
+    gap:9px; padding:14px 11px;
   }
+  .playerAvatarLarge { width:70px; height:88px; }
+  .motmRank { font-size:19px; }
+  .motmCopy > strong { font-size:18px; }
+  .motmStats { gap:8px; }
+  .motmStats b { font-size:15px; }
+  .motmRating { min-width:56px; padding:8px 5px; }
+  .motmRating strong { font-size:21px; }
 
-  .playerAvatarLarge {
-    width: 76px;
-    height: 92px;
-  }
-
-  .motmRank {
-    font-size: 20px;
-  }
-
-  .motmCopy > strong {
-    font-size: 19px;
-  }
-
-  .motmRating {
-    min-width: 59px;
-
-    padding:
-      8px
-      6px;
-  }
-
-  .motmRating strong {
-    font-size: 22px;
-  }
-
+  .ranking { width:100%; min-width:0; }
   .playerRow {
-    min-height: 65px;
-
-    padding:
-      9px
-      9px;
-
-    grid-template-columns:
-      24px
-      42px
-      minmax(0,1fr)
-      48px;
-
-    gap: 7px;
+    width:100%; max-width:100%; min-width:0; min-height:68px; box-sizing:border-box;
+    padding:9px 10px;
+    grid-template-columns:24px 44px minmax(0,1fr) 50px;
+    gap:8px;
   }
+  .playerRow .playerAvatar { width:44px; height:44px; }
+  .playerInfo,.playerNameLine { min-width:0; }
+  .playerNameLine strong { max-width:100%; }
+  .playerMiniStats { display:none; }
+  .playerRating { min-width:48px; padding:8px 5px; font-size:16px; }
+  .playerNameLine span { display:none; }
+}
 
-  .playerRow
-  .playerAvatar {
-    width: 42px;
-    height: 42px;
-  }
-
-  .playerMiniStats {
-    display: none;
-  }
-
-  .playerRating {
-    min-width: 47px;
-
-    font-size: 15px;
-  }
-
-  .playerNameLine span {
-    display: none;
-  }
+@media
+(max-width:390px) {
+  .shell { width:calc(100% - 16px); }
+  .scoreboard { grid-template-columns:minmax(0,1fr) 94px minmax(0,1fr); gap:4px; padding-inline:6px; }
+  .teamLogo { width:82px; height:82px; }
+  .scoreBlock { min-width:94px; }
+  .scoreBlock > strong { font-size:50px; }
+  .eventRow { grid-template-columns:64px minmax(0,1fr); }
+  .timeline::before { left:52px; }
+  .motmBody { grid-template-columns:18px 62px minmax(0,1fr) 52px; gap:7px; padding-inline:8px; }
+  .playerAvatarLarge { width:60px; height:78px; }
+  .motmCopy > strong { font-size:16px; }
+  .motmRating { min-width:50px; }
+  .playerRow { grid-template-columns:21px 40px minmax(0,1fr) 46px; gap:6px; padding-inline:7px; }
+  .playerRow .playerAvatar { width:40px; height:40px; }
+  .playerRating { min-width:44px; font-size:15px; }
 }
