@@ -1319,3 +1319,109 @@ a.playerRow:hover {
     font-size: 15px;
   }
 }
+
+
+/* =========================================================
+   PLAYER CUTOUT POSITION FIX
+   Fotky vyrůstají ze spodní hrany řádku / karty.
+   ========================================================= */
+
+.motmBody {
+  position: relative;
+  align-items: stretch;
+  overflow: hidden;
+}
+
+.motmBody > .playerAvatar {
+  align-self: end;
+  justify-self: center;
+  margin-bottom: -10px;
+}
+
+.motmBody > .playerAvatar.playerAvatarHasImage img {
+  object-position: center bottom;
+}
+
+.playerRow {
+  position: relative;
+  overflow: hidden;
+  align-items: center;
+}
+
+.playerRow > .playerAvatar {
+  align-self: end;
+  justify-self: center;
+  margin-bottom: -7px;
+}
+
+.playerRow > .playerAvatar.playerAvatarHasImage {
+  width: 72px;
+  height: 82px;
+}
+
+.playerRow > .playerAvatar.playerAvatarHasImage img {
+  width: 100%;
+  height: 112%;
+  max-width: none;
+  object-fit: cover;
+  object-position: center top;
+
+  -webkit-mask-image:
+    linear-gradient(
+      to bottom,
+      #000 0%,
+      #000 72%,
+      rgba(0,0,0,.94) 82%,
+      rgba(0,0,0,.58) 91%,
+      transparent 100%
+    );
+
+  mask-image:
+    linear-gradient(
+      to bottom,
+      #000 0%,
+      #000 72%,
+      rgba(0,0,0,.94) 82%,
+      rgba(0,0,0,.58) 91%,
+      transparent 100%
+    );
+}
+
+.playerRow > .playerAvatarFallback {
+  align-self: center;
+  margin-bottom: 0;
+}
+
+@media (max-width: 650px) {
+  .motmBody > .playerAvatar {
+    margin-bottom: -8px;
+  }
+
+  .playerRow {
+    min-height: 80px;
+  }
+
+  .playerRow > .playerAvatar {
+    margin-bottom: -6px;
+  }
+
+  .playerRow > .playerAvatar.playerAvatarHasImage {
+    width: 62px;
+    height: 76px;
+  }
+
+  .playerRow > .playerAvatar.playerAvatarHasImage img {
+    height: 110%;
+  }
+}
+
+@media (max-width: 390px) {
+  .playerRow {
+    min-height: 76px;
+  }
+
+  .playerRow > .playerAvatar.playerAvatarHasImage {
+    width: 56px;
+    height: 70px;
+  }
+}
