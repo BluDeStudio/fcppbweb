@@ -122,46 +122,67 @@ export default async function MatchDetailPage({
   const matchId =
     resolvedParams.id;
 
-  const {
-    data: matchData,
-    error: matchError,
-  } = await supabase
+  const matchSelect = [
+    "id",
+    "club_id",
+    "match_title",
+    "team",
+    "date",
+    "score",
+    "time",
+    "location",
+    "finished_at",
+    "player_of_the_match_number",
+  ].join(", ");
+
+  let matchData: unknown = null;
+
+  const directResult = await supabase
     .from("finished_matches")
-    .select(
-      [
-        "id",
-        "club_id",
-        "match_title",
-        "team",
-        "date",
-        "score",
-        "time",
-        "location",
-        "finished_at",
-        "player_of_the_match_number",
-      ].join(", "),
-    )
+    .select(matchSelect)
     .eq("id", matchId)
     .maybeSingle();
 
-  if (
-    matchError
-  ) {
+  if (directResult.error) {
     console.error(
-      "Detail zápasu – finished_matches:",
-      matchError,
+      "Detail zápasu – přímé hledání podle ID:",
+      directResult.error,
     );
   }
 
-  if (
-    !matchData
-  ) {
+  matchData = directResult.data;
+
+  // Kompatibilita se starými odkazy, které používaly slug
+  // např. 2026-09-13-Moe’s-FC-PPB-B-B.
+  if (!matchData) {
+    const legacyResult = await supabase
+      .from("finished_matches")
+      .select(matchSelect);
+
+    if (legacyResult.error) {
+      console.error(
+        "Detail zápasu – fallback pro starý odkaz:",
+        legacyResult.error,
+      );
+    } else {
+      const legacyMatches =
+        (legacyResult.data ?? []) as unknown as
+          FinishedMatchDbRow[];
+
+      matchData =
+        findFinishedMatchByLegacySlug(
+          legacyMatches,
+          matchId,
+        );
+    }
+  }
+
+  if (!matchData) {
     notFound();
   }
 
   const match =
-    matchData as unknown as
-      FinishedMatchDbRow;
+    matchData as FinishedMatchDbRow;
 
   const [
     statsResponse,
@@ -1739,6 +1760,137 @@ function isFcPpb(
   ).includes(
     "fc ppb",
   );
+}
+
+function findFinishedMatchByLegacySlug(
+  matches: FinishedMatchDbRow[],
+  rawSlug: string,
+): FinishedMatchDbRow | null {
+  let decoded = rawSlug;
+
+  try {
+    decoded = decodeURIComponent(rawSlug);
+  } catch {
+    decoded = rawSlug;
+  }
+
+  const normalizedSlug =
+    normalize(decoded);
+
+  const dateMatch =
+    decoded.match(
+      /^(\d{4}-\d{2}-\d{2})/,
+    );
+
+  const wantedDate =
+    dateMatch?.[1] ?? null;
+
+  const candidates =
+    matches.filter((match) => {
+      if (
+        wantedDate &&
+        normalizeDateForLookup(match.date) !==
+          wantedDate
+      ) {
+        return false;
+      }
+
+      const title =
+        normalize(match.match_title ?? "");
+
+      return (
+        title.length > 0 &&
+        normalizedSlug.includes(title)
+      );
+    });
+
+  if (candidates.length === 1) {
+    return candidates[0];
+  }
+
+  const teamHint =
+    /(?:^|[\s-])b(?:[\s-]|$)/i.test(
+      decoded,
+    )
+      ? "B"
+      : /(?:^|[\s-])a(?:[\s-]|$)/i.test(
+            decoded,
+          )
+        ? "A"
+        : null;
+
+  if (teamHint) {
+    const byTeam =
+      candidates.find(
+        (match) =>
+          String(match.team ?? "")
+            .trim()
+            .toUpperCase() ===
+          teamHint,
+      );
+
+    if (byTeam) {
+      return byTeam;
+    }
+  }
+
+  if (candidates.length > 0) {
+    return candidates[0];
+  }
+
+  // Poslední kompatibilní fallback:
+  // datum + tým, i když starý slug a match_title nejsou zapsané stejně.
+  const byDate =
+    matches.filter(
+      (match) =>
+        !wantedDate ||
+        normalizeDateForLookup(match.date) ===
+          wantedDate,
+    );
+
+  if (teamHint) {
+    return (
+      byDate.find(
+        (match) =>
+          String(match.team ?? "")
+            .trim()
+            .toUpperCase() ===
+          teamHint,
+      ) ??
+      null
+    );
+  }
+
+  return byDate.length === 1
+    ? byDate[0]
+    : null;
+}
+
+function normalizeDateForLookup(
+  value: string | null,
+): string | null {
+  const raw =
+    String(value ?? "").trim();
+
+  const iso =
+    raw.match(
+      /^(\d{4})-(\d{1,2})-(\d{1,2})/,
+    );
+
+  if (iso) {
+    return `${iso[1]}-${String(Number(iso[2])).padStart(2, "0")}-${String(Number(iso[3])).padStart(2, "0")}`;
+  }
+
+  const cz =
+    raw.match(
+      /^(\d{1,2})\.(\d{1,2})\.(\d{4})/,
+    );
+
+  if (cz) {
+    return `${cz[3]}-${String(Number(cz[2])).padStart(2, "0")}-${String(Number(cz[1])).padStart(2, "0")}`;
+  }
+
+  return null;
 }
 
 function normalize(

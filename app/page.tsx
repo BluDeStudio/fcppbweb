@@ -35,6 +35,7 @@ type FinishedMatchRow = {
   team: string;
   date: string;
   time: string | null;
+  score: string | null;
   finishedAt: string | null;
   playerOfTheMatchNumber: number | null;
 };
@@ -296,26 +297,28 @@ export default async function HomePage() {
    */
 
   try {
-    const [
-      aFallbackMatchId,
-      bFallbackMatchId,
-    ] = await Promise.all([
-      aPlayerOfMatch
-        ? Promise.resolve(null)
-        : getLatestFinishedMatchId("A"),
+    [aLastFinishedMatchId, bLastFinishedMatchId] =
+      await Promise.all([
+        getFinishedMatchIdForDisplayedMatch(
+          "A",
+          aMatches[0] ?? null,
+        ),
+        getFinishedMatchIdForDisplayedMatch(
+          "B",
+          bMatches[0] ?? null,
+        ),
+      ]);
 
-      bPlayerOfMatch
-        ? Promise.resolve(null)
-        : getLatestFinishedMatchId("B"),
-    ]);
-
+    // Bezpečný fallback: Hráč utkání už nese skutečné finished_matches.id.
     aLastFinishedMatchId =
+      aLastFinishedMatchId ??
       aPlayerOfMatch?.matchId ??
-      aFallbackMatchId;
+      null;
 
     bLastFinishedMatchId =
+      bLastFinishedMatchId ??
       bPlayerOfMatch?.matchId ??
-      bFallbackMatchId;
+      null;
   } catch (error) {
     console.error(
       "ID posledních dokončených zápasů:",
@@ -356,13 +359,11 @@ export default async function HomePage() {
  * ============================================================
  */
 
-async function getLatestFinishedMatchId(
+async function getFinishedMatchIdForDisplayedMatch(
   team: "A" | "B",
+  displayedMatch: MatchResult | null,
 ): Promise<string | null> {
-  const {
-    data,
-    error,
-  } = await supabase
+  const { data, error } = await supabase
     .from("finished_matches")
     .select(
       [
@@ -372,6 +373,7 @@ async function getLatestFinishedMatchId(
         "team",
         "date",
         "time",
+        "score",
         "finished_at",
         "player_of_the_match_number",
       ].join(", "),
@@ -380,43 +382,144 @@ async function getLatestFinishedMatchId(
 
   if (error) {
     console.error(
-      `Nepodařilo se načíst poslední zápas ${team}-týmu:`,
+      `Nepodařilo se načíst dokončené zápasy ${team}-týmu:`,
       error,
     );
-
     return null;
   }
 
-  const matches =
-    (data ?? [])
-      .map((row) =>
-        parseFinishedMatch(row),
-      )
-      .filter(
-        (
-          value,
-        ): value is FinishedMatchRow =>
-          value !== null,
-      )
-      .sort(
-        (
-          left,
-          right,
-        ) =>
-          getFinishedMatchTimestamp(
-            right,
-          ) -
-          getFinishedMatchTimestamp(
-            left,
-          ),
-      );
+  const matches = (data ?? [])
+    .map((row) => parseFinishedMatch(row))
+    .filter(
+      (value): value is FinishedMatchRow =>
+        value !== null,
+    )
+    .sort(
+      (left, right) =>
+        getFinishedMatchTimestamp(right) -
+        getFinishedMatchTimestamp(left),
+    );
 
-  return (
-    matches[0]?.id ??
-    null
-  );
+  if (!displayedMatch) {
+    return matches[0]?.id ?? null;
+  }
+
+  const displayedDate =
+    parseMatchDateOnly(displayedMatch.date);
+
+  const displayedHome =
+    normalizeMatchName(displayedMatch.homeTeam);
+
+  const displayedAway =
+    normalizeMatchName(displayedMatch.awayTeam);
+
+  const displayedScore =
+    `${displayedMatch.homeScore}:${displayedMatch.awayScore}`;
+
+  // 1) Nejdřív datum + oba týmy. To je nejbezpečnější párování.
+  const byDateAndTeams = matches.find((match) => {
+    const internalDate =
+      parseMatchDateOnly(match.date);
+
+    if (
+      displayedDate &&
+      internalDate &&
+      displayedDate !== internalDate
+    ) {
+      return false;
+    }
+
+    const title =
+      normalizeMatchName(match.matchTitle);
+
+    return (
+      title.includes(displayedHome) &&
+      title.includes(displayedAway)
+    );
+  });
+
+  if (byDateAndTeams) {
+    return byDateAndTeams.id;
+  }
+
+  // 2) Starší záznamy mohou mít jinak napsaný název.
+  //    Zkusíme datum + výsledek.
+  const byDateAndScore = matches.find((match) => {
+    const internalDate =
+      parseMatchDateOnly(match.date);
+
+    if (
+      displayedDate &&
+      internalDate &&
+      displayedDate !== internalDate
+    ) {
+      return false;
+    }
+
+    const storedScore =
+      normalizeStoredScore(match.score);
+
+    return (
+      storedScore === displayedScore ||
+      storedScore ===
+        `${displayedMatch.awayScore}:${displayedMatch.homeScore}`
+    );
+  });
+
+  if (byDateAndScore) {
+    return byDateAndScore.id;
+  }
+
+  // 3) Poslední fallback je nejnovější interní zápas daného týmu.
+  return matches[0]?.id ?? null;
 }
 
+function parseMatchDateOnly(
+  value: string,
+): string | null {
+  const raw = String(value ?? "").trim();
+
+  const iso =
+    raw.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+
+  if (iso) {
+    return `${iso[1]}-${String(Number(iso[2])).padStart(2, "0")}-${String(Number(iso[3])).padStart(2, "0")}`;
+  }
+
+  const cz =
+    raw.match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})/);
+
+  if (cz) {
+    return `${cz[3]}-${String(Number(cz[2])).padStart(2, "0")}-${String(Number(cz[1])).padStart(2, "0")}`;
+  }
+
+  return null;
+}
+
+function normalizeMatchName(
+  value: string,
+): string {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[’‘`´]/g, "'")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+}
+
+function normalizeStoredScore(
+  value: string | null,
+): string {
+  const score =
+    String(value ?? "").match(
+      /(\d+)\s*[:\-]\s*(\d+)/,
+    );
+
+  return score
+    ? `${score[1]}:${score[2]}`
+    : "";
+}
 
 /*
  * ============================================================
@@ -446,6 +549,7 @@ async function getLatestPlayerOfMatchFromApp(
         "team",
         "date",
         "time",
+        "score",
         "finished_at",
         "player_of_the_match_number",
       ].join(", "),
@@ -1202,6 +1306,14 @@ function parseFinishedMatch(
         getObjectValue(
           raw,
           "time",
+        ),
+      ),
+
+    score:
+      toNullableString(
+        getObjectValue(
+          raw,
+          "score",
         ),
       ),
 
