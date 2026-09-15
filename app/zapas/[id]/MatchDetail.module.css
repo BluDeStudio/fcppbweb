@@ -1999,7 +1999,7 @@ a.motmBody:hover {
 
 
 /* =========================================================
-   TIMELINE — BEZ BODŮ + ČISTÝ BÍLÝ MÍČ
+   TIMELINE — BEZ BODŮ + OPRAVDOVÝ CSS MÍČ
    ========================================================= */
 
 .minute::before {
@@ -2007,7 +2007,6 @@ a.motmBody:hover {
   content: none !important;
 }
 
-/* Necháme pouze čistou svislou osu. */
 .timeline::before {
   background:
     linear-gradient(
@@ -2019,45 +2018,106 @@ a.motmBody:hover {
     );
 }
 
-/* Emoji míč vizuálně sjednotíme do čistě bílé. */
+/* Bílý fotbalový míč bez emoji. */
 .goalIcon {
+  position: relative;
+
   width: 22px;
   height: 22px;
 
-  display: grid;
-  place-items: center;
+  display: block;
+  flex: 0 0 22px;
 
   overflow: hidden;
 
+  border: 1.5px solid #fff;
+  border-radius: 50%;
+
   color: transparent;
   font-size: 0;
+
+  background:
+    radial-gradient(
+      circle at 50% 50%,
+      #080a08 0 18%,
+      transparent 19%
+    ),
+    radial-gradient(
+      circle at 22% 24%,
+      #080a08 0 10%,
+      transparent 11%
+    ),
+    radial-gradient(
+      circle at 78% 24%,
+      #080a08 0 10%,
+      transparent 11%
+    ),
+    radial-gradient(
+      circle at 20% 76%,
+      #080a08 0 10%,
+      transparent 11%
+    ),
+    radial-gradient(
+      circle at 80% 76%,
+      #080a08 0 10%,
+      transparent 11%
+    ),
+    #fff;
+
+  box-shadow:
+    0 2px 7px rgba(0,0,0,.35);
 
   filter: none;
 }
 
 .goalIcon::before {
-  content: "⚽";
+  position: absolute;
+  inset: 0;
 
-  display: block;
+  content: "";
 
-  color: #fff;
-  font-size: 18px;
-  line-height: 1;
+  border-radius: 50%;
 
-  /* z emoji udělá jednobarevnou bílou siluetu */
-  filter:
-    grayscale(1)
-    brightness(0)
-    invert(1);
+  background:
+    linear-gradient(
+      32deg,
+      transparent 44%,
+      rgba(0,0,0,.78) 45% 48%,
+      transparent 49%
+    ),
+    linear-gradient(
+      148deg,
+      transparent 44%,
+      rgba(0,0,0,.78) 45% 48%,
+      transparent 49%
+    );
+
+  opacity: .5;
+}
+
+.goalIcon::after {
+  position: absolute;
+  inset: 2px;
+
+  content: "";
+
+  border-radius: 50%;
+
+  pointer-events: none;
+
+  background:
+    radial-gradient(
+      circle at 34% 26%,
+      rgba(255,255,255,.95),
+      transparent 22%
+    );
 }
 
 @media (max-width: 650px) {
   .goalIcon {
     width: 19px;
     height: 19px;
-  }
-
-  .goalIcon::before {
-    font-size: 16px;
+    flex-basis: 19px;
+    border-width: 1.25px;
   }
 }
