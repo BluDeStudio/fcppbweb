@@ -321,12 +321,24 @@ export default async function MatchDetailPage({
     ) as unknown as
       MatchEventDbRow[];
 
-  const players =
+  const playersRaw =
     (
       playersResponse.data ??
       []
     ) as unknown as
       PlayerDbRow[];
+
+  const players =
+    playersRaw.map(
+      (player) => ({
+        ...player,
+        apf_player_id:
+          player.apf_player_id ??
+          getKnownApfPlayerId(
+            player.name,
+          ),
+      }),
+    );
 
   const ratings =
     (
@@ -1879,6 +1891,84 @@ function normalizeDateForLookup(
 
   if (cz) {
     return `${cz[3]}-${String(Number(cz[2])).padStart(2, "0")}-${String(Number(cz[1])).padStart(2, "0")}`;
+  }
+
+  return null;
+}
+
+const KNOWN_APF_PLAYER_IDS =
+  new Map<string, number>([
+    ["radim cervenak", 2945],
+    ["michal himmer", 6703],
+    ["david chlupac", 7040],
+    ["jan jebas", 1385],
+    ["petr jelinek", 6209],
+    ["martin kopriva", 4397],
+    ["jan koutecki", 6919],
+    ["petr porada", 1562],
+    ["ales psohlavec", 5143],
+    ["vojtech suchy", 3746],
+    ["jan sebek", 963],
+    ["jan vlcek", 6700],
+    ["david bass", 532],
+    ["jiri besta", 2024],
+    ["radek cervenak", 2947],
+    ["frantisek husak", 6917],
+    ["david kolarsky", 4455],
+    ["peter kotlar", 6615],
+    ["vojtech kselik", 6616],
+    ["maxim negru", 4637],
+    ["adam nekola", 6946],
+    ["jakub onody", 3389],
+    ["michaela onody sloufova", 4247],
+    ["karel pejsek", 6959],
+    ["david pelikan", 6387],
+    ["vojtech placek", 5161],
+    ["jiri rajtolar", 1743],
+    ["stanislav rajtolar", 1744],
+    ["david schmirler", 3937],
+    ["jiri stehlik", 997],
+    ["lukas tintera", 3931],
+  ]);
+
+function getKnownApfPlayerId(
+  name: string,
+): number | null {
+  const normalizedName =
+    normalize(name);
+
+  const direct =
+    KNOWN_APF_PLAYER_IDS.get(
+      normalizedName,
+    );
+
+  if (direct) {
+    return direct;
+  }
+
+  const parts =
+    normalizedName
+      .split(" ")
+      .filter(Boolean)
+      .sort()
+      .join(" ");
+
+  for (
+    const [knownName, apfId]
+    of KNOWN_APF_PLAYER_IDS
+  ) {
+    const knownParts =
+      knownName
+        .split(" ")
+        .filter(Boolean)
+        .sort()
+        .join(" ");
+
+    if (
+      knownParts === parts
+    ) {
+      return apfId;
+    }
   }
 
   return null;
