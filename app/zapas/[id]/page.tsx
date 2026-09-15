@@ -1,373 +1,130 @@
-import { HomeDashboard } from "@/components/home/HomeDashboard";
-import type { PlayerOfMatch } from "@/components/home/HomeDashboard";
-
-import { clubConfig } from "@/config/club";
+import Link from "next/link";
+import { notFound } from "next/navigation";
 
 import { supabase } from "@/lib/supabase";
-import { testSupabaseConnection } from "@/lib/testSupabase";
-
-import {
-  getDepartedPlayerIds,
-  getPublishedTransfers,
-} from "@/lib/getTransfers";
-
-import { getLeagueTable } from "@/services/apf/getLeagueTable";
+import { clubConfig } from "@/config/club";
 import { getMatchResults } from "@/services/apf/getMatchResults";
-import { getNextMatch } from "@/services/apf/getNextMatch";
-import { getSquad } from "@/services/apf/getSquad";
 
-import type { LeagueRow } from "@/types/league";
-import type { MatchResult } from "@/types/match";
-import type { NextMatch } from "@/types/nextMatch";
-import type { SquadPlayer } from "@/types/player";
-import type { ClubTransfer } from "@/types/transfer";
+import PlayerAvatar from "./PlayerAvatar";
+import styles from "./MatchDetail.module.css";
 
-/*
- * ============================================================
- * INTERNÍ TYPY PRO DATA ZE SUPABASE
- * ============================================================
- */
-
-type FinishedMatchRow = {
-  id: string;
-  clubId: string;
-  matchTitle: string;
-  team: string;
-  date: string;
-  time: string | null;
-  score: string | null;
-  finishedAt: string | null;
-  playerOfTheMatchNumber: number | null;
+type PageProps = {
+  params:
+    | Promise<{
+        id: string;
+      }>
+    | {
+        id: string;
+      };
 };
 
-type PlayerMatchStatRow = {
-  finishedMatchId: string;
-  playerNumber: number;
+type FinishedMatchDbRow = {
+  id: string;
+  club_id: string;
+  match_title: string | null;
+  team: string | null;
+  date: string | null;
+  score: string | null;
+  time: string | null;
+  location: string | null;
+  finished_at: string | null;
+  player_of_the_match_number:
+    number | null;
+};
+
+type PlayerDbRow = {
+  id: string;
+  name: string;
+  number: number | null;
+  position: string | null;
+  apf_player_id: number | null;
+};
+
+type PlayerStatDbRow = {
+  finished_match_id: string;
+  player_id: string | null;
+  player_number: number | null;
+  goals: number | null;
+  assists: number | null;
+  yellow_cards: number | null;
+  red_cards: number | null;
+  played_seconds: number | null;
+  average_rating: number | null;
+  is_player_of_the_match:
+    boolean | null;
+};
+
+type MatchEventDbRow = {
+  id: string | null;
+  type:
+    | "goal_for"
+    | "goal_against"
+    | "yellow_card"
+    | "red_card";
+  period: number | null;
+  minute: number | null;
+  match_minute: number | null;
+  scorer: number | null;
+  assist: number | null;
+  scorer_player_id:
+    string | null;
+  assist_player_id:
+    string | null;
+  card_player_number:
+    number | null;
+  card_player_id:
+    string | null;
+};
+
+type RatingDbRow = {
+  player_id: string | null;
+  player_number: number | null;
+  rating: number | null;
+};
+
+type MatchSide =
+  | "home"
+  | "away";
+
+type DisplayEvent = {
+  id: string;
+  type:
+    MatchEventDbRow["type"];
+  minute: number;
+  period: number;
+  side: MatchSide;
+  title: string;
+  subtitle: string | null;
+  score: string | null;
+};
+
+type RatedPlayer = {
   playerId: string | null;
+  apfPlayerId: number | null;
+  number: number | null;
+  name: string;
+  position: string | null;
   goals: number;
   assists: number;
-  averageRating: number | null;
+  yellowCards: number;
+  redCards: number;
+  playedSeconds: number;
+  rating: number | null;
   isPlayerOfTheMatch: boolean;
 };
 
-type AppPlayerRow = {
-  id: string;
-  clubId: string;
-  name: string;
-  number: number;
-  apfPlayerId: number | null;
-};
+export default async function MatchDetailPage({
+  params,
+}: PageProps) {
+  const resolvedParams =
+    await params;
 
-export default async function HomePage() {
-  await testSupabaseConnection();
+  const matchId =
+    resolvedParams.id;
 
-  const a = clubConfig.teams.aTeam;
-  const b = clubConfig.teams.bTeam;
-
-  let aLeagueTable: LeagueRow[] = [];
-  let bLeagueTable: LeagueRow[] = [];
-
-  let aMatches: MatchResult[] = [];
-  let bMatches: MatchResult[] = [];
-
-  let aNextMatch: NextMatch | null = null;
-  let bNextMatch: NextMatch | null = null;
-
-  let aPlayers: SquadPlayer[] = [];
-  let bPlayers: SquadPlayer[] = [];
-
-  let transfers: ClubTransfer[] = [];
-
-  let aPlayerOfMatch: PlayerOfMatch | null = null;
-  let bPlayerOfMatch: PlayerOfMatch | null = null;
-
-  let aLastFinishedMatchId: string | null = null;
-  let bLastFinishedMatchId: string | null = null;
-
-  /*
-   * ============================================================
-   * TABULKY
-   * ============================================================
-   */
-
-  try {
-    [aLeagueTable, bLeagueTable] = await Promise.all([
-      getLeagueTable({
-        competitionId: a.competition.id,
-        competitionSlug: a.competition.slug,
-        teamName: a.teamName,
-      }),
-
-      getLeagueTable({
-        competitionId: b.competition.id,
-        competitionSlug: b.competition.slug,
-        teamName: b.teamName,
-      }),
-    ]);
-  } catch (error) {
-    console.error("Tabulky APF:", error);
-  }
-
-  /*
-   * ============================================================
-   * ODEHRANÉ ZÁPASY
-   * ============================================================
-   */
-
-  try {
-    [aMatches, bMatches] = await Promise.all([
-      getMatchResults({
-        competitionId: a.competition.id,
-        competitionSlug: a.competition.slug,
-        teamName: a.teamName,
-      }),
-
-      getMatchResults({
-        competitionId: b.competition.id,
-        competitionSlug: b.competition.slug,
-        teamName: b.teamName,
-      }),
-    ]);
-  } catch (error) {
-    console.error("Výsledky APF:", error);
-  }
-
-  /*
-   * ============================================================
-   * NÁSLEDUJÍCÍ ZÁPASY
-   * ============================================================
-   */
-
-  try {
-    [aNextMatch, bNextMatch] = await Promise.all([
-      getNextMatch({
-        competitionId: a.competition.id,
-        competitionSlug: a.competition.slug,
-        teamName: a.teamName,
-      }),
-
-      getNextMatch({
-        competitionId: b.competition.id,
-        competitionSlug: b.competition.slug,
-        teamName: b.teamName,
-      }),
-    ]);
-  } catch (error) {
-    console.error("Rozpis APF:", error);
-  }
-
-  /*
-   * ============================================================
-   * SOUPISKY
-   * ============================================================
-   *
-   * Soupisky používáme dál pro ostatní části homepage.
-   *
-   * HRÁČ UTKÁNÍ už ale na soupisce NEZÁVISÍ.
-   * ============================================================
-   */
-
-  try {
-    const [aSquad, bSquad] = await Promise.all([
-      getSquad({
-        teamId: a.teamId,
-        teamSlug: a.teamSlug,
-        team: "a",
-      }),
-
-      getSquad({
-        teamId: b.teamId,
-        teamSlug: b.teamSlug,
-        team: "b",
-      }),
-    ]);
-
-    const map = new Map<number, SquadPlayer>();
-
-    [...aSquad, ...bSquad].forEach((player) => {
-      const old = map.get(player.id);
-
-      map.set(
-        player.id,
-        old
-          ? {
-              ...old,
-              ...player,
-              shirtNumber:
-                player.shirtNumber ??
-                old.shirtNumber,
-            }
-          : player,
-      );
-    });
-
-    const all = [...map.values()];
-
-    aPlayers = all.filter(
-      (player) =>
-        player.team === "a",
-    );
-
-    bPlayers = all.filter(
-      (player) =>
-        player.team === "b",
-    );
-  } catch (error) {
-    console.error("Soupisky APF:", error);
-  }
-
-  /*
-   * ============================================================
-   * PŘESTUPY
-   * ============================================================
-   */
-
-  try {
-    const [published, departed] =
-      await Promise.all([
-        getPublishedTransfers(),
-        getDepartedPlayerIds(),
-      ]);
-
-    transfers = published;
-
-    aPlayers = aPlayers.filter(
-      (player) =>
-        !departed.has(player.id),
-    );
-
-    bPlayers = bPlayers.filter(
-      (player) =>
-        !departed.has(player.id),
-    );
-  } catch (error) {
-    console.error("Přestupy:", error);
-  }
-
-  /*
-   * ============================================================
-   * HRÁČI UTKÁNÍ
-   * ============================================================
-   *
-   * DŮLEŽITÉ:
-   *
-   * HZ už NEHLEDÁME přes APF soupisku.
-   *
-   * Data jdou přímo:
-   *
-   * finished_matches
-   *        ↓
-   * finished_match_player_stats
-   *        ↓
-   * is_player_of_the_match = true
-   *        ↓
-   * player_id
-   *        ↓
-   * players
-   *
-   * Takže hráč může:
-   *
-   * - být členem A-týmu
-   * - nastoupit za B-tým
-   * - nebýt ve staré soupisce webu
-   *
-   * a homepage ho přesto správně najde.
-   * ============================================================
-   */
-
-  try {
-    [aPlayerOfMatch, bPlayerOfMatch] =
-      await Promise.all([
-        getLatestPlayerOfMatchFromApp("A"),
-        getLatestPlayerOfMatchFromApp("B"),
-      ]);
-  } catch (error) {
-    console.error("Hráči utkání:", error);
-  }
-
-  /*
-   * ============================================================
-   * INTERNÍ ID POSLEDNÍCH ODEHRANÝCH ZÁPASŮ
-   * ============================================================
-   *
-   * Tohle ID používá webový DETAIL ZÁPASU.
-   * Pokud jsme už stejné utkání načetli jako Hráče utkání,
-   * vezmeme jeho matchId bez dalšího dotazu.
-   * ============================================================
-   */
-
-  try {
-    const [
-      aResolvedMatchId,
-      bResolvedMatchId,
-    ] = await Promise.all([
-      getLatestFinishedMatchId(
-        "A",
-        aMatches[0] ?? null,
-      ),
-
-      getLatestFinishedMatchId(
-        "B",
-        bMatches[0] ?? null,
-      ),
-    ]);
-
-    aLastFinishedMatchId =
-      aResolvedMatchId ??
-      aPlayerOfMatch?.matchId ??
-      null;
-
-    bLastFinishedMatchId =
-      bResolvedMatchId ??
-      bPlayerOfMatch?.matchId ??
-      null;
-  } catch (error) {
-    console.error(
-      "ID posledních dokončených zápasů:",
-      error,
-    );
-  }
-
-  /*
-   * ============================================================
-   * HOMEPAGE
-   * ============================================================
-   */
-
-  return (
-    <>
-      <HomeDashboard
-        aNextMatch={aNextMatch}
-        bNextMatch={bNextMatch}
-        aMatches={aMatches}
-        bMatches={bMatches}
-        aLeagueTable={aLeagueTable}
-        bLeagueTable={bLeagueTable}
-        aPlayers={aPlayers}
-        bPlayers={bPlayers}
-        aPlayerOfMatch={aPlayerOfMatch}
-        bPlayerOfMatch={bPlayerOfMatch}
-        aLastFinishedMatchId={aLastFinishedMatchId}
-        bLastFinishedMatchId={bLastFinishedMatchId}
-        transfers={transfers}
-      />
-    </>
-  );
-}
-
-/*
- * ============================================================
- * INTERNÍ ID POSLEDNÍHO DOKONČENÉHO ZÁPASU
- * ============================================================
- */
-
-async function getLatestFinishedMatchId(
-  team: "A" | "B",
-  displayedMatch: MatchResult | null,
-): Promise<string | null> {
   const {
-    data,
-    error,
+    data: matchData,
+    error: matchError,
   } = await supabase
     .from("finished_matches")
     .select(
@@ -377,101 +134,1616 @@ async function getLatestFinishedMatchId(
         "match_title",
         "team",
         "date",
-        "time",
         "score",
+        "time",
+        "location",
         "finished_at",
         "player_of_the_match_number",
       ].join(", "),
     )
-    .eq("team", team);
+    .eq("id", matchId)
+    .maybeSingle();
 
-  if (error) {
+  if (
+    matchError
+  ) {
     console.error(
-      `Nepodařilo se načíst dokončené zápasy ${team}-týmu:`,
+      "Detail zápasu – finished_matches:",
+      matchError,
+    );
+  }
+
+  if (
+    !matchData
+  ) {
+    notFound();
+  }
+
+  const match =
+    matchData as unknown as
+      FinishedMatchDbRow;
+
+  const [
+    statsResponse,
+    eventsResponse,
+    playersResponse,
+    ratingsResponse,
+  ] =
+    await Promise.all([
+      supabase
+        .from(
+          "finished_match_player_stats",
+        )
+        .select(
+          [
+            "finished_match_id",
+            "player_id",
+            "player_number",
+            "goals",
+            "assists",
+            "yellow_cards",
+            "red_cards",
+            "played_seconds",
+            "average_rating",
+            "is_player_of_the_match",
+          ].join(", "),
+        )
+        .eq(
+          "finished_match_id",
+          match.id,
+        ),
+
+      supabase
+        .from(
+          "finished_match_events",
+        )
+        .select(
+          [
+            "id",
+            "type",
+            "period",
+            "minute",
+            "match_minute",
+            "scorer",
+            "assist",
+            "scorer_player_id",
+            "assist_player_id",
+            "card_player_number",
+            "card_player_id",
+          ].join(", "),
+        )
+        .eq(
+          "finished_match_id",
+          match.id,
+        ),
+
+      supabase
+        .from("players")
+        .select(
+          [
+            "id",
+            "name",
+            "number",
+            "position",
+            "apf_player_id",
+          ].join(", "),
+        )
+        .eq(
+          "club_id",
+          match.club_id,
+        ),
+
+      supabase
+        .from(
+          "match_player_ratings",
+        )
+        .select(
+          [
+            "player_id",
+            "player_number",
+            "rating",
+          ].join(", "),
+        )
+        .eq(
+          "finished_match_id",
+          match.id,
+        ),
+    ]);
+
+  if (
+    statsResponse.error
+  ) {
+    console.error(
+      "Detail zápasu – statistiky:",
+      statsResponse.error,
+    );
+  }
+
+  if (
+    eventsResponse.error
+  ) {
+    console.error(
+      "Detail zápasu – události:",
+      eventsResponse.error,
+    );
+  }
+
+  if (
+    playersResponse.error
+  ) {
+    console.error(
+      "Detail zápasu – hráči:",
+      playersResponse.error,
+    );
+  }
+
+  if (
+    ratingsResponse.error
+  ) {
+    console.error(
+      "Detail zápasu – hodnocení:",
+      ratingsResponse.error,
+    );
+  }
+
+  const stats =
+    (
+      statsResponse.data ??
+      []
+    ) as unknown as
+      PlayerStatDbRow[];
+
+  const events =
+    (
+      eventsResponse.data ??
+      []
+    ) as unknown as
+      MatchEventDbRow[];
+
+  const players =
+    (
+      playersResponse.data ??
+      []
+    ) as unknown as
+      PlayerDbRow[];
+
+  const ratings =
+    (
+      ratingsResponse.data ??
+      []
+    ) as unknown as
+      RatingDbRow[];
+
+  const playerById =
+    new Map(
+      players.map(
+        (player) => [
+          player.id,
+          player,
+        ],
+      ),
+    );
+
+  const playerByNumber =
+    new Map(
+      players
+        .filter(
+          (player) =>
+            player.number !==
+            null,
+        )
+        .map(
+          (player) => [
+            Number(
+              player.number,
+            ),
+            player,
+          ],
+        ),
+    );
+
+  const ratingByPlayerId =
+    new Map<
+      string,
+      number[]
+    >();
+
+  const ratingByNumber =
+    new Map<
+      number,
+      number[]
+    >();
+
+  for (
+    const row
+    of ratings
+  ) {
+    const value =
+      toFiniteNumber(
+        row.rating,
+      );
+
+    if (
+      value === null
+    ) {
+      continue;
+    }
+
+    if (
+      row.player_id
+    ) {
+      const list =
+        ratingByPlayerId.get(
+          row.player_id,
+        ) ?? [];
+
+      list.push(
+        value,
+      );
+
+      ratingByPlayerId.set(
+        row.player_id,
+        list,
+      );
+    } else if (
+      row.player_number !==
+      null
+    ) {
+      const number =
+        Number(
+          row.player_number,
+        );
+
+      const list =
+        ratingByNumber.get(
+          number,
+        ) ?? [];
+
+      list.push(
+        value,
+      );
+
+      ratingByNumber.set(
+        number,
+        list,
+      );
+    }
+  }
+
+  const ratedPlayers:
+    RatedPlayer[] =
+      stats
+        .map(
+          (stat) => {
+            const player =
+              stat.player_id
+                ? playerById.get(
+                    stat.player_id,
+                  )
+                : stat.player_number !==
+                    null
+                  ? playerByNumber.get(
+                      Number(
+                        stat.player_number,
+                      ),
+                    )
+                  : undefined;
+
+            const persistedRating =
+              toFiniteNumber(
+                stat.average_rating,
+              );
+
+            const rawRatings =
+              stat.player_id
+                ? ratingByPlayerId.get(
+                    stat.player_id,
+                  ) ?? []
+                : stat.player_number !==
+                    null
+                  ? ratingByNumber.get(
+                      Number(
+                        stat.player_number,
+                      ),
+                    ) ?? []
+                  : [];
+
+            const fallbackRating =
+              rawRatings.length >
+              0
+                ? roundOne(
+                    rawRatings.reduce(
+                      (
+                        sum,
+                        value,
+                      ) =>
+                        sum +
+                        value,
+                      0,
+                    ) /
+                      rawRatings.length,
+                  )
+                : null;
+
+            return {
+              playerId:
+                stat.player_id,
+
+              apfPlayerId:
+                player?.apf_player_id ??
+                null,
+
+              number:
+                player?.number ??
+                stat.player_number,
+
+              name:
+                player?.name ??
+                `Hráč #${
+                  stat.player_number ??
+                  "?"
+                }`,
+
+              position:
+                player?.position ??
+                null,
+
+              goals:
+                Number(
+                  stat.goals ??
+                  0,
+                ),
+
+              assists:
+                Number(
+                  stat.assists ??
+                  0,
+                ),
+
+              yellowCards:
+                Number(
+                  stat.yellow_cards ??
+                  0,
+                ),
+
+              redCards:
+                Number(
+                  stat.red_cards ??
+                  0,
+                ),
+
+              playedSeconds:
+                Number(
+                  stat.played_seconds ??
+                  0,
+                ),
+
+              rating:
+                persistedRating ??
+                fallbackRating,
+
+              isPlayerOfTheMatch:
+                stat.is_player_of_the_match ===
+                true,
+            };
+          },
+        )
+        .sort(
+          (
+            left,
+            right,
+          ) => {
+            if (
+              left.rating ===
+                null &&
+              right.rating !==
+                null
+            ) {
+              return 1;
+            }
+
+            if (
+              left.rating !==
+                null &&
+              right.rating ===
+                null
+            ) {
+              return -1;
+            }
+
+            if (
+              left.rating !==
+                null &&
+              right.rating !==
+                null &&
+              right.rating !==
+                left.rating
+            ) {
+              return (
+                right.rating -
+                left.rating
+              );
+            }
+
+            if (
+              right.goals !==
+              left.goals
+            ) {
+              return (
+                right.goals -
+                left.goals
+              );
+            }
+
+            return left.name.localeCompare(
+              right.name,
+              "cs",
+            );
+          },
+        );
+
+  const [
+    homeTeam,
+    awayTeam,
+  ] =
+    splitMatchTitle(
+      match.match_title ??
+      "FC PPB",
+    );
+
+  const homeIsOurs =
+    isFcPpb(
+      homeTeam,
+    );
+
+  const awayIsOurs =
+    isFcPpb(
+      awayTeam,
+    );
+
+  const [
+    ownScore,
+    opponentScore,
+  ] =
+    parseScore(
+      match.score,
+    );
+
+  let homeScore =
+    ownScore;
+
+  let awayScore =
+    opponentScore;
+
+  if (
+    awayIsOurs &&
+    !homeIsOurs
+  ) {
+    homeScore =
+      opponentScore;
+
+    awayScore =
+      ownScore;
+  }
+
+  const ourSide:
+    MatchSide =
+      awayIsOurs &&
+      !homeIsOurs
+        ? "away"
+        : "home";
+
+  const opponentSide:
+    MatchSide =
+      ourSide === "home"
+        ? "away"
+        : "home";
+
+  const sortedEvents =
+    [...events].sort(
+      (
+        left,
+        right,
+      ) => {
+        const leftMinute =
+          getEventMinute(
+            left,
+          );
+
+        const rightMinute =
+          getEventMinute(
+            right,
+          );
+
+        if (
+          leftMinute !==
+          rightMinute
+        ) {
+          return (
+            leftMinute -
+            rightMinute
+          );
+        }
+
+        return (
+          Number(
+            left.period ??
+            1,
+          ) -
+          Number(
+            right.period ??
+            1,
+          )
+        );
+      },
+    );
+
+  let runningHome = 0;
+  let runningAway = 0;
+
+  const displayEvents:
+    DisplayEvent[] =
+      sortedEvents.map(
+        (
+          event,
+          index,
+        ) => {
+          const type =
+            event.type;
+
+          const side =
+            type ===
+            "goal_for"
+              ? ourSide
+              : type ===
+                  "goal_against"
+                ? opponentSide
+                : ourSide;
+
+          let title =
+            eventLabel(
+              type,
+            );
+
+          let subtitle:
+            string | null =
+              null;
+
+          let score:
+            string | null =
+              null;
+
+          if (
+            type ===
+            "goal_for"
+          ) {
+            const scorer =
+              resolvePlayer(
+                event.scorer_player_id,
+                event.scorer,
+                playerById,
+                playerByNumber,
+              );
+
+            const assist =
+              resolvePlayer(
+                event.assist_player_id,
+                event.assist,
+                playerById,
+                playerByNumber,
+              );
+
+            title =
+              scorer?.name ??
+              "GÓL FC PPB";
+
+            subtitle =
+              assist
+                ? `Asistence: ${assist.name}`
+                : null;
+
+            if (
+              ourSide ===
+              "home"
+            ) {
+              runningHome += 1;
+            } else {
+              runningAway += 1;
+            }
+
+            score =
+              `${runningHome}:${runningAway}`;
+          } else if (
+            type ===
+            "goal_against"
+          ) {
+            title =
+              "GÓL SOUPEŘE";
+
+            if (
+              opponentSide ===
+              "home"
+            ) {
+              runningHome += 1;
+            } else {
+              runningAway += 1;
+            }
+
+            score =
+              `${runningHome}:${runningAway}`;
+          } else {
+            const cardPlayer =
+              resolvePlayer(
+                event.card_player_id,
+                event.card_player_number,
+                playerById,
+                playerByNumber,
+              );
+
+            title =
+              cardPlayer?.name ??
+              eventLabel(
+                type,
+              );
+
+            subtitle =
+              type ===
+              "yellow_card"
+                ? "Žlutá karta"
+                : "Červená karta";
+          }
+
+          return {
+            id:
+              event.id ??
+              `${type}-${getEventMinute(event)}-${index}`,
+
+            type,
+            minute:
+              getEventMinute(
+                event,
+              ),
+
+            period:
+              Number(
+                event.period ??
+                1,
+              ),
+
+            side,
+            title,
+            subtitle,
+            score,
+          };
+        },
+      );
+
+  const playerOfTheMatch =
+    ratedPlayers.find(
+      (player) =>
+        player.isPlayerOfTheMatch,
+    ) ??
+    ratedPlayers[0] ??
+    null;
+
+  const rankedPlayers =
+    ratedPlayers.filter(
+      (player) =>
+        player !==
+        playerOfTheMatch,
+    );
+
+  /*
+   * LOGA TÝMŮ
+   *
+   * FC PPB používá vlastní znak.
+   * U soupeře dohledáme APF ID z již existujících výsledků
+   * přes stejný getMatchResults, který používá homepage.
+   */
+  const teamConfig =
+    match.team === "B"
+      ? clubConfig.teams.bTeam
+      : clubConfig.teams.aTeam;
+
+  let homeTeamId:
+    number | null =
+      homeIsOurs
+        ? teamConfig.teamId
+        : null;
+
+  let awayTeamId:
+    number | null =
+      awayIsOurs
+        ? teamConfig.teamId
+        : null;
+
+  try {
+    const apfResults =
+      await getMatchResults({
+        competitionId:
+          teamConfig.competition.id,
+        competitionSlug:
+          teamConfig.competition.slug,
+        teamName:
+          teamConfig.teamName,
+      });
+
+    const normalizedHome =
+      normalize(homeTeam);
+
+    const normalizedAway =
+      normalize(awayTeam);
+
+    const matchingResult =
+      apfResults.find(
+        (result) =>
+          normalize(result.homeTeam) ===
+            normalizedHome &&
+          normalize(result.awayTeam) ===
+            normalizedAway,
+      ) ??
+      apfResults.find(
+        (result) =>
+          result.homeScore ===
+            homeScore &&
+          result.awayScore ===
+            awayScore &&
+          (
+            normalize(result.homeTeam) ===
+              normalizedHome ||
+            normalize(result.awayTeam) ===
+              normalizedAway
+          ),
+      );
+
+    if (matchingResult) {
+      homeTeamId =
+        matchingResult.homeTeamId ??
+        homeTeamId;
+
+      awayTeamId =
+        matchingResult.awayTeamId ??
+        awayTeamId;
+    }
+  } catch (error) {
+    console.error(
+      "Detail zápasu – logo soupeře:",
       error,
     );
-
-    return null;
   }
-
-  const matches =
-    (data ?? [])
-      .map((row) =>
-        parseFinishedMatch(row),
-      )
-      .filter(
-        (
-          value,
-        ): value is FinishedMatchRow =>
-          value !== null,
-      )
-      .sort(
-        (left, right) =>
-          getFinishedMatchTimestamp(right) -
-          getFinishedMatchTimestamp(left),
-      );
-
-  if (!displayedMatch) {
-    return matches[0]?.id ?? null;
-  }
-
-  const wantedHome =
-    normalizeMatchText(
-      displayedMatch.homeTeam,
-    );
-
-  const wantedAway =
-    normalizeMatchText(
-      displayedMatch.awayTeam,
-    );
-
-  const wantedScore =
-    `${displayedMatch.homeScore}:${displayedMatch.awayScore}`;
-
-  const exact =
-    matches.find((match) => {
-      const title =
-        normalizeMatchText(
-          match.matchTitle,
-        );
-
-      const hasBothTeams =
-        title.includes(
-          wantedHome,
-        ) &&
-        title.includes(
-          wantedAway,
-        );
-
-      if (!hasBothTeams) {
-        return false;
-      }
-
-      if (!match.score) {
-        return true;
-      }
-
-      const stored =
-        normalizeScore(
-          match.score,
-        );
-
-      return (
-        stored === wantedScore ||
-        stored ===
-          `${displayedMatch.awayScore}:${displayedMatch.homeScore}`
-      );
-    });
 
   return (
-    exact?.id ??
-    matches[0]?.id ??
-    null
+    <main
+      className={
+        styles.page
+      }
+    >
+      <div
+        className={
+          styles.shell
+        }
+      >
+        <Link
+          href="/"
+          className={
+            styles.backLink
+          }
+        >
+          ← ZPĚT NA HLAVNÍ STRÁNKU
+        </Link>
+
+        <section
+          className={
+            styles.hero
+          }
+        >
+          <div
+            className={
+              styles.heroWatermark
+            }
+            aria-hidden="true"
+          >
+            FC PPB
+          </div>
+
+          <div
+            className={
+              styles.heroTop
+            }
+          >
+            <span>
+              {match.team ===
+              "B"
+                ? "B-TÝM"
+                : "A-TÝM"}
+            </span>
+
+            <div>
+              {formatDate(
+                match.date,
+              )}
+
+              {match.time
+                ? ` · ${match.time}`
+                : ""}
+
+              {match.location
+                ? ` · ${match.location}`
+                : ""}
+            </div>
+          </div>
+
+          <div
+            className={
+              styles.scoreboard
+            }
+          >
+            <TeamBlock
+              name={
+                homeTeam
+              }
+              ours={
+                homeIsOurs
+              }
+              teamId={
+                homeTeamId
+              }
+            />
+
+            <div
+              className={
+                styles.scoreBlock
+              }
+            >
+              <small>
+                KONEČNÝ VÝSLEDEK
+              </small>
+
+              <strong>
+                <span>
+                  {homeScore}
+                </span>
+
+                <i>
+                  :
+                </i>
+
+                <span>
+                  {awayScore}
+                </span>
+              </strong>
+            </div>
+
+            <TeamBlock
+              name={
+                awayTeam
+              }
+              ours={
+                awayIsOurs
+              }
+              teamId={
+                awayTeamId
+              }
+            />
+          </div>
+        </section>
+
+        <div
+          className={
+            styles.contentGrid
+          }
+        >
+          <section
+            className={
+              styles.card
+            }
+          >
+            <SectionHeading
+              eyebrow="PRŮBĚH UTKÁNÍ"
+              title="ZÁPAS."
+            />
+
+            {displayEvents.length >
+            0 ? (
+              <div
+                className={
+                  styles.timeline
+                }
+              >
+                {displayEvents.map(
+                  (event) => (
+                    <EventRow
+                      key={
+                        event.id
+                      }
+                      event={
+                        event
+                      }
+                    />
+                  ),
+                )}
+              </div>
+            ) : (
+              <div
+                className={
+                  styles.empty
+                }
+              >
+                Průběh utkání
+                zatím není
+                uložený.
+              </div>
+            )}
+          </section>
+
+          <aside
+            className={
+              styles.sideColumn
+            }
+          >
+            {playerOfTheMatch ? (
+              <section
+                className={`${styles.card} ${styles.motmCard}`}
+              >
+                <SectionHeading
+                  eyebrow="NEJLEPŠÍ VÝKON"
+                  title="HRÁČ UTKÁNÍ."
+                />
+
+                <div
+                  className={
+                    styles.motmBody
+                  }
+                >
+                  <div
+                    className={
+                      styles.motmRank
+                    }
+                  >
+                    1.
+                  </div>
+
+                  <PlayerAvatar
+                    apfPlayerId={
+                      playerOfTheMatch.apfPlayerId
+                    }
+                    name={
+                      playerOfTheMatch.name
+                    }
+                    size="large"
+                  />
+
+                  <div
+                    className={
+                      styles.motmCopy
+                    }
+                  >
+                    <strong>
+                      {
+                        playerOfTheMatch.name
+                      }
+                    </strong>
+
+                    <span>
+                      {
+                        playerOfTheMatch.position
+                      }
+                    </span>
+
+                    <div
+                      className={
+                        styles.motmStats
+                      }
+                    >
+                      <b>
+                        {
+                          playerOfTheMatch.goals
+                        }
+                        <small>
+                          G
+                        </small>
+                      </b>
+
+                      <b>
+                        {
+                          playerOfTheMatch.assists
+                        }
+                        <small>
+                          A
+                        </small>
+                      </b>
+                    </div>
+                  </div>
+
+                  <div
+                    className={
+                      styles.motmRating
+                    }
+                  >
+                    <small>
+                      ZNÁMKA
+                    </small>
+
+                    <strong>
+                      {playerOfTheMatch.rating !==
+                      null
+                        ? playerOfTheMatch.rating.toFixed(
+                            1,
+                          )
+                        : "—"}
+                    </strong>
+                  </div>
+                </div>
+              </section>
+            ) : null}
+
+            <section
+              className={
+                styles.card
+              }
+            >
+              <SectionHeading
+                eyebrow="SOUPISKA"
+                title="HODNOCENÍ."
+              />
+
+              <div
+                className={
+                  styles.ranking
+                }
+              >
+                {rankedPlayers.length >
+                0 ? (
+                  rankedPlayers.map(
+                    (
+                      player,
+                      index,
+                    ) => (
+                      <PlayerRatingRow
+                        key={
+                          player.playerId ??
+                          `${player.number}-${player.name}`
+                        }
+                        player={
+                          player
+                        }
+                        position={
+                          index +
+                          2
+                        }
+                      />
+                    ),
+                  )
+                ) : (
+                  <div
+                    className={
+                      styles.empty
+                    }
+                  >
+                    Hodnocení hráčů
+                    není k dispozici.
+                  </div>
+                )}
+              </div>
+            </section>
+          </aside>
+        </div>
+      </div>
+    </main>
   );
 }
 
-function normalizeMatchText(
-  value: string,
+function TeamBlock({
+  name,
+  ours,
+  teamId,
+}: {
+  name: string;
+  ours: boolean;
+  teamId: number | null;
+}) {
+  const initials =
+    name
+      .split(/\s+/)
+      .filter(Boolean)
+      .slice(0, 2)
+      .map(
+        (part) =>
+          part[0]?.toUpperCase() ??
+          "",
+      )
+      .join("");
+
+  const logoSrc =
+    ours
+      ? "/images/fc-ppb-logo.png"
+      : teamId
+        ? `/teams/${teamId}.png`
+        : null;
+
+  return (
+    <div
+      className={
+        styles.team
+      }
+    >
+      <div
+        className={
+          styles.teamLogo
+        }
+      >
+        {logoSrc ? (
+          <img
+            src={logoSrc}
+            alt={`Logo ${name}`}
+          />
+        ) : (
+          <span>
+            {initials}
+          </span>
+        )}
+      </div>
+
+      <strong>
+        {name}
+      </strong>
+    </div>
+  );
+}
+
+function SectionHeading({
+  eyebrow,
+  title,
+}: {
+  eyebrow: string;
+  title: string;
+}) {
+  return (
+    <div
+      className={
+        styles.sectionHeading
+      }
+    >
+      <span>
+        {eyebrow}
+      </span>
+
+      <h2>
+        {title}
+      </h2>
+    </div>
+  );
+}
+
+function EventRow({
+  event,
+}: {
+  event:
+    DisplayEvent;
+}) {
+  const isHome =
+    event.side ===
+    "home";
+
+  const isGoal =
+    event.type ===
+      "goal_for" ||
+    event.type ===
+      "goal_against";
+
+  const isYellow =
+    event.type ===
+    "yellow_card";
+
+  const isRed =
+    event.type ===
+    "red_card";
+
+  return (
+    <div
+      className={`${styles.eventRow} ${
+        event.type === "goal_against"
+          ? styles.eventRowAgainst
+          : event.type === "goal_for"
+            ? styles.eventRowFor
+            : ""
+      }`}
+    >
+      <div
+        className={`${styles.eventContent} ${
+          isHome
+            ? styles.eventHome
+            : styles.eventAway
+        }`}
+      >
+        <div
+          className={
+            styles.eventText
+          }
+        >
+          <strong>
+            {event.title}
+          </strong>
+
+          {event.subtitle ? (
+            <span>
+              {event.subtitle}
+            </span>
+          ) : null}
+        </div>
+
+        <div
+          className={
+            styles.eventBadge
+          }
+        >
+          {isGoal ? (
+            <span
+              className={
+                styles.goalIcon
+              }
+            >
+              ⚽
+            </span>
+          ) : null}
+
+          {isYellow ? (
+            <span
+              className={
+                styles.yellowCard
+              }
+            />
+          ) : null}
+
+          {isRed ? (
+            <span
+              className={
+                styles.redCard
+              }
+            />
+          ) : null}
+
+          {event.score ? (
+            <b>
+              {event.score}
+            </b>
+          ) : null}
+        </div>
+      </div>
+
+      <div
+        className={
+          styles.minute
+        }
+      >
+        <strong>
+          {event.minute}
+          '
+        </strong>
+
+        <small>
+          {event.period}.
+          POLOČAS
+        </small>
+      </div>
+    </div>
+  );
+}
+
+function PlayerRatingRow({
+  player,
+  position,
+}: {
+  player:
+    RatedPlayer;
+
+  position:
+    number;
+}) {
+  const content = (
+    <>
+      <div
+        className={
+          styles.rank
+        }
+      >
+        {position}.
+      </div>
+
+      <PlayerAvatar
+        apfPlayerId={
+          player.apfPlayerId
+        }
+        name={
+          player.name
+        }
+      />
+
+      <div
+        className={
+          styles.playerInfo
+        }
+      >
+        <div
+          className={
+            styles.playerNameLine
+          }
+        >
+          <strong>
+            {player.name}
+          </strong>
+
+          {player.isPlayerOfTheMatch ? (
+            <span>
+              HRÁČ UTKÁNÍ
+            </span>
+          ) : null}
+        </div>
+
+        <small>
+          {[
+            player.position,
+            player.number !==
+            null
+              ? `#${player.number}`
+              : null,
+          ]
+            .filter(Boolean)
+            .join(" · ")}
+        </small>
+      </div>
+
+      <div
+        className={
+          styles.playerMiniStats
+        }
+      >
+        <span>
+          <b>
+            {
+              player.goals
+            }
+          </b>
+          G
+        </span>
+
+        <span>
+          <b>
+            {
+              player.assists
+            }
+          </b>
+          A
+        </span>
+
+        {player.yellowCards > 0 ? (
+          <span className={styles.cardStat}>
+            <i className={styles.yellowCardMini} />
+            <b>{player.yellowCards}</b>
+          </span>
+        ) : null}
+
+        {player.redCards > 0 ? (
+          <span className={styles.cardStat}>
+            <i className={styles.redCardMini} />
+            <b>{player.redCards}</b>
+          </span>
+        ) : null}
+      </div>
+
+      <div
+        className={
+          styles.playerRating
+        }
+      >
+        {player.rating !==
+        null
+          ? player.rating.toFixed(
+              1,
+            )
+          : "—"}
+      </div>
+    </>
+  );
+
+  if (
+    player.apfPlayerId
+  ) {
+    return (
+      <Link
+        href={`/hrac/${player.apfPlayerId}`}
+        className={
+          styles.playerRow
+        }
+      >
+        {content}
+      </Link>
+    );
+  }
+
+  return (
+    <div
+      className={
+        styles.playerRow
+      }
+    >
+      {content}
+    </div>
+  );
+}
+
+function resolvePlayer(
+  playerId:
+    string | null,
+  playerNumber:
+    number | null,
+  playerById:
+    Map<string, PlayerDbRow>,
+  playerByNumber:
+    Map<number, PlayerDbRow>,
+): PlayerDbRow | null {
+  if (
+    playerId
+  ) {
+    const byId =
+      playerById.get(
+        playerId,
+      );
+
+    if (
+      byId
+    ) {
+      return byId;
+    }
+  }
+
+  if (
+    playerNumber !==
+    null
+  ) {
+    return (
+      playerByNumber.get(
+        Number(
+          playerNumber,
+        ),
+      ) ??
+      null
+    );
+  }
+
+  return null;
+}
+
+function getEventMinute(
+  event:
+    MatchEventDbRow,
+): number {
+  return Number(
+    event.match_minute ??
+    event.minute ??
+    0,
+  );
+}
+
+function eventLabel(
+  type:
+    MatchEventDbRow["type"],
+): string {
+  switch (
+    type
+  ) {
+    case "goal_for":
+      return "GÓL FC PPB";
+
+    case "goal_against":
+      return "GÓL SOUPEŘE";
+
+    case "yellow_card":
+      return "ŽLUTÁ KARTA";
+
+    case "red_card":
+      return "ČERVENÁ KARTA";
+
+    default:
+      return "UDÁLOST";
+  }
+}
+
+function splitMatchTitle(
+  value:
+    string,
+): [
+  string,
+  string,
+] {
+  const cleaned =
+    value.trim();
+
+  const separators = [
+    /\s+vs\.?\s+/i,
+    /\s+–\s+/,
+    /\s+—\s+/,
+    /\s+-\s+/,
+  ];
+
+  for (
+    const separator
+    of separators
+  ) {
+    const parts =
+      cleaned.split(
+        separator,
+      );
+
+    if (
+      parts.length >=
+      2
+    ) {
+      return [
+        parts[0].trim(),
+        parts
+          .slice(1)
+          .join(" - ")
+          .trim(),
+      ];
+    }
+  }
+
+  return [
+    cleaned ||
+      "FC PPB",
+    "SOUPEŘ",
+  ];
+}
+
+function parseScore(
+  value:
+    string | null,
+): [
+  number,
+  number,
+] {
+  const match =
+    String(
+      value ??
+      "",
+    ).match(
+      /(\d+)\s*[:\-]\s*(\d+)/,
+    );
+
+  if (
+    !match
+  ) {
+    return [
+      0,
+      0,
+    ];
+  }
+
+  return [
+    Number(
+      match[1],
+    ),
+    Number(
+      match[2],
+    ),
+  ];
+}
+
+function isFcPpb(
+  value:
+    string,
+): boolean {
+  return normalize(
+    value,
+  ).includes(
+    "fc ppb",
+  );
+}
+
+function normalize(
+  value:
+    string,
 ): string {
   return value
     .normalize("NFD")
@@ -487,1119 +1759,60 @@ function normalizeMatchText(
     .trim();
 }
 
-function normalizeScore(
-  value: string,
-): string {
-  const match =
-    value.match(
-      /(\d+)\s*[:\-]\s*(\d+)/,
-    );
-
-  return match
-    ? `${match[1]}:${match[2]}`
-    : "";
-}
-
-/*
- * ============================================================
- * NAČTENÍ POSLEDNÍHO HRÁČE UTKÁNÍ PŘÍMO ZE SUPABASE
- * ============================================================
- */
-
-async function getLatestPlayerOfMatchFromApp(
-  team: "A" | "B",
-): Promise<PlayerOfMatch | null> {
-  /*
-   * ------------------------------------------------------------
-   * 1. POSLEDNÍ DOKONČENÝ ZÁPAS
-   * ------------------------------------------------------------
-   */
-
-  const {
-    data: matchesData,
-    error: matchesError,
-  } = await supabase
-    .from("finished_matches")
-    .select(
-      [
-        "id",
-        "club_id",
-        "match_title",
-        "team",
-        "date",
-        "time",
-        "score",
-        "finished_at",
-        "player_of_the_match_number",
-      ].join(", "),
-    )
-    .eq("team", team);
-
-  if (matchesError) {
-    console.error(
-      `HZ ${team} – chyba při načítání posledního zápasu:`,
-      matchesError,
-    );
-
-    return null;
-  }
-
-  const parsedMatches =
-    (matchesData ?? [])
-      .map((raw) =>
-        parseFinishedMatch(raw),
-      )
-      .filter(
-        (
-          value,
-        ): value is FinishedMatchRow =>
-          value !== null,
-      )
-      .sort(
-        (
-          left,
-          right,
-        ) =>
-          getFinishedMatchTimestamp(
-            right,
-          ) -
-          getFinishedMatchTimestamp(
-            left,
-          ),
-      );
-
-  const match =
-    parsedMatches[0] ??
-    null;
-
-  if (!match) {
-    console.warn(
-      `HZ ${team} – žádný dokončený zápas.`,
-    );
-
-    return null;
-  }
-
-  /*
-   * ------------------------------------------------------------
-   * 2. ŘÁDEK HRÁČE UTKÁNÍ
-   * ------------------------------------------------------------
-   */
-
-  const {
-    data: winnerStatsData,
-    error: winnerStatsError,
-  } = await supabase
-    .from(
-      "finished_match_player_stats",
-    )
-    .select(
-      [
-        "finished_match_id",
-        "player_number",
-        "player_id",
-        "goals",
-        "assists",
-        "average_rating",
-        "is_player_of_the_match",
-      ].join(", "),
-    )
-    .eq(
-      "finished_match_id",
-      match.id,
-    )
-    .eq(
-      "is_player_of_the_match",
-      true,
-    )
-    .limit(1);
-
-  if (winnerStatsError) {
-    console.error(
-      `HZ ${team} – chyba při načítání vítěze:`,
-      winnerStatsError,
-    );
-
-    return null;
-  }
-
-  let winnerStat:
-    PlayerMatchStatRow | null =
-      null;
-
-  const winnerRaw =
-    winnerStatsData?.[0];
-
-  if (winnerRaw) {
-    winnerStat =
-      parsePlayerMatchStat(
-        winnerRaw,
-      );
-  }
-
-  /*
-   * ------------------------------------------------------------
-   * FALLBACK:
-   *
-   * Pokud starší zápas nemá
-   * is_player_of_the_match,
-   * použijeme player_of_the_match_number
-   * z finished_matches.
-   * ------------------------------------------------------------
-   */
-
-  if (
-    !winnerStat &&
-    match.playerOfTheMatchNumber !== null
-  ) {
-    const {
-      data: fallbackStatsData,
-      error: fallbackStatsError,
-    } = await supabase
-      .from(
-        "finished_match_player_stats",
-      )
-      .select(
-        [
-          "finished_match_id",
-          "player_number",
-          "player_id",
-          "goals",
-          "assists",
-          "average_rating",
-          "is_player_of_the_match",
-        ].join(", "),
-      )
-      .eq(
-        "finished_match_id",
-        match.id,
-      )
-      .eq(
-        "player_number",
-        match.playerOfTheMatchNumber,
-      )
-      .limit(1);
-
-    if (fallbackStatsError) {
-      console.error(
-        `HZ ${team} – fallback podle čísla hráče selhal:`,
-        fallbackStatsError,
-      );
-    }
-
-    const fallbackRaw =
-      fallbackStatsData?.[0];
-
-    if (fallbackRaw) {
-      winnerStat =
-        parsePlayerMatchStat(
-          fallbackRaw,
-        );
-    }
-  }
-
-  if (!winnerStat) {
-    console.warn(
-      `HZ ${team} – zápas "${match.matchTitle}" nemá hráče utkání.`,
-    );
-
-    return null;
-  }
-
-  /*
-   * ------------------------------------------------------------
-   * 3. NAČTENÍ HRÁČE PODLE PLAYER_ID
-   * ------------------------------------------------------------
-   */
-
-  let player:
-    AppPlayerRow | null =
-      null;
-
-  if (winnerStat.playerId) {
-    const {
-      data: playerData,
-      error: playerError,
-    } = await supabase
-      .from("players")
-      .select(
-        [
-          "id",
-          "club_id",
-          "name",
-          "number",
-          "apf_player_id",
-        ].join(", "),
-      )
-      .eq(
-        "id",
-        winnerStat.playerId,
-      )
-      .maybeSingle();
-
-    if (playerError) {
-      console.error(
-        `HZ ${team} – chyba při načítání hráče podle player_id:`,
-        playerError,
-      );
-    }
-
-    if (playerData) {
-      player =
-        parseAppPlayer(
-          playerData,
-        );
-    }
-  }
-
-  /*
-   * ------------------------------------------------------------
-   * FALLBACK PODLE ČÍSLA HRÁČE
-   * ------------------------------------------------------------
-   *
-   * Hodí se pro starší zápasy,
-   * kde player_id nemuselo být uložené.
-   * ------------------------------------------------------------
-   */
-
-  if (!player) {
-    const {
-      data: playerByNumberData,
-      error: playerByNumberError,
-    } = await supabase
-      .from("players")
-      .select(
-        [
-          "id",
-          "club_id",
-          "name",
-          "number",
-          "apf_player_id",
-        ].join(", "),
-      )
-      .eq(
-        "club_id",
-        match.clubId,
-      )
-      .eq(
-        "number",
-        winnerStat.playerNumber,
-      )
-      .limit(1);
-
-    if (playerByNumberError) {
-      console.error(
-        `HZ ${team} – chyba při načítání hráče podle čísla:`,
-        playerByNumberError,
-      );
-    }
-
-    const playerRaw =
-      playerByNumberData?.[0];
-
-    if (playerRaw) {
-      player =
-        parseAppPlayer(
-          playerRaw,
-        );
-    }
-  }
-
-  if (!player) {
-    console.warn(
-      `HZ ${team} – hráč utkání byl nalezen ve statistikách, ale nepodařilo se najít jeho profil.`,
-    );
-
-    return null;
-  }
-
-  /*
-   * ------------------------------------------------------------
-   * 4. HODNOCENÍ
-   * ------------------------------------------------------------
-   *
-   * Aplikace už ukládá výslednou známku přímo do:
-   *
-   * finished_match_player_stats.average_rating
-   *
-   * Tohle je stejná známka, kterou vidíme ve statistikách.
-   * Např. pro poslední zápasy:
-   *
-   * Jan Jebas = 8.9
-   * Vojtěch Kselík = 7.1
-   *
-   * Proto ji používáme jako hlavní zdroj pro kartu HRÁČ UTKÁNÍ.
-   * Raw hlasování v match_player_ratings je pouze fallback,
-   * kdyby average_rating u staršího zápasu nebylo uložené.
-   * ------------------------------------------------------------
-   */
-
-  let rating =
-    winnerStat.averageRating;
-
-  let ratingVotes = 0;
-
-  if (
-    rating === null &&
-    winnerStat.playerId
-  ) {
-    const ratingResult =
-      await loadPlayerRating({
-        matchId:
-          match.id,
-
-        playerId:
-          winnerStat.playerId,
-
-        playerNumber:
-          null,
-      });
-
-    rating =
-      ratingResult.rating;
-
-    ratingVotes =
-      ratingResult.votes;
-  }
-
-  /*
-   * ------------------------------------------------------------
-   * 5. APF ID
-   * ------------------------------------------------------------
-   *
-   * Homepage používá APF ID jako číselné ID
-   * hráče – mimo jiné pro jeho fotku.
-   * ------------------------------------------------------------
-   */
-
-  if (
-    player.apfPlayerId ===
-    null
-  ) {
-    console.warn(
-      `HZ ${team} – ${player.name} nemá v databázi nastavené apf_player_id.`,
-    );
-
-    return null;
-  }
-
-  /*
-   * ------------------------------------------------------------
-   * 6. HOTOVÝ HRÁČ UTKÁNÍ
-   * ------------------------------------------------------------
-   */
-
-  return {
-    id:
-      player.apfPlayerId,
-
-    name:
-      player.name,
-
-    goals:
-      winnerStat.goals,
-
-    assists:
-      winnerStat.assists,
-
-    rating,
-
-    ratingVotes,
-
-    matchId:
-      match.id,
-
-    matchTitle:
-      match.matchTitle,
-
-    matchDate:
-      match.date,
-  };
-}
-
-/*
- * ============================================================
- * ČAS DOKONČENÉHO ZÁPASU
- * ============================================================
- *
- * finished_matches.date je historicky uložené v různých
- * formátech, takže ho NESMÍME řadit textově v Supabase.
- * ============================================================
- */
-
-function getFinishedMatchTimestamp(
-  match: FinishedMatchRow,
-): number {
-  const parsedDate =
-    parseMatchDateTime(
-      match.date,
-      match.time,
-    );
-
-  if (
-    parsedDate !== null
-  ) {
-    return parsedDate;
-  }
-
-  if (
-    match.finishedAt
-  ) {
-    const finishedAt =
-      new Date(
-        match.finishedAt,
-      ).getTime();
-
-    if (
-      Number.isFinite(
-        finishedAt,
-      )
-    ) {
-      return finishedAt;
-    }
-  }
-
-  return 0;
-}
-
-function parseMatchDateTime(
-  dateValue: string,
-  timeValue: string | null,
+function toFiniteNumber(
+  value:
+    unknown,
 ): number | null {
-  const raw =
-    String(
-      dateValue ?? "",
-    ).trim();
-
-  if (!raw) {
+  if (
+    value === null ||
+    value === undefined ||
+    value === ""
+  ) {
     return null;
   }
 
-  const isoMatch =
-    raw.match(
-      /^(\d{4})-(\d{1,2})-(\d{1,2})(?:[T\s](\d{1,2}):(\d{2}))?/,
+  const number =
+    Number(
+      value,
     );
-
-  if (isoMatch) {
-    const year =
-      Number(
-        isoMatch[1],
-      );
-
-    const month =
-      Number(
-        isoMatch[2],
-      );
-
-    const day =
-      Number(
-        isoMatch[3],
-      );
-
-    const fallbackTime =
-      String(
-        timeValue ?? "",
-      ).match(
-        /^(\d{1,2}):(\d{2})/,
-      );
-
-    const hour =
-      Number(
-        isoMatch[4] ??
-        fallbackTime?.[1] ??
-        0,
-      );
-
-    const minute =
-      Number(
-        isoMatch[5] ??
-        fallbackTime?.[2] ??
-        0,
-      );
-
-    return new Date(
-      year,
-      month - 1,
-      day,
-      hour,
-      minute,
-      0,
-      0,
-    ).getTime();
-  }
-
-  const czMatch =
-    raw.match(
-      /^(\d{1,2})\.(\d{1,2})\.(\d{4})(?:\s+(\d{1,2}):(\d{2}))?/,
-    );
-
-  if (czMatch) {
-    const day =
-      Number(
-        czMatch[1],
-      );
-
-    const month =
-      Number(
-        czMatch[2],
-      );
-
-    const year =
-      Number(
-        czMatch[3],
-      );
-
-    const fallbackTime =
-      String(
-        timeValue ?? "",
-      ).match(
-        /^(\d{1,2}):(\d{2})/,
-      );
-
-    const hour =
-      Number(
-        czMatch[4] ??
-        fallbackTime?.[1] ??
-        0,
-      );
-
-    const minute =
-      Number(
-        czMatch[5] ??
-        fallbackTime?.[2] ??
-        0,
-      );
-
-    return new Date(
-      year,
-      month - 1,
-      day,
-      hour,
-      minute,
-      0,
-      0,
-    ).getTime();
-  }
-
-  const nativeTime =
-    new Date(
-      raw,
-    ).getTime();
 
   return Number.isFinite(
-    nativeTime,
+    number,
   )
-    ? nativeTime
+    ? number
     : null;
 }
 
-/*
- * ============================================================
- * NAČTENÍ PRŮMĚRNÉHO HODNOCENÍ
- * ============================================================
- */
-
-async function loadPlayerRating({
-  matchId,
-  playerId,
-  playerNumber,
-}: {
-  matchId: string;
-  playerId: string | null;
-  playerNumber: number | null;
-}): Promise<{
-  rating: number | null;
-  votes: number;
-}> {
-  let query = supabase
-    .from(
-      "match_player_ratings",
-    )
-    .select("rating")
-    .eq(
-      "finished_match_id",
-      matchId,
-    );
-
-  if (playerId) {
-    query =
-      query.eq(
-        "player_id",
-        playerId,
-      );
-  } else if (
-    playerNumber !== null
-  ) {
-    query =
-      query.eq(
-        "player_number",
-        playerNumber,
-      );
-  } else {
-    return {
-      rating: null,
-      votes: 0,
-    };
-  }
-
-  const {
-    data,
-    error,
-  } =
-    await query;
-
-  if (error) {
-    console.error(
-      "Nepodařilo se načíst hodnocení hráče:",
-      error,
-    );
-
-    return {
-      rating: null,
-      votes: 0,
-    };
-  }
-
-  const values =
-    (data ?? [])
-      .map(
-        (row) =>
-          toNumber(
-            getObjectValue(
-              row,
-              "rating",
-            ),
-          ),
-      )
-      .filter(
-        (
-          value,
-        ): value is number =>
-          value !== null,
-      );
-
-  if (
-    values.length ===
-    0
-  ) {
-    return {
-      rating: null,
-      votes: 0,
-    };
-  }
-
-  const average =
-    values.reduce(
-      (
-        sum,
-        value,
-      ) =>
-        sum + value,
-      0,
-    ) /
-    values.length;
-
-  return {
-    rating:
-      roundToOne(
-        average,
-      ),
-
-    votes:
-      values.length,
-  };
-}
-
-/*
- * ============================================================
- * PARSER – FINISHED MATCH
- * ============================================================
- */
-
-function parseFinishedMatch(
-  raw: unknown,
-): FinishedMatchRow | null {
-  const id =
-    toStringValue(
-      getObjectValue(
-        raw,
-        "id",
-      ),
-    );
-
-  const clubId =
-    toStringValue(
-      getObjectValue(
-        raw,
-        "club_id",
-      ),
-    );
-
-  const matchTitle =
-    toStringValue(
-      getObjectValue(
-        raw,
-        "match_title",
-      ),
-    );
-
-  const team =
-    toStringValue(
-      getObjectValue(
-        raw,
-        "team",
-      ),
-    );
-
-  const date =
-    toStringValue(
-      getObjectValue(
-        raw,
-        "date",
-      ),
-    );
-
-  if (
-    !id ||
-    !clubId ||
-    !matchTitle ||
-    !team ||
-    !date
-  ) {
-    return null;
-  }
-
-  return {
-    id,
-
-    clubId,
-
-    matchTitle,
-
-    team,
-
-    date,
-
-    time:
-      toNullableString(
-        getObjectValue(
-          raw,
-          "time",
-        ),
-      ),
-
-    score:
-      toNullableString(
-        getObjectValue(
-          raw,
-          "score",
-        ),
-      ),
-
-    finishedAt:
-      toNullableString(
-        getObjectValue(
-          raw,
-          "finished_at",
-        ),
-      ),
-
-    playerOfTheMatchNumber:
-      toNumber(
-        getObjectValue(
-          raw,
-          "player_of_the_match_number",
-        ),
-      ),
-  };
-}
-
-/*
- * ============================================================
- * PARSER – MATCH PLAYER STAT
- * ============================================================
- */
-
-function parsePlayerMatchStat(
-  raw: unknown,
-): PlayerMatchStatRow | null {
-  const finishedMatchId =
-    toStringValue(
-      getObjectValue(
-        raw,
-        "finished_match_id",
-      ),
-    );
-
-  const playerNumber =
-    toNumber(
-      getObjectValue(
-        raw,
-        "player_number",
-      ),
-    );
-
-  if (
-    !finishedMatchId ||
-    playerNumber === null
-  ) {
-    return null;
-  }
-
-  return {
-    finishedMatchId,
-
-    playerNumber,
-
-    playerId:
-      toNullableString(
-        getObjectValue(
-          raw,
-          "player_id",
-        ),
-      ),
-
-    goals:
-      toNumber(
-        getObjectValue(
-          raw,
-          "goals",
-        ),
-      ) ?? 0,
-
-    assists:
-      toNumber(
-        getObjectValue(
-          raw,
-          "assists",
-        ),
-      ) ?? 0,
-
-    averageRating:
-      toNumber(
-        getObjectValue(
-          raw,
-          "average_rating",
-        ),
-      ),
-
-    isPlayerOfTheMatch:
-      getObjectValue(
-        raw,
-        "is_player_of_the_match",
-      ) === true,
-  };
-}
-
-/*
- * ============================================================
- * PARSER – PLAYER
- * ============================================================
- */
-
-function parseAppPlayer(
-  raw: unknown,
-): AppPlayerRow | null {
-  const id =
-    toStringValue(
-      getObjectValue(
-        raw,
-        "id",
-      ),
-    );
-
-  const clubId =
-    toStringValue(
-      getObjectValue(
-        raw,
-        "club_id",
-      ),
-    );
-
-  const name =
-    toStringValue(
-      getObjectValue(
-        raw,
-        "name",
-      ),
-    );
-
-  const number =
-    toNumber(
-      getObjectValue(
-        raw,
-        "number",
-      ),
-    );
-
-  if (
-    !id ||
-    !clubId ||
-    !name ||
-    number === null
-  ) {
-    return null;
-  }
-
-  return {
-    id,
-
-    clubId,
-
-    name,
-
+function roundOne(
+  value:
     number,
-
-    apfPlayerId:
-      toNumber(
-        getObjectValue(
-          raw,
-          "apf_player_id",
-        ),
-      ),
-  };
-}
-
-/*
- * ============================================================
- * BEZPEČNÉ ČTENÍ OBJEKTU
- * ============================================================
- */
-
-function getObjectValue(
-  value: unknown,
-  key: string,
-): unknown {
-  if (
-    typeof value !==
-      "object" ||
-    value === null
-  ) {
-    return undefined;
-  }
-
-  return (
-    value as Record<
-      string,
-      unknown
-    >
-  )[key];
-}
-
-/*
- * ============================================================
- * PŘEVOD NA STRING
- * ============================================================
- */
-
-function toStringValue(
-  value: unknown,
-): string | null {
-  if (
-    typeof value ===
-    "string"
-  ) {
-    const trimmed =
-      value.trim();
-
-    return trimmed.length >
-      0
-      ? trimmed
-      : null;
-  }
-
-  if (
-    typeof value ===
-      "number" &&
-    Number.isFinite(
-      value,
-    )
-  ) {
-    return String(value);
-  }
-
-  return null;
-}
-
-/*
- * ============================================================
- * NULLABLE STRING
- * ============================================================
- */
-
-function toNullableString(
-  value: unknown,
-): string | null {
-  if (
-    value === null ||
-    value === undefined
-  ) {
-    return null;
-  }
-
-  return toStringValue(
-    value,
-  );
-}
-
-/*
- * ============================================================
- * PŘEVOD NA NUMBER
- * ============================================================
- */
-
-function toNumber(
-  value: unknown,
-): number | null {
-  if (
-    typeof value ===
-      "number" &&
-    Number.isFinite(
-      value,
-    )
-  ) {
-    return value;
-  }
-
-  if (
-    typeof value ===
-    "string"
-  ) {
-    const trimmed =
-      value.trim();
-
-    if (
-      trimmed ===
-      ""
-    ) {
-      return null;
-    }
-
-    const number =
-      Number(trimmed);
-
-    return Number.isFinite(
-      number,
-    )
-      ? number
-      : null;
-  }
-
-  return null;
-}
-
-/*
- * ============================================================
- * ZAOKROUHLENÍ HODNOCENÍ
- * ============================================================
- */
-
-function roundToOne(
-  value: number,
 ): number {
-  return (
-    Math.round(
-      value * 10,
-    ) / 10
-  );
+  return Math.round(
+    value *
+      10,
+  ) / 10;
+}
+
+function formatDate(
+  value:
+    string | null,
+): string {
+  if (
+    !value
+  ) {
+    return "DATUM NEUVEDENO";
+  }
+
+  const iso =
+    value.match(
+      /^(\d{4})-(\d{1,2})-(\d{1,2})/,
+    );
+
+  if (
+    iso
+  ) {
+    return `${iso[3]}.${iso[2]}.${iso[1]}`;
+  }
+
+  return value;
 }
