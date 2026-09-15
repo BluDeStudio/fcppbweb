@@ -49,6 +49,9 @@ type Props = {
   aPlayerOfMatch: PlayerOfMatch | null;
   bPlayerOfMatch: PlayerOfMatch | null;
 
+  aLastFinishedMatchId: string | null;
+  bLastFinishedMatchId: string | null;
+
   transfers: ClubTransfer[];
 };
 
@@ -135,6 +138,9 @@ export function HomeDashboard(
                   props.aMatches[0] ??
                   null
                 }
+                matchId={
+                  props.aLastFinishedMatchId
+                }
               />
             </div>
           </TeamFrame>
@@ -160,6 +166,9 @@ export function HomeDashboard(
                 match={
                   props.bMatches[0] ??
                   null
+                }
+                matchId={
+                  props.bLastFinishedMatchId
                 }
               />
             </div>
@@ -442,9 +451,13 @@ function TeamCardFrame({
 
 function LastMatchPanel({
   match,
+  matchId,
 }: {
   match:
     MatchResult | null;
+
+  matchId:
+    string | null;
 }) {
   return (
     <article
@@ -513,7 +526,13 @@ function LastMatchPanel({
               {match.date}
             </span>
 
-            {match.detailUrl ? (
+            {matchId ? (
+              <Link
+                href={`/zapas/${matchId}`}
+              >
+                DETAIL →
+              </Link>
+            ) : match.detailUrl ? (
               <a
                 href={
                   match.detailUrl
@@ -521,7 +540,7 @@ function LastMatchPanel({
                 target="_blank"
                 rel="noreferrer"
               >
-                DETAIL ↗
+                APF ↗
               </a>
             ) : null}
           </div>

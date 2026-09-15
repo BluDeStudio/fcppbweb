@@ -80,6 +80,9 @@ export default async function HomePage() {
   let aPlayerOfMatch: PlayerOfMatch | null = null;
   let bPlayerOfMatch: PlayerOfMatch | null = null;
 
+  let aLastFinishedMatchId: string | null = null;
+  let bLastFinishedMatchId: string | null = null;
+
   /*
    * ============================================================
    * TABULKY
@@ -283,6 +286,45 @@ export default async function HomePage() {
 
   /*
    * ============================================================
+   * INTERNÍ ID POSLEDNÍCH ODEHRANÝCH ZÁPASŮ
+   * ============================================================
+   *
+   * Tohle ID používá webový DETAIL ZÁPASU.
+   * Pokud jsme už stejné utkání načetli jako Hráče utkání,
+   * vezmeme jeho matchId bez dalšího dotazu.
+   * ============================================================
+   */
+
+  try {
+    const [
+      aFallbackMatchId,
+      bFallbackMatchId,
+    ] = await Promise.all([
+      aPlayerOfMatch
+        ? Promise.resolve(null)
+        : getLatestFinishedMatchId("A"),
+
+      bPlayerOfMatch
+        ? Promise.resolve(null)
+        : getLatestFinishedMatchId("B"),
+    ]);
+
+    aLastFinishedMatchId =
+      aPlayerOfMatch?.matchId ??
+      aFallbackMatchId;
+
+    bLastFinishedMatchId =
+      bPlayerOfMatch?.matchId ??
+      bFallbackMatchId;
+  } catch (error) {
+    console.error(
+      "ID posledních dokončených zápasů:",
+      error,
+    );
+  }
+
+  /*
+   * ============================================================
    * HOMEPAGE
    * ============================================================
    */
@@ -300,11 +342,81 @@ export default async function HomePage() {
         bPlayers={bPlayers}
         aPlayerOfMatch={aPlayerOfMatch}
         bPlayerOfMatch={bPlayerOfMatch}
+        aLastFinishedMatchId={aLastFinishedMatchId}
+        bLastFinishedMatchId={bLastFinishedMatchId}
         transfers={transfers}
       />
     </>
   );
 }
+
+/*
+ * ============================================================
+ * INTERNÍ ID POSLEDNÍHO DOKONČENÉHO ZÁPASU
+ * ============================================================
+ */
+
+async function getLatestFinishedMatchId(
+  team: "A" | "B",
+): Promise<string | null> {
+  const {
+    data,
+    error,
+  } = await supabase
+    .from("finished_matches")
+    .select(
+      [
+        "id",
+        "club_id",
+        "match_title",
+        "team",
+        "date",
+        "time",
+        "finished_at",
+        "player_of_the_match_number",
+      ].join(", "),
+    )
+    .eq("team", team);
+
+  if (error) {
+    console.error(
+      `Nepodařilo se načíst poslední zápas ${team}-týmu:`,
+      error,
+    );
+
+    return null;
+  }
+
+  const matches =
+    (data ?? [])
+      .map((row) =>
+        parseFinishedMatch(row),
+      )
+      .filter(
+        (
+          value,
+        ): value is FinishedMatchRow =>
+          value !== null,
+      )
+      .sort(
+        (
+          left,
+          right,
+        ) =>
+          getFinishedMatchTimestamp(
+            right,
+          ) -
+          getFinishedMatchTimestamp(
+            left,
+          ),
+      );
+
+  return (
+    matches[0]?.id ??
+    null
+  );
+}
+
 
 /*
  * ============================================================
