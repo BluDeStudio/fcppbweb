@@ -1996,3 +1996,68 @@ a.motmBody:hover {
     width: 13px;
   }
 }
+
+
+/* =========================================================
+   TIMELINE — BEZ BODŮ + ČISTÝ BÍLÝ MÍČ
+   ========================================================= */
+
+.minute::before {
+  display: none !important;
+  content: none !important;
+}
+
+/* Necháme pouze čistou svislou osu. */
+.timeline::before {
+  background:
+    linear-gradient(
+      to bottom,
+      transparent,
+      rgba(255,255,255,.14) 5%,
+      rgba(255,255,255,.14) 95%,
+      transparent
+    );
+}
+
+/* Emoji míč vizuálně sjednotíme do čistě bílé. */
+.goalIcon {
+  width: 22px;
+  height: 22px;
+
+  display: grid;
+  place-items: center;
+
+  overflow: hidden;
+
+  color: transparent;
+  font-size: 0;
+
+  filter: none;
+}
+
+.goalIcon::before {
+  content: "⚽";
+
+  display: block;
+
+  color: #fff;
+  font-size: 18px;
+  line-height: 1;
+
+  /* z emoji udělá jednobarevnou bílou siluetu */
+  filter:
+    grayscale(1)
+    brightness(0)
+    invert(1);
+}
+
+@media (max-width: 650px) {
+  .goalIcon {
+    width: 19px;
+    height: 19px;
+  }
+
+  .goalIcon::before {
+    font-size: 16px;
+  }
+}
