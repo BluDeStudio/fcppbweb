@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 
 import { supabase } from "@/lib/supabase";
 import { clubConfig } from "@/config/club";
-import { getMatches } from "@/services/apf/getMatches";
+import { getMatchResults } from "@/services/apf/getMatchResults";
 
 import PlayerAvatar from "./PlayerAvatar";
 import styles from "./MatchDetail.module.css";
@@ -833,38 +833,39 @@ export default async function MatchDetailPage({
         playerOfTheMatch,
     );
 
+  /*
+   * LOGA TÝMŮ
+   *
+   * FC PPB používá vlastní znak.
+   * U soupeře dohledáme APF ID z již existujících výsledků
+   * přes stejný getMatchResults, který používá homepage.
+   */
+  const teamConfig =
+    match.team === "B"
+      ? clubConfig.teams.bTeam
+      : clubConfig.teams.aTeam;
+
   let homeTeamId:
     number | null =
       homeIsOurs
-        ? match.team === "B"
-          ? clubConfig.teams.bTeam.teamId
-          : clubConfig.teams.aTeam.teamId
+        ? teamConfig.teamId
         : null;
 
   let awayTeamId:
     number | null =
       awayIsOurs
-        ? match.team === "B"
-          ? clubConfig.teams.bTeam.teamId
-          : clubConfig.teams.aTeam.teamId
+        ? teamConfig.teamId
         : null;
 
   try {
-    const teamConfig =
-      match.team === "B"
-        ? clubConfig.teams.bTeam
-        : clubConfig.teams.aTeam;
-
-    const apfMatches =
-      await getMatches({
+    const apfResults =
+      await getMatchResults({
         competitionId:
           teamConfig.competition.id,
         competitionSlug:
           teamConfig.competition.slug,
-        teamId:
-          teamConfig.teamId,
-        teamSlug:
-          teamConfig.teamSlug,
+        teamName:
+          teamConfig.teamName,
       });
 
     const normalizedHome =
@@ -873,40 +874,40 @@ export default async function MatchDetailPage({
     const normalizedAway =
       normalize(awayTeam);
 
-    const matchingApfMatch =
-      apfMatches.find(
-        (apfMatch) =>
-          normalize(
-            apfMatch.homeTeam,
-          ) ===
+    const matchingResult =
+      apfResults.find(
+        (result) =>
+          normalize(result.homeTeam) ===
             normalizedHome &&
-          normalize(
-            apfMatch.awayTeam,
-          ) ===
+          normalize(result.awayTeam) ===
             normalizedAway,
       ) ??
-      apfMatches.find(
-        (apfMatch) =>
-          apfMatch.homeScore ===
+      apfResults.find(
+        (result) =>
+          result.homeScore ===
             homeScore &&
-          apfMatch.awayScore ===
-            awayScore,
+          result.awayScore ===
+            awayScore &&
+          (
+            normalize(result.homeTeam) ===
+              normalizedHome ||
+            normalize(result.awayTeam) ===
+              normalizedAway
+          ),
       );
 
-    if (
-      matchingApfMatch
-    ) {
+    if (matchingResult) {
       homeTeamId =
-        matchingApfMatch.homeTeamId ??
+        matchingResult.homeTeamId ??
         homeTeamId;
 
       awayTeamId =
-        matchingApfMatch.awayTeamId ??
+        matchingResult.awayTeamId ??
         awayTeamId;
     }
   } catch (error) {
     console.error(
-      "Detail zápasu – APF logo soupeře:",
+      "Detail zápasu – logo soupeře:",
       error,
     );
   }
