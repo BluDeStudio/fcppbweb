@@ -305,72 +305,98 @@
 .timeline {
   position: relative;
 
-  padding: 18px 20px 24px;
+  padding: 22px 24px 28px;
 }
 
 .timeline::before {
   position: absolute;
-  left: 50%;
-  top: 18px;
-  bottom: 24px;
+  right: 78px;
+  top: 24px;
+  bottom: 28px;
 
   width: 1px;
 
   content: "";
 
   background:
-    rgba(255,255,255,.09);
-
-  transform:
-    translateX(-50%);
+    linear-gradient(
+      to bottom,
+      transparent,
+      rgba(255,255,255,.11) 8%,
+      rgba(255,255,255,.11) 92%,
+      transparent
+    );
 }
 
 .eventRow {
   position: relative;
 
-  min-height: 74px;
+  min-height: 68px;
 
   display: grid;
   grid-template-columns:
     minmax(0,1fr)
-    82px;
+    78px;
   align-items: center;
 }
 
 .eventContent {
+  position: relative;
+
   min-width: 0;
 
-  display: flex;
+  display: grid;
+  grid-template-columns:
+    minmax(0,1fr)
+    auto;
   align-items: center;
-  gap: 13px;
+  gap: 18px;
 
-  padding:
-    10px
-    14px;
+  margin-right: 26px;
+  padding: 12px 4px 12px 14px;
 
-  border:
-    1px solid
-    rgba(255,255,255,.075);
+  border: 0;
+  border-radius: 0;
 
-  border-radius: 10px;
-
-  background:
-    rgba(255,255,255,.018);
+  background: transparent;
 }
 
-.eventHome {
-  margin-right: 16px;
+.eventContent::before {
+  position: absolute;
+  left: 0;
+  top: 13px;
+  bottom: 13px;
+
+  width: 2px;
+
+  content: "";
+
+  background: rgba(255,255,255,.12);
 }
 
+.eventContent::after {
+  position: absolute;
+  right: -26px;
+  top: 50%;
+
+  width: 26px;
+  height: 1px;
+
+  content: "";
+
+  background: rgba(255,255,255,.1);
+}
+
+.eventHome,
 .eventAway {
-  margin-right: 16px;
+  margin-right: 26px;
 }
 
 .eventText {
   min-width: 0;
 
   display: grid;
-  gap: 3px;
+  gap: 4px;
 }
 
 .eventText strong {
@@ -384,10 +410,10 @@
 }
 
 .eventText span {
-  color: rgba(255,255,255,.42);
+  color: rgba(255,255,255,.38);
 
   font-size: 9px;
-  font-weight: 700;
+  font-weight: 750;
 }
 
 .eventBadge {
@@ -395,7 +421,7 @@
 
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
 }
 
 .eventBadge b {
@@ -403,14 +429,22 @@
 
   color: var(--green);
 
-  font-size: 16px;
+  font-size: 17px;
   font-weight: 1000;
 
   text-align: right;
 }
 
 .goalIcon {
-  font-size: 16px;
+  width: 22px;
+  height: 22px;
+
+  display: grid;
+  place-items: center;
+
+  font-size: 15px;
+
+  filter: grayscale(1) brightness(1.65);
 }
 
 .yellowCard,
@@ -435,41 +469,129 @@
 
 .minute {
   position: relative;
-
   z-index: 2;
+
+  min-height: 52px;
 
   display: grid;
   justify-items: center;
-  gap: 2px;
+  align-content: center;
+  gap: 3px;
 }
 
 .minute::before {
   position: absolute;
-  left: 0;
+  left: -5px;
   top: 50%;
 
-  width: 16px;
-  height: 1px;
+  width: 9px;
+  height: 9px;
 
   content: "";
 
-  background:
-    rgba(255,255,255,.09);
+  border: 2px solid #0a0d0b;
+  border-radius: 50%;
+
+  background: var(--green);
+
+  box-shadow:
+    0 0 0 1px rgba(83,242,10,.25),
+    0 0 12px rgba(83,242,10,.18);
+
+  transform: translate(-50%, -50%);
 }
 
 .minute strong {
   color: var(--green);
 
-  font-size: 15px;
+  font-size: 17px;
   font-weight: 1000;
 }
 
 .minute small {
-  color: rgba(255,255,255,.28);
+  color: rgba(255,255,255,.25);
 
   font-size: 5px;
   font-weight: 900;
   letter-spacing: .1em;
+}
+
+/* Naše góly */
+.eventRowFor .eventContent {
+  border: 0;
+  background: transparent;
+}
+
+.eventRowFor .eventContent::before {
+  background:
+    linear-gradient(
+      to bottom,
+      transparent,
+      rgba(83,242,10,.95),
+      transparent
+    );
+
+  box-shadow:
+    0 0 10px rgba(83,242,10,.18);
+}
+
+/* Góly soupeře */
+.eventRowAgainst .eventContent {
+  border: 0;
+  background: transparent;
+}
+
+.eventRowAgainst .eventContent::before {
+  background:
+    linear-gradient(
+      to bottom,
+      transparent,
+      rgba(255,94,94,.95),
+      transparent
+    );
+
+  box-shadow:
+    0 0 10px rgba(255,94,94,.15);
+}
+
+.eventRowAgainst .eventText strong,
+.eventRowAgainst .eventBadge b,
+.eventRowAgainst .minute strong {
+  color: #ff7777;
+}
+
+.eventRowAgainst .minute::before {
+  background: #ff6262;
+
+  box-shadow:
+    0 0 0 1px rgba(255,98,98,.22),
+    0 0 12px rgba(255,98,98,.15);
+}
+
+.cardStat {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 3px !important;
+}
+
+.yellowCardMini,
+.redCardMini {
+  width: 7px;
+  height: 10px;
+
+  display: inline-block;
+
+  border-radius: 1px;
+
+  transform: rotate(2deg);
+}
+
+.yellowCardMini {
+  background: #f0ca2d;
+}
+
+.redCardMini {
+  background: #e23a3a;
 }
 
 .motmCard {
@@ -1593,5 +1715,132 @@ a.motmBody:hover {
 
   .motmRating strong {
     font-size: 25px;
+  }
+}
+
+
+/* =========================================================
+   CLEAN MATCH TIMELINE — RESPONSIVE OVERRIDES
+   ========================================================= */
+
+@media (max-width: 650px) {
+  .timeline {
+    padding: 14px 12px 20px;
+  }
+
+  .timeline::before {
+    left: 60px;
+    right: auto;
+    top: 16px;
+    bottom: 20px;
+  }
+
+  .eventRow {
+    min-height: 72px;
+
+    grid-template-columns:
+      60px
+      minmax(0,1fr);
+  }
+
+  .minute {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .minute::before {
+    left: auto;
+    right: -5px;
+
+    transform:
+      translate(50%, -50%);
+  }
+
+  .eventContent {
+    grid-column: 2;
+    grid-row: 1;
+
+    margin-right: 0;
+    margin-left: 18px;
+
+    padding:
+      11px
+      4px
+      11px
+      12px;
+  }
+
+  .eventHome,
+  .eventAway {
+    margin-right: 0;
+    margin-left: 18px;
+  }
+
+  .eventContent::after {
+    left: -18px;
+    right: auto;
+
+    width: 18px;
+  }
+
+  .eventText strong {
+    font-size: 11px;
+  }
+
+  .eventText span {
+    font-size: 8px;
+  }
+
+  .eventBadge {
+    gap: 7px;
+  }
+
+  .eventBadge b {
+    min-width: 34px;
+
+    font-size: 14px;
+  }
+
+  .goalIcon {
+    width: 18px;
+    height: 18px;
+
+    font-size: 13px;
+  }
+
+  .minute strong {
+    font-size: 15px;
+  }
+}
+
+@media (max-width: 390px) {
+  .timeline {
+    padding-inline: 8px;
+  }
+
+  .timeline::before {
+    left: 54px;
+  }
+
+  .eventRow {
+    grid-template-columns:
+      54px
+      minmax(0,1fr);
+  }
+
+  .eventContent {
+    margin-left: 14px;
+    padding-left: 10px;
+    gap: 8px;
+  }
+
+  .eventHome,
+  .eventAway {
+    margin-left: 14px;
+  }
+
+  .eventContent::after {
+    left: -14px;
+    width: 14px;
   }
 }
