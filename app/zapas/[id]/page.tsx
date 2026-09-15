@@ -958,16 +958,7 @@ export default async function MatchDetailPage({
             styles.hero
           }
         >
-          <div
-            className={
-              styles.heroWatermark
-            }
-            aria-hidden="true"
-          >
-            FC PPB
-          </div>
-
-          <div
+<div
             className={
               styles.heroTop
             }
