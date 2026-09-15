@@ -1114,90 +1114,25 @@ export default async function MatchDetailPage({
                   title="HRÁČ UTKÁNÍ."
                 />
 
-                <div
-                  className={
-                    styles.motmBody
-                  }
-                >
-                  <div
-                    className={
-                      styles.motmRank
-                    }
+                {playerOfTheMatch.apfPlayerId ? (
+                  <Link
+                    href={`/hrac/${playerOfTheMatch.apfPlayerId}`}
+                    className={styles.motmBody}
+                    aria-label={`Otevřít profil hráče ${playerOfTheMatch.name}`}
                   >
-                    1.
-                  </div>
-
-                  <PlayerAvatar
-                    apfPlayerId={
-                      playerOfTheMatch.apfPlayerId
-                    }
-                    name={
-                      playerOfTheMatch.name
-                    }
-                    size="large"
-                  />
-
+                    <PlayerOfMatchContent
+                      player={playerOfTheMatch}
+                    />
+                  </Link>
+                ) : (
                   <div
-                    className={
-                      styles.motmCopy
-                    }
+                    className={styles.motmBody}
                   >
-                    <strong>
-                      {
-                        playerOfTheMatch.name
-                      }
-                    </strong>
-
-                    <span>
-                      {
-                        playerOfTheMatch.position
-                      }
-                    </span>
-
-                    <div
-                      className={
-                        styles.motmStats
-                      }
-                    >
-                      <b>
-                        {
-                          playerOfTheMatch.goals
-                        }
-                        <small>
-                          G
-                        </small>
-                      </b>
-
-                      <b>
-                        {
-                          playerOfTheMatch.assists
-                        }
-                        <small>
-                          A
-                        </small>
-                      </b>
-                    </div>
+                    <PlayerOfMatchContent
+                      player={playerOfTheMatch}
+                    />
                   </div>
-
-                  <div
-                    className={
-                      styles.motmRating
-                    }
-                  >
-                    <small>
-                      ZNÁMKA
-                    </small>
-
-                    <strong>
-                      {playerOfTheMatch.rating !==
-                      null
-                        ? playerOfTheMatch.rating.toFixed(
-                            1,
-                          )
-                        : "—"}
-                    </strong>
-                  </div>
-                </div>
+                )}
               </section>
             ) : null}
 
@@ -1451,6 +1386,87 @@ function EventRow({
         </small>
       </div>
     </div>
+  );
+}
+
+function PlayerOfMatchContent({
+  player,
+}: {
+  player: RatedPlayer;
+}) {
+  return (
+    <>
+      <div
+        className={
+          styles.motmRank
+        }
+      >
+        1.
+      </div>
+
+      <PlayerAvatar
+        apfPlayerId={
+          player.apfPlayerId
+        }
+        name={
+          player.name
+        }
+        size="large"
+      />
+
+      <div
+        className={
+          styles.motmCopy
+        }
+      >
+        <strong>
+          {player.name}
+        </strong>
+
+        <span>
+          {player.position}
+        </span>
+
+        <div
+          className={
+            styles.motmStats
+          }
+        >
+          <b>
+            {player.goals}
+            <small>
+              G
+            </small>
+          </b>
+
+          <b>
+            {player.assists}
+            <small>
+              A
+            </small>
+          </b>
+        </div>
+      </div>
+
+      <div
+        className={
+          styles.motmRating
+        }
+      >
+        <small>
+          ZNÁMKA
+        </small>
+
+        <strong>
+          {player.rating !==
+          null
+            ? player.rating.toFixed(
+                1,
+              )
+            : "—"}
+        </strong>
+      </div>
+    </>
   );
 }
 
