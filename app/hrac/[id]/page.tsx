@@ -4,7 +4,6 @@ import { notFound } from "next/navigation";
 
 import { PlayerRecentMatches } from "@/components/player/PlayerRecentMatches";
 
-import { clubConfig } from "@/config/club";
 import { getPlayerMeta } from "@/data/playerMeta";
 
 import { getPlayerAppStats } from "@/lib/getPlayerAppStats";
@@ -152,6 +151,11 @@ export default async function PlayerPage({
       : meta.team === "b"
         ? "B-tým"
         : "A-tým + B-tým";
+
+  const displayName =
+    splitPlayerName(
+      profile.name,
+    );
 
   /*
    * ========================================
@@ -409,6 +413,22 @@ export default async function PlayerPage({
         >
           <div
             className={
+              styles.heroWatermark
+            }
+            aria-hidden="true"
+          >
+            FC PPB
+          </div>
+
+          <div
+            className={
+              styles.heroGlow
+            }
+            aria-hidden="true"
+          />
+
+          <div
+            className={
               styles.heroContent
             }
           >
@@ -435,38 +455,52 @@ export default async function PlayerPage({
 
             <div
               className={
-                styles.number
+                styles.heroIdentity
               }
             >
-              {number !== null &&
-              number !== undefined
-                ? `#${number}`
-                : "#—"}
-            </div>
+              <span
+                className={
+                  styles.firstName
+                }
+              >
+                {displayName.firstName}
+              </span>
 
-            <h1>
-              {profile.name}
-            </h1>
+              <h1>
+                {displayName.lastName}
+              </h1>
 
-            <div
-              className={
-                styles.playerMeta
-              }
-            >
-              {profile.age !==
-                null && (
+              <div
+                className={
+                  styles.heroDetails
+                }
+              >
+                <strong
+                  className={
+                    styles.number
+                  }
+                >
+                  {number !== null &&
+                  number !== undefined
+                    ? `#${number}`
+                    : "#—"}
+                </strong>
+
+                {profile.age !==
+                  null && (
+                  <span>
+                    {profile.age} let
+                  </span>
+                )}
+
                 <span>
-                  {profile.age} let
+                  {position}
                 </span>
-              )}
 
-              <span>
-                {position}
-              </span>
-
-              <span>
-                {team}
-              </span>
+                <span>
+                  {team}
+                </span>
+              </div>
             </div>
           </div>
 
@@ -476,23 +510,14 @@ export default async function PlayerPage({
             }
           >
             <Image
-              src={
-                `/images/${playerId}.jpg`
-              }
-              alt={
-                profile.name
-              }
+              src={`/images/${playerId}.png`}
+              alt={profile.name}
               fill
               priority
-              sizes="(max-width: 760px) 100vw, 50vw"
+              unoptimized
+              sizes="(max-width: 760px) 92vw, 48vw"
               className={
                 styles.photoImage
-              }
-            />
-
-            <div
-              className={
-                styles.photoShade
               }
             />
           </div>
@@ -865,6 +890,42 @@ export default async function PlayerPage({
  * SEZÓNA APLIKACE
  * ========================================
  */
+
+function splitPlayerName(
+  value: string,
+): {
+  firstName: string;
+  lastName: string;
+} {
+  const parts =
+    value
+      .trim()
+      .split(/\s+/)
+      .filter(Boolean);
+
+  if (parts.length <= 1) {
+    return {
+      firstName: "",
+      lastName:
+        parts[0] ?? "",
+    };
+  }
+
+  /*
+   * APF vrací jméno ve formátu
+   * PŘÍJMENÍ JMÉNO.
+   */
+  const lastName =
+    parts[0];
+
+  const firstName =
+    parts.slice(1).join(" ");
+
+  return {
+    firstName,
+    lastName,
+  };
+}
 
 function findAppSeason(
   seasons:
