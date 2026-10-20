@@ -762,7 +762,7 @@ export default async function PlayerPage({
               appStats?.matches ??
               []
             }
-            limit={8}
+            limit={10}
           />
         </section>
 
@@ -781,8 +781,38 @@ export default async function PlayerPage({
             <details className={styles.seasonRow}>
               <summary>
                 <div className={styles.seasonIdentity}>
-                  <span>Poslední sezóna</span>
-                  <strong>2025/26</strong>
+                  <span>AKTUÁLNÍ SEZÓNA</span>
+                  <strong>{CURRENT_SEASON}</strong>
+                </div>
+
+                <div className={styles.seasonQuickStats}>
+                  <SeasonQuickStat label="Z" value={currentSeasonStats.matches} />
+                  <SeasonQuickStat label="G" value={currentSeasonStats.goals} />
+                  <SeasonQuickStat label="A" value={currentSeasonStats.assists} />
+                  <SeasonQuickStat label="Ø" value={currentSeasonStats.rating !== null ? currentSeasonStats.rating.toFixed(1) : "—"} />
+                </div>
+
+                <i className={styles.seasonToggle} aria-hidden="true">+</i>
+              </summary>
+
+              <div className={styles.seasonExpanded}>
+                <div className={styles.seasonTotalStats}>
+                  <SeasonDetailStat label="Zápasy" value={currentSeasonStats.matches} />
+                  <SeasonDetailStat label="Góly" value={currentSeasonStats.goals} />
+                  <SeasonDetailStat label="Asistence" value={currentSeasonStats.assists} />
+                  <SeasonDetailStat label="ŽK" value={currentSeasonStats.yellowCards} />
+                  <SeasonDetailStat label="ČK" value={currentSeasonStats.redCards} />
+                  <SeasonDetailStat label="Známka" value={currentSeasonStats.rating !== null ? currentSeasonStats.rating.toFixed(1) : "—"} />
+                  <SeasonDetailStat label="Docházka" value={currentSeasonStats.attendance !== null ? `${currentSeasonStats.attendance}%` : "—"} />
+                </div>
+              </div>
+            </details>
+
+            <details className={styles.seasonRow}>
+              <summary>
+                <div className={styles.seasonIdentity}>
+                  <span>POSLEDNÍ SEZÓNA</span>
+                  <strong>{PREVIOUS_SEASON}</strong>
                 </div>
 
                 <div className={styles.seasonQuickStats}>
@@ -844,8 +874,13 @@ export default async function PlayerPage({
             {profile.seasons
               .filter(
                 (season) =>
-                  normalizeSeasonLabel(season.season) !== "2025/26",
+                  !([CURRENT_SEASON, PREVIOUS_SEASON].includes(normalizeSeasonLabel(season.season))),
               )
+              .sort((a, b) => {
+                const aYear = Number(normalizeSeasonLabel(a.season).slice(0, 4));
+                const bYear = Number(normalizeSeasonLabel(b.season).slice(0, 4));
+                return (Number.isFinite(bYear) ? bYear : 0) - (Number.isFinite(aYear) ? aYear : 0);
+              })
               .map((season) => (
                 <details
                   key={`${season.season}-${season.team}`}
@@ -853,7 +888,7 @@ export default async function PlayerPage({
                 >
                   <summary>
                     <div className={styles.seasonIdentity}>
-                      <span>Sezóna</span>
+                      <span>SEZÓNA</span>
                       <strong>{normalizeSeasonLabel(season.season)}</strong>
                     </div>
 
@@ -878,6 +913,7 @@ export default async function PlayerPage({
                   </div>
                 </details>
               ))}
+          </div>
           </div>
         </section>
       </div>
