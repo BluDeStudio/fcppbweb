@@ -3102,3 +3102,44 @@
     height: 73%;
   }
 }
+
+/* =========================================================
+   FC PPB – společný panel hráče a celkové kariéry
+   ========================================================= */
+.heroCareerShell {
+  overflow: hidden;
+  margin-top: 0;
+  border: 1px solid rgba(255, 255, 255, .11);
+  border-radius: 22px;
+  background: linear-gradient(145deg, rgba(12, 21, 14, .98), rgba(5, 10, 7, .99));
+}
+
+.heroCareerShell .hero {
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+}
+
+.heroCareerShell .dashboardSection {
+  margin: 0;
+  padding: 0;
+}
+
+.heroCareerShell .dashboardPanel {
+  margin: 0;
+  border: 0;
+  border-top: 1px solid rgba(255, 255, 255, .09);
+  border-radius: 0;
+  background: linear-gradient(180deg, rgba(10, 19, 12, .94), rgba(7, 14, 9, .98));
+}
+
+/* Záhlaví statistik bez malých pomocných nadpisů. */
+.dashboardHeader > div:first-child {
+  min-width: 0;
+}
+
+@media (max-width: 760px) {
+  .heroCareerShell { border-radius: 17px; }
+  .heroCareerShell .hero { border-radius: 0; }
+  .heroCareerShell .dashboardPanel { padding: 15px; }
+}

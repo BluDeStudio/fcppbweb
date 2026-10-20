@@ -406,6 +406,7 @@ export default async function PlayerPage({
             HERO
         ================================== */}
 
+        <div className={styles.heroCareerShell}>
         <section
           className={
             styles.hero
@@ -543,13 +544,6 @@ export default async function PlayerPage({
               }
             >
               <div>
-                <span
-                  className={
-                    styles.dashboardEyebrow
-                  }
-                >
-                  Kariéra
-                </span>
 
                 <h2>
                   Celková kariéra.
@@ -627,6 +621,8 @@ export default async function PlayerPage({
           </div>
         </section>
 
+        </div>
+
         {/* ==================================
             AKTUÁLNÍ SEZÓNA 2026/27
         ================================== */}
@@ -645,13 +641,6 @@ export default async function PlayerPage({
               }
             >
               <div>
-                <span
-                  className={
-                    styles.dashboardEyebrow
-                  }
-                >
-                  Aktuálně
-                </span>
 
                 <h2>
                   Sezóna{" "}
@@ -748,9 +737,6 @@ export default async function PlayerPage({
               styles.sectionTitle
             }
           >
-            <span>
-              Výkon
-            </span>
 
             <h2>
               Poslední zápasy.
@@ -773,7 +759,6 @@ export default async function PlayerPage({
 
         <section className={styles.history}>
           <div className={styles.sectionTitle}>
-            <span>Historie</span>
             <h2>Přehled sezón.</h2>
           </div>
 
