@@ -1,3 +1,7 @@
+"use client";
+
+import { useMemo, useState } from "react";
+
 import type {
   PlayerAppMatch,
 } from "@/types/playerAppStats";
@@ -13,50 +17,68 @@ type PlayerRecentMatchesProps = {
 
 export function PlayerRecentMatches({
   matches,
-  limit = 6,
 }: PlayerRecentMatchesProps) {
-  const visibleMatches =
-    matches.slice(
-      0,
-      limit,
-    );
+  const [expanded, setExpanded] = useState(false);
 
-  if (
-    visibleMatches.length ===
-    0
-  ) {
+  // Keep the optional `limit` prop in the type for compatibility with existing pages.
+  // The requested preview always contains up to 10 matches.
+  const sortedMatches = useMemo(
+    () =>
+      [...matches].sort((a, b) => {
+        const aDate = parseMatchDate(a.date);
+        const bDate = parseMatchDate(b.date);
+        return bDate - aDate;
+      }),
+    [matches],
+  );
+
+  if (sortedMatches.length === 0) {
     return (
-      <div
-        className={
-          styles.empty
-        }
-      >
-        Z aplikace zatím nemáme
-        žádné dokončené zápasy
-        tohoto hráče.
+      <div className={styles.empty}>
+        Z aplikace zatím nemáme žádné dokončené zápasy tohoto hráče.
       </div>
     );
   }
 
+  const previewCount = 10;
+  const visibleMatches = expanded
+    ? sortedMatches
+    : sortedMatches.slice(0, previewCount);
+  const hasMore = sortedMatches.length > previewCount;
+
   return (
-    <div
-      className={
-        styles.list
-      }
-    >
-      {visibleMatches.map(
-        (
-          match,
-        ) => (
-          <MatchRow
-            key={
-              match.matchId
-            }
-            match={
-              match
-            }
-          />
-        ),
+    <div className={styles.list}>
+      {visibleMatches.map((match) => (
+        <MatchRow key={match.matchId} match={match} />
+      ))}
+
+      {hasMore && (
+        <button
+          type="button"
+          aria-expanded={expanded}
+          onClick={() => setExpanded((previous) => !previous)}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "10px",
+            width: "100%",
+            padding: "15px 20px",
+            marginTop: "8px",
+            border: "1px solid rgba(83, 242, 10, 0.35)",
+            borderRadius: "12px",
+            background: "rgba(83, 242, 10, 0.07)",
+            color: "#baff91",
+            fontSize: "14px",
+            fontWeight: 700,
+            cursor: "pointer",
+          }}
+        >
+          <span aria-hidden="true">{expanded ? "▲" : "▼"}</span>
+          {expanded
+            ? "Sbalit historii zápasů"
+            : `Zobrazit celou historii (${sortedMatches.length} zápasů)`}
+        </button>
       )}
     </div>
   );
@@ -325,30 +347,63 @@ function getRatingClass(
   return styles.ratingRed;
 }
 
-function formatDate(
-  value: string,
-): string {
-  const date =
-    new Date(
-      value,
-    );
+/**
+ * Converts supported match dates to comparable timestamps.
+ * Handles Czech DD.MM.YYYY, ISO YYYY-MM-DD, optional time and ISO timestamps.
+ * Invalid dates sort to the end of the history.
+ */
+function parseMatchDate(value: string): number {
+  const raw = String(value ?? "").trim();
+  if (!raw) return Number.NEGATIVE_INFINITY;
 
-  if (
-    Number.isNaN(
-      date.getTime(),
-    )
-  ) {
-    return value;
+  const czech = raw.match(
+    /^(\d{1,2})\.\s*(\d{1,2})\.\s*(\d{4})(?:[\s,]+(\d{1,2}):(\d{2}))?/,
+  );
+  if (czech) {
+    const [, day, month, year, hour = "0", minute = "0"] = czech;
+    return validDateTimestamp(+year, +month, +day, +hour, +minute);
   }
 
-  return date.toLocaleDateString(
-    "cs-CZ",
-    {
-      day: "2-digit",
-
-      month: "2-digit",
-
-      year: "numeric",
-    },
+  const iso = raw.match(
+    /^(\d{4})-(\d{1,2})-(\d{1,2})(?:[T\s](\d{1,2}):(\d{2}))?/,
   );
+  if (iso) {
+    const [, year, month, day, hour = "0", minute = "0"] = iso;
+    return validDateTimestamp(+year, +month, +day, +hour, +minute);
+  }
+
+  const parsed = Date.parse(raw);
+  return Number.isFinite(parsed) ? parsed : Number.NEGATIVE_INFINITY;
+}
+
+function validDateTimestamp(
+  year: number,
+  month: number,
+  day: number,
+  hour: number,
+  minute: number,
+): number {
+  const timestamp = Date.UTC(year, month - 1, day, hour, minute);
+  const date = new Date(timestamp);
+  if (
+    date.getUTCFullYear() !== year ||
+    date.getUTCMonth() !== month - 1 ||
+    date.getUTCDate() !== day ||
+    date.getUTCHours() !== hour ||
+    date.getUTCMinutes() !== minute
+  ) {
+    return Number.NEGATIVE_INFINITY;
+  }
+  return timestamp;
+}
+
+function formatDate(value: string): string {
+  const timestamp = parseMatchDate(value);
+  if (!Number.isFinite(timestamp)) return value;
+  return new Date(timestamp).toLocaleDateString("cs-CZ", {
+    timeZone: "UTC",
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  });
 }
