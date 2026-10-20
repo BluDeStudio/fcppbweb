@@ -178,6 +178,10 @@ function MatchRow({
               "—"}
           </strong>
 
+          {match.isPlayerOfTheMatch && (
+            <span className={styles.motmDesktop} title="Hráč zápasu">HZ</span>
+          )}
+
           {match.averageRating !==
           null ? (
             <span
