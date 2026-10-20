@@ -651,8 +651,9 @@
 
 
 /* =========================================================
-   DESKTOP: jeden zápas = jeden kompaktní horizontální řádek.
-   Mobilní pravidla výše zůstávají beze změny.
+   DESKTOP – skutečně jeden řádek, větší statistiky uprostřed.
+   Explicitní grid-row: 1 brání přesunutí statistik na druhý řádek,
+   protože jejich HTML pořadí následuje až za výsledkem.
    ========================================================= */
 .motmDesktop {
   display: none;
@@ -661,11 +662,18 @@
 @media (min-width: 761px) {
   .match {
     display: grid;
-    grid-template-columns: minmax(115px, 130px) minmax(140px, 1fr) repeat(4, 49px) minmax(50px, 65px) 30px 44px;
+    grid-template-columns:
+      142px
+      minmax(160px, 1fr)
+      repeat(4, minmax(58px, 78px))
+      75px
+      34px
+      50px;
+    grid-template-rows: minmax(56px, auto);
     align-items: center;
-    column-gap: 8px;
-    min-height: 59px;
-    padding: 9px 13px;
+    column-gap: clamp(6px, 0.75vw, 13px);
+    min-height: 64px;
+    padding: 8px 15px;
   }
 
   .topRow,
@@ -674,58 +682,65 @@
     display: contents;
   }
 
+  .dateTeam,
+  .matchInfo,
+  .miniStat,
+  .score,
+  .motmDesktop,
+  .rating,
+  .ratingEmpty {
+    grid-row: 1;
+    align-self: center;
+  }
+
   .dateTeam {
     grid-column: 1;
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 7px;
     white-space: nowrap;
   }
 
-  .date {
-    font-size: 9px;
-  }
-
+  .date { font-size: 10px; }
   .team {
-    min-height: 20px;
-    padding: 0 7px;
-    font-size: 8px;
+    min-height: 23px;
+    padding: 0 8px;
+    font-size: 9px;
   }
 
   .matchInfo {
     grid-column: 2;
     min-width: 0;
   }
-
   .matchInfo h3 {
-    font-size: 12px;
-    line-height: 1.25;
+    font-size: 14px;
+    line-height: 1.3;
   }
-
-  .meta {
-    display: none;
-  }
+  .meta { display: none; }
 
   .miniStat {
+    display: inline-flex;
     justify-content: center;
+    align-items: center;
+    gap: 6px;
     min-width: 0;
-    min-height: 29px;
-    padding: 0 5px;
-    gap: 4px;
+    min-height: 36px;
+    padding: 0 7px;
+    border-radius: 8px;
   }
-
   .miniStat:nth-child(1) { grid-column: 3; }
   .miniStat:nth-child(2) { grid-column: 4; }
   .miniStat:nth-child(3) { grid-column: 5; }
   .miniStat:nth-child(4) { grid-column: 6; }
-
-  .miniStat span { font-size: 8px; }
-  .miniStat strong { font-size: 12px; }
+  .miniStat span { font-size: 10px; }
+  .miniStat strong { font-size: 15px; }
+  .yellowCard,
+  .redCard { width: 9px; height: 14px; }
 
   .score {
     grid-column: 7;
     min-width: 0;
-    font-size: 20px;
+    font-size: 23px;
     text-align: right;
     white-space: nowrap;
   }
@@ -733,31 +748,29 @@
   .motmDesktop {
     grid-column: 8;
     display: inline-flex;
-    justify-content: center;
     align-items: center;
-    min-height: 20px;
-    padding: 0 4px;
-    border: 1px solid rgba(83, 242, 10, .28);
+    justify-content: center;
+    min-height: 23px;
+    padding: 0 5px;
+    border: 1px solid rgba(83, 242, 10, 0.32);
     border-radius: 999px;
     color: var(--primary);
-    font-size: 8px;
+    font-size: 9px;
     font-weight: 950;
   }
 
   .rating,
   .ratingEmpty {
     grid-column: 9;
-    min-width: 44px;
-    height: 33px;
-    font-size: 13px;
+    min-width: 48px;
+    height: 36px;
+    font-size: 14px;
   }
 
-  .statsRow > .motm {
-    display: none;
-  }
+  .statsRow > .motm { display: none; }
 }
 
-/* Na mobilu je HZ stále na původním místě ve spodním řádku. */
+/* Mobilní rozložení ponecháno přesně podle původního souboru. */
 @media (max-width: 760px) {
   .motmDesktop { display: none; }
 }
