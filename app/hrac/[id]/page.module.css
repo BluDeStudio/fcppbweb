@@ -3143,3 +3143,45 @@
   .heroCareerShell .hero { border-radius: 0; }
   .heroCareerShell .dashboardPanel { padding: 15px; }
 }
+
+/* =========================================================
+   PROFIL: JMENO VYSE, KARIÉRNÍ STATISTIKY HNED POD NÍM
+   Desktop: spolecny panel bez prazdneho prostoru mezi nimi.
+   ========================================================= */
+@media (min-width: 761px) {
+  .heroCareerShell .hero {
+    min-height: 355px;
+    grid-template-columns: minmax(0, 1.15fr) minmax(320px, .85fr);
+  }
+
+  .heroCareerShell .heroContent {
+    justify-content: center;
+    padding: 78px 24px 30px 42px;
+  }
+
+  .heroCareerShell .badges {
+    top: 26px;
+    left: 42px;
+  }
+
+  .heroCareerShell .heroIdentity {
+    transform: translateY(-8px);
+  }
+
+  .heroCareerShell .heroDetails {
+    margin-top: 18px;
+  }
+
+  .heroCareerShell .photo {
+    min-height: 355px;
+  }
+
+  .heroCareerShell .dashboardPanel {
+    padding-top: 20px;
+    padding-bottom: 22px;
+  }
+
+  .heroCareerShell .dashboardHeader {
+    margin-bottom: 12px;
+  }
+}
