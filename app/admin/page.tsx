@@ -13,6 +13,11 @@ export default async function AdminPage() {
       text: "Příchody, odchody, editace a kluby APF.",
     },
     {
+      href: "/admin/clanky",
+      title: "Články",
+      text: "Zprávy z kabiny, rozhovory, koncepty a publikování.",
+    },
+    {
       href: "/admin/hraci",
       title: "Hráči",
       text: "Profily hráčů, A/B tým a propojení na APF + STATPPKA.",

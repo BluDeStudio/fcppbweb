@@ -21,10 +21,7 @@ export function AdminShell({
           <Link href="/admin/prestupy">Přestupy</Link>
           <Link href="/admin/hraci">Hráči</Link>
 
-          <span className={styles.disabled}>
-            Články
-            <small>brzy</small>
-          </span>
+          <Link href="/admin/clanky">Články</Link>
         </nav>
 
         <form action={adminLogout}>
