@@ -3185,3 +3185,158 @@
     margin-bottom: 12px;
   }
 }
+
+/* =========================================================
+   FC PPB – JEDEN SOUVISLÝ PROFILOVÝ PANEL
+   Fotografie sahá od spodního okraje celé karty až za statistiky.
+   ========================================================= */
+.heroCareerShell {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, .11);
+  border-radius: 22px;
+  background: linear-gradient(112deg, #0c170e 0%, #08110a 56%, #050b07 100%);
+}
+
+/* Jemný skutečný klubový znak za hráčem. */
+.heroCareerShell::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  right: 3%;
+  top: 3%;
+  width: min(48%, 500px);
+  aspect-ratio: 1;
+  background: url('/images/fc-ppb-logo.png') center / contain no-repeat;
+  opacity: .055;
+  filter: grayscale(1);
+  pointer-events: none;
+}
+
+.heroCareerShell .hero {
+  position: static;
+  isolation: auto;
+  min-height: 370px;
+  border: 0;
+  border-radius: 0;
+  overflow: visible;
+  background: transparent;
+}
+
+.heroCareerShell .hero::before,
+.heroCareerShell .hero::after,
+.heroCareerShell .heroWatermark {
+  display: none;
+}
+
+.heroCareerShell .heroGlow {
+  z-index: 0;
+  right: 3%;
+  bottom: -5%;
+  opacity: .7;
+}
+
+.heroCareerShell .heroContent {
+  z-index: 4;
+  justify-content: center;
+  padding-top: 82px;
+  padding-bottom: 22px;
+}
+
+.heroCareerShell .heroIdentity {
+  transform: translateY(-12px);
+}
+
+.heroCareerShell .photo {
+  position: absolute;
+  z-index: 2;
+  right: 3%;
+  bottom: 0;
+  top: auto;
+  width: 48%;
+  height: 100%;
+  min-height: 0;
+  pointer-events: none;
+}
+
+.heroCareerShell .photoImage {
+  object-fit: contain !important;
+  object-position: center bottom !important;
+  transform: none;
+}
+
+.heroCareerShell .dashboardSection {
+  position: relative;
+  z-index: 3;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+}
+
+.heroCareerShell .dashboardPanel {
+  position: relative;
+  z-index: 3;
+  margin: 0;
+  padding: 8px 24px 22px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  overflow: visible;
+}
+
+.heroCareerShell .dashboardPanel::after {
+  display: none;
+}
+
+.heroCareerShell .dashboardHeader {
+  position: relative;
+  z-index: 4;
+  margin-bottom: 12px;
+}
+
+.heroCareerShell .metricGrid {
+  position: relative;
+  z-index: 4;
+  border: 1px solid rgba(255,255,255,.09);
+  border-radius: 12px;
+  background: rgba(6, 15, 8, .83);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+@media (max-width: 760px) {
+  .heroCareerShell { border-radius: 17px; }
+  .heroCareerShell::before {
+    right: -18%;
+    top: 15%;
+    width: 95%;
+    opacity: .045;
+  }
+  .heroCareerShell .hero {
+    min-height: 480px;
+  }
+  .heroCareerShell .heroContent {
+    padding: 24px 18px 40px;
+    justify-content: flex-start;
+  }
+  .heroCareerShell .heroIdentity { transform: none; }
+  .heroCareerShell .photo {
+    right: -12%;
+    bottom: 0;
+    width: 105%;
+    height: 76%;
+  }
+  .heroCareerShell .dashboardPanel {
+    padding: 12px 14px 16px;
+  }
+  .heroCareerShell .metricGrid {
+    background: rgba(6, 15, 8, .90);
+  }
+}
+
+@media (max-width: 390px) {
+  .heroCareerShell .hero { min-height: 450px; }
+  .heroCareerShell .photo { right: -16%; width: 112%; }
+}
