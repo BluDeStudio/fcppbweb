@@ -914,7 +914,6 @@ export default async function PlayerPage({
                 </details>
               ))}
           </div>
-          </div>
         </section>
       </div>
     </main>
