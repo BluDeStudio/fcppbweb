@@ -3,7 +3,6 @@
 import Link from "next/link";
 import {
   useEffect,
-  useMemo,
   useState,
   type ReactNode,
 } from "react";
@@ -14,7 +13,6 @@ import type { LeagueRow } from "@/types/league";
 import type { MatchResult } from "@/types/match";
 import type { NextMatch } from "@/types/nextMatch";
 import type { SquadPlayer } from "@/types/player";
-import type { ClubTransfer } from "@/types/transfer";
 
 import styles from "./HomeDashboard.module.css";
 
@@ -31,6 +29,15 @@ export type PlayerOfMatch = {
   matchId: string;
   matchTitle: string;
   matchDate: string;
+};
+
+export type HomeNewsArticle = {
+  id: string;
+  title: string;
+  slug: string;
+  type: "article" | "interview";
+  imageUrl: string | null;
+  publishedAt: string | null;
 };
 
 type Props = {
@@ -52,7 +59,7 @@ type Props = {
   aLastFinishedMatchId: string | null;
   bLastFinishedMatchId: string | null;
 
-  transfers: ClubTransfer[];
+  articles: HomeNewsArticle[];
 };
 
 type Team =
@@ -1058,207 +1065,58 @@ function NewsSection({
 }: {
   props: Props;
 }) {
-  const cards =
-    useMemo(() => {
-      const transferCards =
-        props.transfers
-          .slice(0, 3)
-          .map(
-            (transfer) => ({
-              key:
-                `transfer-${transfer.id}`,
-
-              tag:
-                transfer.direction ===
-                "arrival"
-                  ? "PŘÍCHOD"
-                  : "ODCHOD",
-
-              title:
-                `${transfer.playerName} · ${movementLabel(transfer)}`,
-
-              date:
-                "AKTUALITA KLUBU",
-
-              image:
-                getTransferImage(
-                  transfer,
-                ),
-
-              href:
-                "/prestupy",
-            }),
-          );
-
-      if (
-        transferCards.length >=
-        3
-      ) {
-        return transferCards;
-      }
-
-      const matchCards =
-        [
-          props.aMatches[0]
-            ? {
-                key:
-                  "a-result",
-
-                tag:
-                  "A-TÝM",
-
-                title:
-                  `${props.aMatches[0].homeTeam} ${props.aMatches[0].homeScore}:${props.aMatches[0].awayScore} ${props.aMatches[0].awayTeam}`,
-
-                date:
-                  props.aMatches[0]
-                    .date,
-
-                image:
-                  "/images/fc-ppb-logo.png",
-
-                href:
-                  "/zapasy",
-              }
-            : null,
-
-          props.bMatches[0]
-            ? {
-                key:
-                  "b-result",
-
-                tag:
-                  "B-TÝM",
-
-                title:
-                  `${props.bMatches[0].homeTeam} ${props.bMatches[0].homeScore}:${props.bMatches[0].awayScore} ${props.bMatches[0].awayTeam}`,
-
-                date:
-                  props.bMatches[0]
-                    .date,
-
-                image:
-                  "/images/fc-ppb-logo.png",
-
-                href:
-                  "/zapasy",
-              }
-            : null,
-        ].filter(
-          Boolean,
-        ) as Array<{
-          key: string;
-          tag: string;
-          title: string;
-          date: string;
-          image: string;
-          href: string;
-        }>;
-
-      return [
-        ...transferCards,
-        ...matchCards,
-      ].slice(0, 3);
-    }, [
-      props.transfers,
-      props.aMatches,
-      props.bMatches,
-    ]);
-
-  if (
-    cards.length === 0
-  ) {
-    return null;
-  }
+  const cards = props.articles.slice(0, 3);
 
   return (
-    <section
-      className={
-        styles.section
-      }
-    >
-      <div
-        className={
-          styles.sectionHeaderRow
-        }
-      >
-        <SectionTitle
-          title="ZPRÁVY Z KABINY."
-          compact
-        />
-
-        <Link
-          className={
-            styles.textLink
-          }
-          href="/novinky"
-        >
+    <section className={styles.section}>
+      <div className={styles.sectionHeaderRow}>
+        <SectionTitle title="ZPRÁVY Z KABINY." compact />
+        <Link className={styles.textLink} href="/clanky">
           VŠECHNY NOVINKY →
         </Link>
       </div>
 
-      <div
-        className={
-          styles.newsGrid
-        }
-      >
-        {cards.map(
-          (card) => (
+      {cards.length === 0 ? (
+        <Empty text="Zatím nebyl publikován žádný článek." />
+      ) : (
+        <div className={styles.newsGrid}>
+          {cards.map((card) => (
             <Link
-              href={
-                card.href
-              }
-              className={
-                styles.newsCard
-              }
-              key={
-                card.key
-              }
+              href={`/clanky/${encodeURIComponent(card.slug)}`}
+              className={styles.newsCard}
+              key={card.id}
             >
               <CardSweep />
-
-              <div
-                className={
-                  styles.newsVisual
-                }
-              >
+              <div className={styles.newsVisual}>
                 <img
-                  src={
-                    card.image
-                  }
+                  src={card.imageUrl || "/images/fc-ppb-logo.png"}
                   alt=""
                 />
               </div>
-
-              <div
-                className={
-                  styles.newsShade
-                }
-              />
-
-              <div
-                className={
-                  styles.newsCopy
-                }
-              >
-                <span>
-                  {card.tag}
-                </span>
-
-                <h3>
-                  {card.title}
-                </h3>
-
-                <small>
-                  {card.date}
-                </small>
+              <div className={styles.newsShade} />
+              <div className={styles.newsCopy}>
+                <span>{card.type === "interview" ? "ROZHOVOR" : "ČLÁNEK"}</span>
+                <h3>{card.title}</h3>
+                <small>{formatNewsDate(card.publishedAt)}</small>
               </div>
             </Link>
-          ),
-        )}
-      </div>
+          ))}
+        </div>
+      )}
     </section>
   );
+}
+
+function formatNewsDate(value: string | null): string {
+  if (!value) return "FC PPB";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "FC PPB";
+  return new Intl.DateTimeFormat("cs-CZ", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    timeZone: "Europe/Prague",
+  }).format(date);
 }
 
 /* =========================================================
@@ -2024,53 +1882,6 @@ function aroundOurTeam(
   return rows.slice(
     start,
     end,
-  );
-}
-
-function movementLabel(
-  transfer:
-    ClubTransfer,
-): string {
-  switch (
-    transfer.movementDetail
-  ) {
-    case "transfer_from":
-    case "transfer_to":
-      return "PŘESTUP";
-
-    case "loan_in":
-      return "NA HOSTOVÁNÍ";
-
-    case "loan_out":
-      return "HOSTOVÁNÍ";
-
-    case "loan_end":
-      return "KONEC HOSTOVÁNÍ";
-
-    case "released":
-      return "UKONČENÍ PŮSOBENÍ";
-
-    default:
-      return "ZMĚNA V KÁDRU";
-  }
-}
-
-function getTransferImage(
-  transfer:
-    ClubTransfer,
-): string {
-  if (
-    transfer.playerId &&
-    PNG_PLAYER_IDS.has(
-      transfer.playerId,
-    )
-  ) {
-    return `/images/${transfer.playerId}.png`;
-  }
-
-  return (
-    transfer.imageUrl ||
-    "/images/fc-ppb-logo.png"
   );
 }
 

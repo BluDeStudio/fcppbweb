@@ -1,5 +1,5 @@
 import { HomeDashboard } from "@/components/home/HomeDashboard";
-import type { PlayerOfMatch } from "@/components/home/HomeDashboard";
+import type { PlayerOfMatch, HomeNewsArticle } from "@/components/home/HomeDashboard";
 
 import { clubConfig } from "@/config/club";
 
@@ -8,7 +8,6 @@ import { testSupabaseConnection } from "@/lib/testSupabase";
 
 import {
   getDepartedPlayerIds,
-  getPublishedTransfers,
 } from "@/lib/getTransfers";
 
 import { getLeagueTable } from "@/services/apf/getLeagueTable";
@@ -20,7 +19,6 @@ import type { LeagueRow } from "@/types/league";
 import type { MatchResult } from "@/types/match";
 import type { NextMatch } from "@/types/nextMatch";
 import type { SquadPlayer } from "@/types/player";
-import type { ClubTransfer } from "@/types/transfer";
 
 /*
  * ============================================================
@@ -76,7 +74,7 @@ export default async function HomePage() {
   let aPlayers: SquadPlayer[] = [];
   let bPlayers: SquadPlayer[] = [];
 
-  let transfers: ClubTransfer[] = [];
+  let articles: HomeNewsArticle[] = [];
 
   let aPlayerOfMatch: PlayerOfMatch | null = null;
   let bPlayerOfMatch: PlayerOfMatch | null = null;
@@ -223,13 +221,7 @@ export default async function HomePage() {
    */
 
   try {
-    const [published, departed] =
-      await Promise.all([
-        getPublishedTransfers(),
-        getDepartedPlayerIds(),
-      ]);
-
-    transfers = published;
+    const departed = await getDepartedPlayerIds();
 
     aPlayers = aPlayers.filter(
       (player) =>
@@ -242,6 +234,36 @@ export default async function HomePage() {
     );
   } catch (error) {
     console.error("Přestupy:", error);
+  }
+
+  /*
+   * ============================================================
+   * ZPRÁVY Z KABINY – 3 NEJNOVĚJŠÍ PUBLIKOVANÉ ČLÁNKY
+   * ============================================================
+   */
+
+  try {
+    const { data, error } = await supabase
+      .from("web_articles")
+      .select("id, title, slug, type, cover_image_url, published_at")
+      .eq("published", true)
+      .order("published_at", { ascending: false })
+      .limit(3);
+
+    if (error) {
+      console.error("Články homepage:", error);
+    } else {
+      articles = (data ?? []).map((item) => ({
+        id: String(item.id),
+        title: String(item.title),
+        slug: String(item.slug),
+        type: item.type === "interview" ? "interview" : "article",
+        imageUrl: item.cover_image_url ?? null,
+        publishedAt: item.published_at ?? null,
+      }));
+    }
+  } catch (error) {
+    console.error("Načítání článků homepage:", error);
   }
 
   /*
@@ -347,7 +369,7 @@ export default async function HomePage() {
         bPlayerOfMatch={bPlayerOfMatch}
         aLastFinishedMatchId={aLastFinishedMatchId}
         bLastFinishedMatchId={bLastFinishedMatchId}
-        transfers={transfers}
+        articles={articles}
       />
     </>
   );
