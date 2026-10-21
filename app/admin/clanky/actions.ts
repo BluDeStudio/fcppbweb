@@ -32,6 +32,16 @@ export async function saveArticle(data: FormData) {
     player = result.data;
   }
   const published = field(data, "published") === "true";
+  const upload = data.get("coverFile");
+  const removeCover = field(data, "removeCover") === "true";
+  let coverImageUrl: string | null | undefined;
+  if (upload instanceof File && upload.size > 0) {
+    if (upload.type !== "image/webp" || upload.size > 2 * 1024 * 1024) redirect("/admin/clanky?error=image");
+    const fileName = `${crypto.randomUUID()}.webp`;
+    const { error: uploadError } = await db.storage.from("article-covers").upload(fileName, upload, { contentType: "image/webp", upsert: false });
+    if (uploadError) { console.error("Article image upload", uploadError); redirect("/admin/clanky?error=upload"); }
+    coverImageUrl = db.storage.from("article-covers").getPublicUrl(fileName).data.publicUrl;
+  } else if (removeCover) coverImageUrl = null;
   let oldPublishedAt: string | null = null;
   if (id) {
     const old = await db.from("web_articles").select("published_at").eq("id", id).single();
@@ -43,6 +53,7 @@ export async function saveArticle(data: FormData) {
     player_id: player?.id ?? null, player_name: player?.name ?? null,
     player_apf_id: player?.apf_player_id ?? null,
     player_image_url: player?.apf_player_id ? `/images/${player.apf_player_id}.png` : null,
+    ...(coverImageUrl !== undefined ? { cover_image_url: coverImageUrl } : {}),
     published, published_at: published ? oldPublishedAt ?? new Date().toISOString() : null,
     updated_at: new Date().toISOString(),
   };
