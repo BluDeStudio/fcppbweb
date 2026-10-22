@@ -13,29 +13,10 @@ export function ArticleShare({ slug, title }: Props) {
   const [notice, setNotice] = useState("");
 
   const url = `https://www.fcppb.cz/clanky/${encodeURIComponent(slug)}`;
-  const storyUrl = `/clanky/${encodeURIComponent(slug)}/story`;
-
-  function instagram() {
-    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-
-    if (isIOS) {
-      window.open(storyUrl, "_blank");
-      setNotice(
-        "Ulož obrázek do Fotek, otevři Instagram Stories a přidej nálepku Odkaz."
-      );
-      return;
-    }
-
-    const link = document.createElement("a");
-    link.href = storyUrl;
-    link.download = `FC-PPB-story-${slug}.png`;
-    link.click();
-
-    setNotice("Ulož grafiku a vlož ji do Instagram Stories.");
-  }
 
   function whatsapp() {
     const message = `${title}\n${url}`;
+
     window.open(
       `https://wa.me/?text=${encodeURIComponent(message)}`,
       "_blank",
@@ -57,34 +38,6 @@ export function ArticleShare({ slug, title }: Props) {
       <span className={styles.label}>SDÍLET</span>
 
       <div className={styles.icons}>
-        <button
-          type="button"
-          className={styles.iconButton}
-          onClick={instagram}
-          aria-label="Připravit grafiku pro Instagram Stories"
-          title="Instagram Stories"
-        >
-          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <rect
-              x="3"
-              y="3"
-              width="18"
-              height="18"
-              rx="5"
-              stroke="currentColor"
-              strokeWidth="1.8"
-            />
-            <circle
-              cx="12"
-              cy="12"
-              r="4"
-              stroke="currentColor"
-              strokeWidth="1.8"
-            />
-            <circle cx="17.5" cy="6.5" r="1.2" fill="currentColor" />
-          </svg>
-        </button>
-
         <button
           type="button"
           className={styles.iconButton}

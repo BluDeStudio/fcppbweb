@@ -1,75 +1,70 @@
 
 .wrap {
+  width: 100%;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: 12px;
-  padding: 18px 0;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 22px 12px 28px;
+  box-sizing: border-box;
   border-bottom: 1px solid #273129;
 }
 
 .label {
-  color: #8c938e;
+  color: #aab5ac;
   font-size: 13px;
   font-weight: 900;
-  letter-spacing: 0.045em;
+  letter-spacing: 0.08em;
+  text-align: center;
 }
 
 .icons {
   display: flex;
+  width: 100%;
+  max-width: 180px;
   align-items: center;
-  gap: 18px;
+  justify-content: space-evenly;
+  gap: 24px;
 }
 
 .iconButton {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
-  padding: 4px;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  padding: 8px;
   border: 0;
-  border-radius: 7px;
+  border-radius: 10px;
   background: transparent;
-  color: #a9b0aa;
+  color: #b9c3ba;
   cursor: pointer;
-  transition:
-    color 0.2s ease,
-    transform 0.2s ease,
-    background 0.2s ease;
+  transition: color 0.2s ease, background 0.2s ease;
 }
 
 .iconButton svg {
-  width: 23px;
-  height: 23px;
+  display: block;
+  width: 25px;
+  height: 25px;
 }
 
 .iconButton:hover {
-  color: #72ef3c;
+  color: #75ed3b;
   background: #17251a;
-  transform: translateY(-2px);
 }
 
 .iconButton:focus-visible {
-  outline: 2px solid #72ef3c;
+  outline: 2px solid #75ed3b;
   outline-offset: 3px;
 }
 
 .notice {
-  margin: 2px 0 0;
+  max-width: 320px;
+  margin: 0;
   color: #82ee5c;
   font-size: 12px;
   line-height: 1.5;
-  max-width: 360px;
-}
-
-@media (max-width: 640px) {
-  .icons {
-    gap: 20px;
-  }
-
-  .iconButton {
-    width: 36px;
-    height: 36px;
-  }
+  text-align: center;
 }
