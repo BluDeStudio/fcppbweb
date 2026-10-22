@@ -39,3 +39,9 @@
   .qa h2 { font-size: 15px; }
   .playerLink { margin: 0 20px 25px; }
 }
+
+/* Kategorie a sdílení v horní části článku */
+.topRow { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 36px; }
+@media (max-width: 520px) {
+  .topRow { gap: 8px; }
+}
