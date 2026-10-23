@@ -1555,3 +1555,8 @@ and
       none !important;
   }
 }
+/* Jednotna vyska hlavniho nadpisu podle ZPRAVY Z KABINY */
+.page .hero { min-height: 0; display: block; overflow: visible; border-bottom: 0; background: #050605; }
+.page .heroInner { width: min(1320px, calc(100% - 48px)); padding: 56px 0 0; }
+.page .heroGlow, .page .heroLogo { display: none; }
+@media (max-width: 700px) { .page .heroInner { width: min(1320px, calc(100% - 32px)); padding-top: 32px; } }

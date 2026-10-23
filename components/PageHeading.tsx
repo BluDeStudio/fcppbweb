@@ -1,10 +1,14 @@
 import styles from "./PageHeading.module.css";
 
 type Props = { title: string; subtitle?: string; compact?: boolean };
-export default function PageHeading({ title, subtitle, compact = false }: Props) {
-  return <header className={`${styles.heading} ${compact ? styles.compact : ""}`}>
-    <div className={styles.headingText}><h1>{title}<span>.</span></h1>
-      {subtitle && <p>{subtitle}</p>}
-    </div>
-  </header>;
+
+export default function PageHeading({ title, subtitle }: Props) {
+  return (
+    <header className={styles.wrapper}>
+      <div className={styles.heading}>
+        <h1>{title.replace(/\.$/, "")}.</h1>
+      </div>
+      {subtitle && <p className={styles.subtitle}>{subtitle}</p>}
+    </header>
+  );
 }
