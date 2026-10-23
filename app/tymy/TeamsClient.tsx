@@ -8,6 +8,7 @@ import {
 } from "react";
 
 import styles from "./Teams.module.css";
+import PageHeading from "@/components/PageHeading";
 
 export type SquadTeam =
   | "a"
@@ -650,22 +651,8 @@ export default function TeamsClient({
           aria-hidden="true"
         />
 
-        <div
-          className={
-            styles.heroInner
-          }
-        >
-          <span>
-            FC PPB · FUTSAL PLZEŇ
-          </span>
-
-          <h1>
-            TÝMY.
-          </h1>
-
-          <p>
-            SOUPISKA · STATISTIKY · VÝKONY
-          </p>
+        <div className={styles.heroInner}>
+          <PageHeading title="TÝMY" subtitle="SOUPISKA / STATISTIKY / VÝKONY" compact />
         </div>
       </section>
 

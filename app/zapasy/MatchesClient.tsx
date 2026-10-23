@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import type { SeasonMatch } from "@/services/apf/getSeasonMatches";
 import styles from "./Matches.module.css";
+import PageHeading from "@/components/PageHeading";
 
 type Row = SeasonMatch & { detailId: string | null };
 type Filter = "all" | "played" | "upcoming";
@@ -32,8 +33,7 @@ export default function MatchesClient({ matches, season }: { matches: Row[]; sea
   };
   const visible = useMemo(() => matches.filter(m => m.team === team && (filter === "all" || (filter === "played" ? m.homeScore !== null : m.homeScore === null))).sort((a,b) => a.sortDate.localeCompare(b.sortDate)), [matches, team, filter]);
   return <main className={styles.page}><div className={styles.shell}>
-    <h1 className={styles.title}>ZÁPASY<span>.</span></h1>
-    <p className={styles.intro}>PŘEHLED ZÁPASŮ <span className={styles.separator}>/</span> SEZÓNA {season} <span className={styles.separator}>/</span> {team === "A" ? "1. B TŘÍDA" : "2. B TŘÍDA"}</p>
+    <PageHeading title="ZÁPASY" subtitle={`PŘEHLED ZÁPASŮ / SEZÓNA ${season} / ${team === "A" ? "1. B TŘÍDA" : "2. B TŘÍDA"}`} />
     <div className={styles.toolbar}>
       <div className={styles.tabs} aria-label="Výběr týmu">
         {(["A", "B"] as const).map(t => <button key={t} type="button" className={team === t ? styles.active : ""} onClick={() => updateSelection(t, filter)}>{t}-TÝM</button>)}
