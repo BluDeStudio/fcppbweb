@@ -32,6 +32,11 @@ export async function saveArticle(data: FormData) {
     player = result.data;
   }
   const published = field(data, "published") === "true";
+  const suppliedPublishedAt = field(data, "publishedAt");
+  const parsedPublishedAt = suppliedPublishedAt ? new Date(suppliedPublishedAt) : null;
+  if (suppliedPublishedAt && (!parsedPublishedAt || Number.isNaN(parsedPublishedAt.getTime()))) {
+    redirect("/admin/clanky?error=date");
+  }
   const upload = data.get("coverFile");
   const removeCover = field(data, "removeCover") === "true";
   let coverImageUrl: string | null | undefined;
@@ -54,7 +59,7 @@ export async function saveArticle(data: FormData) {
     player_apf_id: player?.apf_player_id ?? null,
     player_image_url: player?.apf_player_id ? `/images/${player.apf_player_id}.png` : null,
     ...(coverImageUrl !== undefined ? { cover_image_url: coverImageUrl } : {}),
-    published, published_at: published ? oldPublishedAt ?? new Date().toISOString() : null,
+    published, published_at: parsedPublishedAt?.toISOString() ?? oldPublishedAt ?? (published ? new Date().toISOString() : null),
     updated_at: new Date().toISOString(),
   };
   const result = id ? await db.from("web_articles").update(payload).eq("id", id) : await db.from("web_articles").insert(payload);
