@@ -1,6 +1,7 @@
 import * as cheerio from "cheerio";
 import { clubConfig } from "@/config/club";
 import { fetchApfPage } from "./fetchApfPage";
+import { getMatchResults } from "./getMatchResults";
 
 export type SeasonMatch = {
   key: string;
@@ -37,7 +38,7 @@ function parseDate(raw: string) {
   return { date: `${day}. ${month}. ${year}`, sortDate, time: match[4] ? `${match[4].padStart(2, "0")}:${match[5]}` : "" };
 }
 
-export async function getSeasonMatches(team: "A" | "B"): Promise<SeasonMatch[]> {
+async function getScheduleMatches(team: "A" | "B"): Promise<SeasonMatch[]> {
   const config = team === "A" ? clubConfig.teams.aTeam : clubConfig.teams.bTeam;
   const html = await fetchApfPage(`/soutez/${config.competition.id}/${config.competition.slug}/rozpis`);
   const $ = cheerio.load(html);
@@ -77,4 +78,87 @@ export async function getSeasonMatches(team: "A" | "B"): Promise<SeasonMatch[]> 
     });
   });
   return matches;
+}
+
+
+/** Kombinuje plánované zápasy z rozpisu a odehrané zápasy z výsledků APF. */
+export async function getSeasonMatches(team: "A" | "B"): Promise<SeasonMatch[]> {
+  const config = team === "A" ? clubConfig.teams.aTeam : clubConfig.teams.bTeam;
+  const [scheduleResponse, resultsResponse] = await Promise.allSettled([
+    getScheduleMatches(team),
+    getMatchResults({
+      competitionId: config.competition.id,
+      competitionSlug: config.competition.slug,
+      teamName: config.teamName,
+    }),
+  ]);
+
+  if (scheduleResponse.status === "rejected") {
+    console.error(`APF ${team} rozpis:`, scheduleResponse.reason);
+  }
+  if (resultsResponse.status === "rejected") {
+    console.error(`APF ${team} výsledky:`, resultsResponse.reason);
+  }
+  if (scheduleResponse.status === "rejected" && resultsResponse.status === "rejected") {
+    throw new Error(`Nepodařilo se načíst rozpis ani výsledky APF pro ${team}-tým.`);
+  }
+
+  const schedule = scheduleResponse.status === "fulfilled" ? scheduleResponse.value : [];
+  const results = resultsResponse.status === "fulfilled" ? resultsResponse.value : [];
+  const combined = new Map<string, SeasonMatch>();
+
+  const identity = (m: SeasonMatch) => {
+    // APF ID je nejpřesnější identifikátor; záložně datum + oba týmy.
+    if (m.apfId !== null) return `apf-${m.apfId}`;
+    return `fixture-${m.sortDate}-${normalize(m.home)}-${normalize(m.away)}`;
+  };
+
+  const sameFixture = (a: SeasonMatch, b: SeasonMatch) =>
+    (a.apfId !== null && b.apfId !== null && a.apfId === b.apfId) ||
+    (Boolean(a.sortDate) && a.sortDate === b.sortDate &&
+      normalize(a.home) === normalize(b.home) && normalize(a.away) === normalize(b.away));
+
+  for (const match of schedule) combined.set(identity(match), match);
+
+  for (const result of results) {
+    const parsed = parseDate(result.date);
+    const played: SeasonMatch = {
+      key: `${team}-${result.id}`,
+      team,
+      date: parsed.date,
+      sortDate: parsed.sortDate,
+      time: parsed.time,
+      round: "",
+      home: result.homeTeam,
+      away: result.awayTeam,
+      homeId: result.homeTeamId,
+      awayId: result.awayTeamId,
+      homeScore: result.homeScore,
+      awayScore: result.awayScore,
+      apfId: result.id,
+    };
+
+    const existingEntry = [...combined.entries()].find(([, item]) => sameFixture(item, played));
+    if (existingEntry) {
+      const [oldKey, old] = existingEntry;
+      combined.delete(oldKey);
+      // Rozpis může mít přesnější čas a kolo; výsledky jsou zdrojem skóre.
+      combined.set(identity(played), {
+        ...old,
+        ...played,
+        date: old.date || played.date,
+        sortDate: old.sortDate || played.sortDate,
+        time: old.time || played.time,
+        round: old.round || played.round,
+        homeId: played.homeId ?? old.homeId,
+        awayId: played.awayId ?? old.awayId,
+      });
+    } else {
+      combined.set(identity(played), played);
+    }
+  }
+
+  return [...combined.values()].sort((a, b) =>
+    a.sortDate.localeCompare(b.sortDate) || a.time.localeCompare(b.time)
+  );
 }
