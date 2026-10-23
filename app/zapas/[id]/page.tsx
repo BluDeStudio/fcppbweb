@@ -6,6 +6,7 @@ import { clubConfig } from "@/config/club";
 import { getMatchResults } from "@/services/apf/getMatchResults";
 
 import PlayerAvatar from "./PlayerAvatar";
+import BackToPrevious from "./BackToPrevious";
 import styles from "./MatchDetail.module.css";
 
 type PageProps = {
@@ -956,14 +957,7 @@ export default async function MatchDetailPage({
           styles.shell
         }
       >
-        <Link
-          href="/"
-          className={
-            styles.backLink
-          }
-        >
-          ← ZPĚT NA HLAVNÍ STRÁNKU
-        </Link>
+        <BackToPrevious className={styles.backLink} />
 
         <section
           className={
