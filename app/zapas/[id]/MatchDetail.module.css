@@ -2535,3 +2535,28 @@ a.motmBody:hover {
     font-size: 10px;
   }
 }
+
+/* Vlastní PNG míč v průběhu utkání */
+.goalIcon {
+  width: 27px !important;
+  height: 27px !important;
+  flex: 0 0 27px !important;
+  display: grid !important;
+  place-items: center !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+.goalIcon img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+@media (max-width: 650px) {
+  .goalIcon {
+    width: 23px !important;
+    height: 23px !important;
+    flex-basis: 23px !important;
+  }
+}
