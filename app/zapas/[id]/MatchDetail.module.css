@@ -2656,3 +2656,19 @@ a.motmBody:hover {
   .scoreBlock { margin-top: 45px; }
   .scoreBlock > strong { font-size: 38px; }
 }
+
+/* Mobil: menší loga, bezpečný prostor bez ořezu */
+@media (max-width: 650px) {
+  .scoreboard { grid-template-columns: minmax(0, 1fr) minmax(88px, auto) minmax(0, 1fr); min-height: 225px; padding: 26px 10px 28px; align-items: start; }
+  .team { grid-template-rows: 76px minmax(30px, auto); row-gap: 10px; align-content: start; }
+  .teamLogo { width: 70px; height: 70px; max-width: 100%; overflow: visible; align-self: center; justify-self: center; }
+  .teamLogo img { width: 100%; height: 100%; object-fit: contain; object-position: center; }
+  .team > strong { align-self: start; font-size: clamp(12px, 3.4vw, 16px); line-height: 1.15; }
+  .scoreBlock { margin-top: 34px; }
+}
+@media (max-width: 390px) {
+  .scoreboard { grid-template-columns: minmax(0, 1fr) 82px minmax(0, 1fr); }
+  .team { grid-template-rows: 70px minmax(30px, auto); }
+  .teamLogo { width: 64px; height: 64px; }
+  .scoreBlock { margin-top: 30px; }
+}
