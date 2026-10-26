@@ -17,11 +17,10 @@ function dateKey(raw: string | null) {
 function matchDbId(match: SeasonMatch, rows: Finished[]) {
   const teamRows = rows.filter(row => (row.team || "A").toUpperCase() === match.team);
   const dated = teamRows.filter(row => dateKey(row.date) === match.sortDate);
-  if (dated.length === 1) return dated[0].id;
   const home = normalize(match.home), away = normalize(match.away);
   const named = dated.filter(row => {
     const title = normalize(row.match_title || "");
-    return title.includes(home) && title.includes(away);
+    return home.length > 0 && away.length > 0 && title.includes(home) && title.includes(away);
   });
   return named.length === 1 ? named[0].id : null;
 }
