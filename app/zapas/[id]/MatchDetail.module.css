@@ -2562,54 +2562,97 @@ a.motmBody:hover {
 }
 
 
-/* MOBILE SCOREBOARD: izolované sloupce pro loga a názvy */
+/* MOBILE SCOREBOARD — pevné oddělení log, názvů a skóre.
+   Nahrazuje předchozí mobilní pravidla, nikoli další překryv. */
 @media (max-width: 650px) {
   .scoreboard {
-    grid-template-columns: minmax(0, 1fr) minmax(76px, auto) minmax(0, 1fr);
-    column-gap: 6px;
-    align-items: center;
-    padding: 24px 10px 30px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(88px, auto) minmax(0, 1fr);
+    align-items: start;
+    gap: 4px;
+    padding: 28px 10px 36px;
+    min-height: 260px;
   }
+
   .team {
-    width: 100%;
-    min-width: 0;
-    grid-template-rows: 96px minmax(65px, auto);
-    row-gap: 12px;
+    display: grid;
+    grid-template-rows: 96px auto;
+    align-content: start;
     justify-items: center;
-    align-self: stretch;
+    align-items: start;
+    align-self: start;
+    gap: 12px;
+    min-width: 0;
+    width: 100%;
   }
+
   .teamLogo {
+    box-sizing: border-box;
     width: min(88px, 100%);
     height: 88px;
     max-width: 100%;
-    align-self: end;
+    align-self: center;
+    justify-self: center;
+    overflow: hidden;
   }
+
   .teamLogo img {
+    display: block;
     width: 100%;
     height: 100%;
+    max-width: 100%;
+    max-height: 100%;
     object-fit: contain;
   }
+
   .team > strong {
     display: block;
+    box-sizing: border-box;
     width: 100%;
     max-width: 100%;
     min-width: 0;
     margin: 0;
     padding: 0;
-    font-size: clamp(12px, 3.45vw, 17px);
-    line-height: 1.06;
-    letter-spacing: -0.035em;
+    align-self: start;
+    font-size: clamp(12px, 3.4vw, 16px);
+    line-height: 1.12;
+    letter-spacing: -0.025em;
     text-align: center;
     overflow-wrap: anywhere;
     word-break: normal;
   }
-  .scoreBlock { min-width: 0; align-self: center; }
-  .scoreBlock > strong { font-size: clamp(40px, 12vw, 60px); gap: 4px; }
+
+  .scoreBlock {
+    min-width: 0;
+    align-self: start;
+    margin-top: 52px;
+    gap: 8px;
+  }
+
+  .scoreBlock > strong {
+    font-size: clamp(38px, 11vw, 56px);
+    gap: 4px;
+  }
 }
+
 @media (max-width: 390px) {
-  .scoreboard { grid-template-columns: minmax(0, 1fr) minmax(70px, auto) minmax(0, 1fr); gap: 4px; }
-  .team { grid-template-rows: 84px minmax(65px, auto); row-gap: 10px; }
-  .teamLogo { width: min(78px, 100%); height: 78px; }
+  .scoreboard {
+    grid-template-columns: minmax(0, 1fr) 82px minmax(0, 1fr);
+    gap: 3px;
+    padding-inline: 8px;
+  }
+
+  .team {
+    grid-template-rows: 84px auto;
+    gap: 10px;
+  }
+
+  .teamLogo {
+    width: min(76px, 100%);
+    height: 76px;
+  }
+
   .team > strong { font-size: 12px; }
-  .scoreBlock > strong { font-size: 40px; }
+  .scoreBlock { margin-top: 45px; }
+  .scoreBlock > strong { font-size: 38px; }
 }
