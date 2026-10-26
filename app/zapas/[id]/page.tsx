@@ -481,19 +481,20 @@ export default async function MatchDetailPage({
                 stat.average_rating,
               );
 
-            const rawRatings =
-              stat.player_id
-                ? ratingByPlayerId.get(
-                    stat.player_id,
-                  ) ?? []
-                : stat.player_number !==
-                    null
-                  ? ratingByNumber.get(
-                      Number(
-                        stat.player_number,
-                      ),
-                    ) ?? []
-                  : [];
+            // Preferujeme hlasovani podle ID hrace. U starsich
+            // zapasu jsou hlasy ulozene jen pod cislem dresu.
+            // Pokud pro ID neexistuji hlasy, pouzijeme cislo dresu.
+            const ratingsById = stat.player_id
+              ? ratingByPlayerId.get(stat.player_id) ?? []
+              : [];
+
+            const ratingsByNumber = stat.player_number !== null
+              ? ratingByNumber.get(Number(stat.player_number)) ?? []
+              : [];
+
+            const rawRatings = ratingsById.length > 0
+              ? ratingsById
+              : ratingsByNumber;
 
             const fallbackRating =
               rawRatings.length >
