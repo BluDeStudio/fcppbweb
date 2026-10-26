@@ -1843,32 +1843,8 @@ function findFinishedMatchByLegacySlug(
     return candidates[0];
   }
 
-  // Poslední kompatibilní fallback:
-  // datum + tým, i když starý slug a match_title nejsou zapsané stejně.
-  const byDate =
-    matches.filter(
-      (match) =>
-        !wantedDate ||
-        normalizeDateForLookup(match.date) ===
-          wantedDate,
-    );
-
-  if (teamHint) {
-    return (
-      byDate.find(
-        (match) =>
-          String(match.team ?? "")
-            .trim()
-            .toUpperCase() ===
-          teamHint,
-      ) ??
-      null
-    );
-  }
-
-  return byDate.length === 1
-    ? byDate[0]
-    : null;
+  // Bez shody nazvu nesmime otevrit jine utkani jen podle data a tymu.
+  return null;
 }
 
 function normalizeDateForLookup(
