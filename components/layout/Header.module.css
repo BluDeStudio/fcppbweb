@@ -225,3 +225,47 @@
     transform: translateY(-8px) rotate(-45deg);
   }
 }
+
+/* Mobilní panel je portálem vložen přímo do body, aby jej
+   backdrop-filter a výška hlavičky neomezovaly. */
+@media (max-width: 1000px) {
+  .headerOpen {
+    z-index: 1201;
+    background: #020403;
+  }
+
+  .mobilePanel {
+    position: fixed;
+    top: 68px;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1200;
+    box-sizing: border-box;
+    width: 100%;
+    height: calc(100dvh - 68px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    background: #050705;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: transform .25s ease, opacity .2s ease, visibility .25s;
+  }
+
+  .mobilePanelOpen {
+    transform: translateX(0);
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+  }
+
+  .mobileSocials {
+    position: relative;
+    right: auto;
+    bottom: auto;
+    left: auto;
+    margin-top: 30px;
+    padding-bottom: 30px;
+  }
+}

@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 
 import { navigation } from "@/data/navigation";
 
@@ -17,6 +18,11 @@ const INSTAGRAM_URL =
 export function Header() {
   const [open, setOpen] =
     useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     document.body.style.overflow =
@@ -29,7 +35,8 @@ export function Header() {
   }, [open]);
 
   return (
-    <header className={styles.header}>
+    <>
+    <header className={`${styles.header} ${open ? styles.headerOpen : ""}`}>
       <div className={styles.inner}>
         <Link
           href="/"
@@ -99,6 +106,7 @@ export function Header() {
               (value) => !value,
             )
           }
+          aria-controls="fc-ppb-mobile-menu"
           aria-expanded={open}
           aria-label={
             open
@@ -112,7 +120,11 @@ export function Header() {
         </button>
       </div>
 
+    </header>
+    {mounted && createPortal(
       <div
+        id="fc-ppb-mobile-menu"
+        aria-hidden={!open}
         className={`${styles.mobilePanel} ${
           open
             ? styles.mobilePanelOpen
@@ -172,6 +184,7 @@ export function Header() {
           </div>
         </div>
       </div>
-    </header>
+    , document.body)}
+    </>
   );
 }
