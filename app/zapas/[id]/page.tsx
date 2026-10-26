@@ -120,8 +120,16 @@ export default async function MatchDetailPage({
   const resolvedParams =
     await params;
 
-  const matchId =
-    resolvedParams.id;
+  // Next.js muze predat ID jako URL-encoded retezec (napr. Plze%C5%88).
+  // Pro dotaz do Supabase pouzivame skutecne UTF-8 ID.
+  const rawMatchId = resolvedParams.id;
+  let matchId = rawMatchId;
+  try {
+    matchId = decodeURIComponent(rawMatchId);
+  } catch {
+    // Neplatne URL kodovani: zachovame puvodni hodnotu.
+    matchId = rawMatchId;
+  }
 
   const matchSelect = [
     "id",
@@ -179,6 +187,11 @@ export default async function MatchDetailPage({
   }
 
   if (!matchData) {
+    console.error("Detail zápasu – záznam nenalezen", {
+      rawMatchId,
+      matchId,
+      directError: directResult.error?.message ?? null,
+    });
     notFound();
   }
 
